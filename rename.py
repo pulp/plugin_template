@@ -62,7 +62,7 @@ def main():
         parser.print_help()
         return 2
 
-    pulp_plugin_name = 'pulp_' + plugin_name
+    pulp_plugin_name = plugin_name
     replace_map = {TEMPLATE_SNAKE: pulp_plugin_name,
                    TEMPLATE_DASH_SHORT: to_dash(plugin_name),
                    TEMPLATE_DASH: to_dash(pulp_plugin_name),
