@@ -24,6 +24,13 @@ Below are some ideas for how to document your plugin.
 All REST API examples below use `httpie <https://httpie.org/doc>`__ to
 perform the requests.
 
+This documentation makes use of the `jq library <https://stedolan.github.io/jq/>`_
+to parse the json received from requests, in order to get the unique urls generated
+when objects are created. To follow this documentation as-is please install the jq
+library with:
+
+``$ sudo dnf install jq``
+
 Install ``pulpcore``
 --------------------
 
@@ -50,55 +57,52 @@ Create a repository ``foo``
 
 ``$ http POST http://localhost:8000/api/v3/repositories/ name=foo``
 
+``$ export REPO_HREF=$(http :8000/api/v3/repositories/ | jq -r '.results[] | select(.name == "foo") | ._href')``
+
 Add an Importer to repository ``foo``
 -------------------------------------
 
 Add important details about your Importer and provide examples.
 
-``$ http POST http://localhost:8000/api/v3/repositories/foo/importers/plugin-template/ some=params``
+``$ http POST http://localhost:8000/api/v3/importers/plugin-template/ some=params repository=$REPO_HREF``
 
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/api/v3/repositories/foo/importers/plugin-template/bar/",
+        "_href": "http://localhost:8000/api/v3/importers/plugin-template/$UUID/",
         ...
     }
 
-Add a Publisher to repository ``foo``
--------------------------------------
+``$ export IMPORTER_HREF=$(http :8000/api/v3/importers/plugin-template/ | jq -r '.results[] | select(.name == "bar") | ._href')``
 
-``$ http POST http://localhost:8000/api/v3/repositories/foo/publishers/plugin-template/ name=bar``
-
-.. code:: json
-
-    {
-        "_href": "http://localhost:8000/api/v3/repositories/foo/publishers/plugin-template/bar/",
-        ...
-    }
-
-Add a Distribution to Publisher ``bar``
----------------------------------------
-
-``$ http POST http://localhost:8000/api/v3/repositories/foo/publishers/plugin-template/bar/distributions/ some=params``
 
 Sync repository ``foo`` using Importer ``bar``
 ----------------------------------------------
 
 Use ``plugin-template`` Importer:
 
-``http POST http://localhost:8000/api/v3/repositories/foo/importers/plugin-template/bar/sync/``
+``$ http POST $IMPORTER_HREF'sync/'``
 
-Add content to repository ``foo``
----------------------------------
 
-``$ http POST http://localhost:8000/api/v3/repositorycontents/ repository='http://localhost:8000/api/v3/repositories/foo/' content='http://localhost:8000/api/v3/content/plugin-template/a9578a5f-c59f-4920-9497-8d1699c112ff/'``
+Add a Publisher to repository ``foo``
+-------------------------------------
+
+``$ http POST http://localhost:8000/api/v3/publishers/plugin-template/ name=bar repository=$REPO_HREF``
+
+.. code:: json
+
+    {
+        "_href": "http://localhost:8000/api/v3/publishers/plugin-template/$UUID/",
+        ...
+    }
+
+``$ export PUBLISHER_HREF=$(http :8000/api/v3/publishers/file/ | jq -r '.results[] | select(.name == "bar") | ._href')``
+
 
 Create a Publication using Publisher ``bar``
 --------------------------------------------
 
-Dispatch the Publish task
-
-``$ http POST http://localhost:8000/api/v3/repositories/foo/publishers/plugin-template/bar/publish/``
+``$ http POST http://localhost:8000/api/v3/publications/ publisher=$PUBLISHER_HREF``
 
 .. code:: json
 
@@ -108,6 +112,14 @@ Dispatch the Publish task
             "task_id": "fd4cbecd-6c6a-4197-9cbe-4e45b0516309"
         }
     ]
+
+``$ export PUBLICATION_HREF=$(http :8000/api/v3/publications/ | jq -r --arg PUBLISHER_HREF "$PUBLISHER_HREF" '.results[] | select(.publisher==$PUBLISHER_HREF) | ._href')``
+
+Add a Distribution to Publisher ``bar``
+---------------------------------------
+
+``$ http POST http://localhost:8000/api/v3/distributions/ name='baz' publisher=$PUBLISHER_HREF publication=$PUBLICATION_HREF``
+
 
 Check status of a task
 ----------------------
