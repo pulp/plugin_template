@@ -15,7 +15,7 @@ from logging import getLogger
 from django.db import models
 
 from pulpcore.plugin.models import (Artifact, Content, ContentArtifact, RemoteArtifact, Importer,
-                                    ProgressBar, Publisher, RepositoryContent, PublishedArtifact,
+                                    ProgressBar, Publisher, RepositoryVersion, PublishedArtifact,
                                     PublishedMetadata)
 from pulpcore.plugin.tasking import Task
 
@@ -74,8 +74,15 @@ class PluginTemplateImporter(Importer):
 
     TYPE = 'plugin-template'
 
-    def sync(self):
+    def sync(self, new_version, base_version):
         """
-        Synchronize the repository with the remote repository.
+        Synchronize the repository with the remote repository. Generates a new RepositoryVersion
+
+        Args:
+            new_version (pulpcore.plugin.models.RepositoryVersion): the new version to which
+                content should be added and removed.
+            base_version (pulpcore.plugin.models.RepositoryVersion): the targeted pre-existing
+                version or None if one does not exist.
+
         """
         raise NotImplementedError
