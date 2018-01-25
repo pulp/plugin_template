@@ -48,18 +48,9 @@ class PluginTemplatePublisher(Publisher):
     A Publisher for PluginTemplateContent.
 
     Define any additional fields for your new publisher if needed.
-    A ``publish`` method should be defined.
-    It is responsible for publishing metadata and artifacts
-    which belongs to a specific repository.
-    """
+   """
 
     TYPE = 'plugin-template'
-
-    def publish(self):
-        """
-        Publish the repository.
-        """
-        raise NotImplementedError
 
 
 class PluginTemplateImporter(Importer):
@@ -67,22 +58,7 @@ class PluginTemplateImporter(Importer):
     An Importer for PluginTemplateContent.
 
     Define any additional fields for your new importer if needed.
-    A ``sync`` method should be defined.
-    It is responsible for parsing metadata of the content,
-    downloading of the content and saving it to Pulp.
-    """
+   """
 
     TYPE = 'plugin-template'
 
-    def sync(self, new_version, base_version):
-        """
-        Synchronize the repository with the remote repository. Generates a new RepositoryVersion
-
-        Args:
-            new_version (pulpcore.plugin.models.RepositoryVersion): the new version to which
-                content should be added and removed.
-            base_version (pulpcore.plugin.models.RepositoryVersion): the targeted pre-existing
-                version or None if one does not exist.
-
-        """
-        raise NotImplementedError
