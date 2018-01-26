@@ -65,20 +65,20 @@ def publish(publisher_pk):
     #
     #     # Use the WorkingDirectory context manager to set the CWD before writing any files.
     #     with WorkingDirectory():
-    #         write_metadata(publication, path)
+    #         metadata_path = write_metadata(publication, path)
     #
     #         # Create a PublishedMetadata unit and save to the database.
-    #         metadata = models.PublishedMetadata(
-    #             relative_path=os.path.basename(path),
-    #             publication=publication,
-    #             file=File(open(path, 'rb')))
-    #         metadata.save()
+    #         publication.add_metadata(metadata_path)
+    #
+    #     for content in publication.repository_version.content()
+    #         for content_artifact in content.contentartifact_set.all():
+    #             publication.add_artifact(content_artifact)
     #
     # log.info(
     #     _('Publishing: repository=%(repository)s, version=%(version)d, publisher=%(publisher)s'),
     #     {
     #         'repository': repository.name,
     #         'publisher': publisher.name,
-    #         'version': latest_version,
+    #         'version': latest_version.number,
     #     })
     raise NotImplementedError
