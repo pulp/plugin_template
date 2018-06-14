@@ -13,7 +13,7 @@ TEMPLATE_CAMEL = 'PulpPluginTemplate'
 TEMPLATE_CAMEL_SHORT = 'PluginTemplate'
 TEMPLATE_DASH = 'pulp-plugin-template'
 TEMPLATE_DASH_SHORT = 'plugin-template'
-IGNORE_FILES = ('LICENSE', 'rename.py', 'flake8.cfg')
+IGNORE_FILES = ('LICENSE', 'bootstrap.py', 'flake8.cfg')
 IGNORE_COPYTREE = ('.git*', '*.pyc', '*.egg-info', 'rename.py', '__pycache__')
 
 
