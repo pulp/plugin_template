@@ -14,7 +14,7 @@ from logging import getLogger
 
 from django.db import models
 
-from pulpcore.plugin.models import (Artifact, Content, ContentArtifact, RemoteArtifact, Importer,
+from pulpcore.plugin.models import (Artifact, Content, ContentArtifact, RemoteArtifact, Remote,
                                     ProgressBar, Publisher, RepositoryVersion, PublishedArtifact,
                                     PublishedMetadata)
 from pulpcore.plugin.tasking import Task
@@ -62,9 +62,9 @@ class PluginTemplatePublisher(Publisher):
         raise NotImplementedError
 
 
-class PluginTemplateImporter(Importer):
+class PluginTemplateRemote(Remote):
     """
-    An Importer for PluginTemplateContent.
+    A Remote for PluginTemplateContent.
 
     Define any additional fields for your new importer if needed.
     A ``sync`` method should be defined.

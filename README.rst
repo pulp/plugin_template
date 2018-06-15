@@ -1,11 +1,11 @@
-Template to create your own plugin
-==================================
+Bootstrap a new Pulp plugin
+===========================
 
 This is the ``plugin_template`` repository to help plugin writers
 get started and write their own plugin for `Pulp Project
 3.0+ <https://pypi.python.org/pypi/pulpcore/>`__.
 
-Clone this repository and run the provided ``rename.py`` script to create
+Clone this repository and run the provided ``bootstrap.py`` script to create
 a skeleton for your plugin with the name of your choice. It will contain
 ``setup.py``, expected plugin layout and stubs for necessary classes and methods.
 
@@ -13,7 +13,7 @@ a skeleton for your plugin with the name of your choice. It will contain
 
 ``$ cd plugin_template``
 
-``$ ./rename.py your_plugin_name``
+``$ ./bootstrap.py your_plugin_name``
 
 Check `Plugin Writer's Guide <http://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/index.html>`__
 for more details and suggestions on plugin implementaion.
@@ -41,15 +41,41 @@ provided with pulpcore.
 Install plugin
 --------------
 
-From source
-~~~~~~~~~~~
+This document assumes that you have
+`installed pulpcore <https://docs.pulpproject.org/en/3.0/nightly/installation/instructions.html>`_
+into a the virtual environment ``pulpvenv``.
 
-Define installation steps here.
+Users should install from **either** PyPI or source.
 
-Install from PyPI
-~~~~~~~~~~~~~~~~~
+From PyPI
+*********
 
-Define installation steps here.
+From Source
+***********
+
+.. code-block:: bash
+
+   source /path/to/pulpvenv/bin/activate
+   cd pulp_plugin_template
+   pip install -e .
+
+Make and Run Migrations
+-----------------------
+
+.. code-block:: bash
+
+   pulp-manager makemigrations pulp_plugin_template
+   pulp-manager migrate pulp_plugin_template
+
+Run Services
+------------
+
+.. code-block:: bash
+
+   pulp-manager runserver
+   sudo systemctl restart pulp_resource_manager
+   sudo systemctl restart pulp_worker@1
+   sudo systemctl restart pulp_worker@2
 
 
 Create a repository ``foo``
@@ -96,7 +122,7 @@ Add a Publisher to repository ``foo``
         ...
     }
 
-``$ export PUBLISHER_HREF=$(http :8000/api/v3/publishers/file/ | jq -r '.results[] | select(.name == "bar") | ._href')``
+``$ export PUBLISHER_HREF=$(http :8000/api/v3/publishers/plugin-template/ | jq -r '.results[] | select(.name == "bar") | ._href')``
 
 
 Create a Publication using Publisher ``bar``

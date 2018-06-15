@@ -8,7 +8,6 @@ implementation for more details.
 .. _pulp_example:
     https://github.com/pulp/pulp_example/
 """
-
 from rest_framework import serializers
 from pulpcore.plugin import serializers as platform
 
@@ -38,24 +37,23 @@ class PluginTemplateContentSerializer(platform.ContentSerializer):
         model = models.PluginTemplateContent
 
 
-class PluginTemplateImporterSerializer(platform.ImporterSerializer):
+class PluginTemplateRemoteSerializer(platform.RemoteSerializer):
     """
-    A Serializer for PluginTemplateImporter.
+    A Serializer for PluginTemplateRemote.
 
-    Add any new fields if defined on PluginTemplateImporter.
+    Add any new fields if defined on PluginTemplateRemote.
     Similar to the example above, in PluginTemplateContentSerializer.
     Additional validators can be added to the parent validators list
 
     For example::
 
     class Meta:
-        validators = platform.ImporterSerializer.Meta.validators + [myValidator1, myValidator2]
+        validators = platform.RemoteSerializer.Meta.validators + [myValidator1, myValidator2]
     """
 
     class Meta:
-        fields = platform.ImporterSerializer.Meta.fields
-        model = models.PluginTemplateImporter
-        validators = platform.ImporterSerializer.Meta.validators
+        fields = platform.RemoteSerializer.Meta.fields
+        model = models.PluginTemplateRemote
 
 
 class PluginTemplatePublisherSerializer(platform.PublisherSerializer):
@@ -75,4 +73,3 @@ class PluginTemplatePublisherSerializer(platform.PublisherSerializer):
     class Meta:
         fields = platform.PublisherSerializer.Meta.fields
         model = models.PluginTemplatePublisher
-        validators = platform.PublisherSerializer.Meta.validators
