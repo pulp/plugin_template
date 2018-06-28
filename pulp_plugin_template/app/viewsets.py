@@ -96,7 +96,9 @@ class PluginTemplatePublisherViewSet(core.PublisherViewSet):
     @detail_route(methods=('post',), serializer_class=RepositoryPublishURLSerializer)
     def publish(self, request, pk):
         """
-        Publishes a repository. Either the ``repository`` or the ``repository_version`` fields can
+        Publishes a repository.
+
+        Either the ``repository`` or the ``repository_version`` fields can
         be provided but not both at the same time.
         """
         publisher = self.get_object()
