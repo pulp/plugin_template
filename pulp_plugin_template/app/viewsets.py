@@ -9,8 +9,11 @@ implementation for more details.
     https://github.com/pulp/pulp_example/
 """
 
+from drf_yasg.utils import swagger_auto_schema
+
 from pulpcore.plugin import viewsets as core
 from pulpcore.plugin.serializers import (
+    AsnycOperationResponseSerializer,
     RepositoryPublishURLSerializer,
     RepositorySyncURLSerializer,
 )
@@ -48,6 +51,10 @@ class PluginTemplateRemoteViewSet(core.RemoteViewSet):
     queryset = models.PluginTemplateRemote.objects.all()
     serializer_class = serializers.PluginTemplateRemoteSerializer
 
+    # This decorator is necessary since a sync operation is asyncrounous and returns
+    # the id and href of the sync task.
+    @swagger_auto_schema(operation_description="Trigger an asynchronous task to sync content",
+                         responses={202: AsnycOperationResponseSerializer})
     @detail_route(methods=('post',), serializer_class=RepositorySyncURLSerializer)
     def sync(self, request, pk):
         """
@@ -82,7 +89,10 @@ class PluginTemplatePublisherViewSet(core.PublisherViewSet):
     queryset = models.PluginTemplatePublisher.objects.all()
     serializer_class = serializers.PluginTemplatePublisherSerializer
 
-
+    # This decorator is necessary since a publish operation is asyncrounous and returns
+    # the id and href of the publish task.
+    @swagger_auto_schema(operation_description="Trigger an asynchronous task to publish content",
+                         responses={202: AsnycOperationResponseSerializer})
     @detail_route(methods=('post',), serializer_class=RepositoryPublishURLSerializer)
     def publish(self, request, pk):
         """
