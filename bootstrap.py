@@ -13,7 +13,14 @@ TEMPLATE_CAMEL = 'PulpPluginTemplate'
 TEMPLATE_CAMEL_SHORT = 'PluginTemplate'
 TEMPLATE_DASH = 'pulp-plugin-template'
 TEMPLATE_DASH_SHORT = 'plugin-template'
-IGNORE_FILES = ('LICENSE', 'bootstrap.py', 'flake8.cfg')
+IGNORE_FILES = (
+    'LICENSE',
+    'COMMITMENT',
+    'flake8.cfg',
+    'pep8speaks.yml',
+    'bootstrap.py',
+    'Vagrantfile.example'
+)
 IGNORE_COPYTREE = ('.git*', '*.pyc', '*.egg-info', 'rename.py', '__pycache__')
 
 
@@ -110,6 +117,7 @@ def main():
             os.rename(tempfile_path, file_path)
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
