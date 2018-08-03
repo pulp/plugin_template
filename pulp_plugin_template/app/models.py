@@ -1,26 +1,17 @@
 """
-Check `Plugin Writer's Guide`_ and `pulp_example`_ plugin
-implementation for more details.
+Check `Plugin Writer's Guide`_ for more details.
 
 .. _Plugin Writer's Guide:
     http://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/index.html
-
-.. _pulp_example:
-    https://github.com/pulp/pulp_example/
 """
 
-from gettext import gettext as _
 from logging import getLogger
 
 from django.db import models
 
-from pulpcore.plugin.models import (Artifact, Content, ContentArtifact, RemoteArtifact, Remote,
-                                    ProgressBar, Publisher, RepositoryVersion, PublishedArtifact,
-                                    PublishedMetadata)
-from pulpcore.plugin.tasking import Task
+from pulpcore.plugin.models import Content, ContentArtifact, Remote, Publisher
 
-
-log = getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class PluginTemplateContent(Content):
@@ -51,12 +42,6 @@ class PluginTemplatePublisher(Publisher):
     """
 
     TYPE = 'plugin-template'
-
-    def publish(self):
-        """
-        Publish the repository.
-        """
-        raise NotImplementedError
 
 
 class PluginTemplateRemote(Remote):

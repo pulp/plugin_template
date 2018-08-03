@@ -26,7 +26,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-    )
+    ),
     entry_points={
         'pulpcore.plugin': [
             'pulp_plugin_template = pulp_plugin_template:default_app_config',
