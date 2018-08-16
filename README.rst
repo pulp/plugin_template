@@ -1,3 +1,5 @@
+<--- TEMPLATE_REMOVE_START -->
+
 Bootstrap a new Pulp plugin
 ===========================
 
@@ -15,12 +17,26 @@ a skeleton for your plugin with the name of your choice. It will contain
 
 ``$ ./bootstrap.py your_plugin_name``
 
+.. note::
+
+   Whatever you choose for "your_plugin_name" will be prefixed with "pulp_".
+   Therefore, for this argument it is best to just provide the content type
+   which you would like to support, e.g. "rubygem" or "maven".
+
+In addition to the basic plugin boilerplate, this template also provides a basic set of
+functional tests using the `pulp_smash <https://pulp-smash.readthedocs.io/en/latest/>`_ framework,
+and a Travis configuration file / scripts for continuous integration. These are highly recommended,
+as they will make continuous verification of your plugin's functionality much easier.
+
+In order to use these tests, you will need to address the "FIXME" messages left in places where
+plugin-writer intervention is required.
+
 Check `Plugin Writer's Guide <http://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/index.html>`__
-for more details and suggestions on plugin implementaion.
+for more details and suggestions on plugin implementation.
 
 Below are some ideas for how to document your plugin.
 
-
+<--- TEMPLATE_REMOVE_END -->
 ``pulp_plugin_template`` Plugin
 ===============================
 
@@ -111,7 +127,7 @@ Create a repository ``foo``
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/pulp/api/v3/repositories/8d7cd67a-9421-461f-9106-2df8e4854f5f/",
+        "_href": "http://localhost:8000/pulp/api/v3/repositories/1/",
         ...
     }
 
@@ -125,7 +141,7 @@ Create a new remote ``bar``
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/pulp/pulp/api/v3/remotes/plugin-template/13ac2d63-7b7b-401d-b71b-9a5af05aab3c/",
+        "_href": "http://localhost:8000/pulp/pulp/api/v3/remotes/plugin-template/1/",
         ...
     }
 
@@ -145,10 +161,10 @@ Look at the new Repository Version created
 .. code:: json
 
     {
-        "_added_href": "http://localhost:8000/pulp/api/v3/repositories/b787e6ad-d6b6-4e3d-ab12-73eba19b42fb/versions/1/added_content/",
-        "_content_href": "http://localhost:8000/pulp/api/v3/repositories/b787e6ad-d6b6-4e3d-ab12-73eba19b42fb/versions/1/content/",
-        "_href": "http://localhost:8000/pulp/api/v3/repositories/b787e6ad-d6b6-4e3d-ab12-73eba19b42fb/versions/1/",
-        "_removed_href": "http://localhost:8000/pulp/api/v3/repositories/b787e6ad-d6b6-4e3d-ab12-73eba19b42fb/versions/1/removed_content/",
+        "_added_href": "http://localhost:8000/pulp/api/v3/repositories/1/versions/1/added_content/",
+        "_content_href": "http://localhost:8000/pulp/api/v3/repositories/1/versions/1/content/",
+        "_href": "http://localhost:8000/pulp/api/v3/repositories/1/versions/1/",
+        "_removed_href": "http://localhost:8000/pulp/api/v3/repositories/1/versions/1/removed_content/",
         "content_summary": {
             "plugin-template": 3
         },
@@ -167,7 +183,7 @@ Create an Artifact by uploading the plugin-template to Pulp.
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/pulp/api/v3/artifacts/7d39e3f6-535a-4b6e-81e9-c83aa56aa19e/",
+        "_href": "http://localhost:8000/pulp/api/v3/artifacts/1/",
         ...
     }
 
@@ -176,13 +192,12 @@ Create ``plugin-template`` content from an Artifact
 
 Create a content unit and point it to your artifact
 
-``$ http POST http://localhost:8000/pulp/api/v3/content/plugin-template/plugin-templates/ relative_path=$CONTENT_NAME artifact="http://localhost:8000/pulp/api/v3/artifacts/7d39e3f6-535a-4b6e-81e9-c83aa56aa19e/"``
+``$ http POST http://localhost:8000/pulp/api/v3/content/plugin-template/plugin-templates/ relative_path=$CONTENT_NAME artifact="http://localhost:8000/pulp/api/v3/artifacts/1/"``
 
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/pulp/api/v3/content/plugin-template/plugin-templates/a9578a5f-c59f-4920-9497-8d1699c112ff/",
-        "artifact": "http://localhost:8000/pulp/api/v3/artifacts/7d39e3f6-535a-4b6e-81e9-c83aa56aa19e/",
+        "artifact": "http://localhost:8000/pulp/api/v3/artifacts/1/",
         "relative_path": "$CONTENT_NAME",
         "type": "plugin-template"
     }
@@ -204,7 +219,7 @@ Create a ``plugin-template`` Publisher ``baz``
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/pulp/pulp/api/v3/publishers/plugin-template/fd4cbecd-6c6a-4197-9cbe-4e45b0516309/",
+        "_href": "http://localhost:8000/pulp/pulp/api/v3/publishers/plugin-template/1/",
         ...
     }
 
@@ -236,7 +251,7 @@ Add a Distribution to Publisher ``bar``
 .. code:: json
 
     {
-        "_href": "http://localhost:8000/pulp/api/v3/distributions/9b29f1b2-6726-40a2-988a-273d3f009a41/",
+        "_href": "http://localhost:8000/pulp/api/v3/distributions/1/",
        ...
     }
 

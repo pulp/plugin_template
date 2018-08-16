@@ -1,12 +1,8 @@
 """
-Check `Plugin Writer's Guide`_ and `pulp_example`_ plugin
-implementation for more details.
+Check `Plugin Writer's Guide`_ for more details.
 
 .. _Plugin Writer's Guide:
     http://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/index.html
-
-.. _pulp_example:
-    https://github.com/pulp/pulp_example/
 """
 from rest_framework import serializers
 from pulpcore.plugin import serializers as platform

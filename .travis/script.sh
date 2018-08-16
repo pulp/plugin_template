@@ -20,7 +20,7 @@ rq worker -n 'resource_manager@%h' -w 'pulpcore.tasking.worker.PulpWorker' >> ~/
 rq worker -n 'reserved_resource_worker_1@%h' -w 'pulpcore.tasking.worker.PulpWorker' >> ~/reserved_worker-1.log 2>&1 &
 
 sleep 5
-# py.test -v --color=yes --pyargs pulp_smash.tests.pulp3
+pytest -v -r sx --color=yes --pyargs pulp_plugin_template.tests.functional
 
 if [ $? -ne 0 ]; then
   result=1

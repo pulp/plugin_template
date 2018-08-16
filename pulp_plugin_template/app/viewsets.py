@@ -1,19 +1,15 @@
 """
-Check `Plugin Writer's Guide`_ and `pulp_example`_ plugin
-implementation for more details.
+Check `Plugin Writer's Guide`_ for more details.
 
 .. _Plugin Writer's Guide:
     http://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/index.html
-
-.. _pulp_example:
-    https://github.com/pulp/pulp_example/
 """
 
 from drf_yasg.utils import swagger_auto_schema
 
 from pulpcore.plugin import viewsets as core
 from pulpcore.plugin.serializers import (
-    AsnycOperationResponseSerializer,
+    AsyncOperationResponseSerializer,
     RepositoryPublishURLSerializer,
     RepositorySyncURLSerializer,
 )
@@ -29,7 +25,7 @@ class PluginTemplateContentViewSet(core.ContentViewSet):
 
     Define endpoint name which will appear in the API endpoint for this content type.
     For example::
-        http://pulp.example.com/api/v3/content/plugin-template/
+        http://pulp.example.com/pulp/api/v3/content/plugin-template/
 
     Also specify queryset and serializer for PluginTemplateContent.
     """
@@ -53,8 +49,10 @@ class PluginTemplateRemoteViewSet(core.RemoteViewSet):
 
     # This decorator is necessary since a sync operation is asyncrounous and returns
     # the id and href of the sync task.
-    @swagger_auto_schema(operation_description="Trigger an asynchronous task to sync content",
-                         responses={202: AsnycOperationResponseSerializer})
+    @swagger_auto_schema(
+        operation_description="Trigger an asynchronous task to sync content",
+        responses={202: AsyncOperationResponseSerializer}
+    )
     @detail_route(methods=('post',), serializer_class=RepositorySyncURLSerializer)
     def sync(self, request, pk):
         """
@@ -91,8 +89,10 @@ class PluginTemplatePublisherViewSet(core.PublisherViewSet):
 
     # This decorator is necessary since a publish operation is asyncrounous and returns
     # the id and href of the publish task.
-    @swagger_auto_schema(operation_description="Trigger an asynchronous task to publish content",
-                         responses={202: AsnycOperationResponseSerializer})
+    @swagger_auto_schema(
+        operation_description="Trigger an asynchronous task to publish content",
+        responses={202: AsyncOperationResponseSerializer}
+    )
     @detail_route(methods=('post',), serializer_class=RepositoryPublishURLSerializer)
     def publish(self, request, pk):
         """
