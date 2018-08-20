@@ -1,4 +1,4 @@
-<--- TEMPLATE_REMOVE_START -->
+<!-- TEMPLATE_REMOVE_START -->
 
 Bootstrap a new Pulp plugin
 ===========================
@@ -36,7 +36,7 @@ for more details and suggestions on plugin implementation.
 
 Below are some ideas for how to document your plugin.
 
-<--- TEMPLATE_REMOVE_END -->
+<!-- TEMPLATE_REMOVE_END -->
 ``pulp_plugin_template`` Plugin
 ===============================
 
