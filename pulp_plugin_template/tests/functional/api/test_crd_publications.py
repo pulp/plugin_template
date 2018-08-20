@@ -25,6 +25,8 @@ from pulp_plugin_template.tests.functional.utils import (
 from pulp_plugin_template.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
+# Implement sync and publish support before enabling this test.
+@unittest.skip("FIXME: plugin writer action required")
 class PublicationsTestCase(unittest.TestCase):
     """Perform actions over publications."""
 

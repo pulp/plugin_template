@@ -23,7 +23,7 @@ from pulp_plugin_template.tests.functional.utils import gen_plugin_template_remo
 from pulp_plugin_template.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
-# Read the instructions provided below on the steps needed to enable this test.
+# Read the instructions provided below for the steps needed to enable this test (see: FIXME's).
 @unittest.skip("FIXME: plugin writer action required")
 class ContentUnitTestCase(unittest.TestCase):
     """CRUD content unit.
@@ -105,7 +105,7 @@ def _gen_content_unit_attrs(artifact):
     :param: artifact: A dict of info about the artifact.
     :returns: A semi-random dict for use in creating a content unit.
     """
-    # FIXME: add content specific metadata here
+    # FIXME: Add content specific metadata here.
     return {'artifact': artifact['_href']}
 
 
