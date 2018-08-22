@@ -1,21 +1,18 @@
 # coding=utf-8
 """Tests that sync plugin_template plugin repositories."""
 import unittest
-from random import randint
-from urllib.parse import urlsplit
 
 from pulp_smash import api, config
 from pulp_smash.pulp3.constants import REPO_PATH
 from pulp_smash.pulp3.utils import (
     gen_repo,
     get_content,
+    get_added_content,
     sync,
 )
 
 from pulp_plugin_template.tests.functional.constants import (
     PLUGIN_TEMPLATE_FIXTURE_COUNT,
-    PLUGIN_TEMPLATE_FIXTURE_URL,
-    PLUGIN_TEMPLATE_LARGE_FIXTURE_URL,
     PLUGIN_TEMPLATE_REMOTE_PATH
 )
 from pulp_plugin_template.tests.functional.utils import gen_plugin_template_remote
@@ -24,7 +21,7 @@ from pulp_plugin_template.tests.functional.utils import set_up_module as setUpMo
 
 # Implement sync support before enabling this test.
 @unittest.skip("FIXME: plugin writer action required")
-class SyncPluginTemplateRepoTestCase(unittest.TestCase):
+class BasicSyncPluginTemplateRepoTestCase(unittest.TestCase):
     """Sync repositories with the plugin_template plugin."""
 
     @classmethod
@@ -61,93 +58,16 @@ class SyncPluginTemplateRepoTestCase(unittest.TestCase):
         self.assertIsNone(repo['_latest_version_href'])
         sync(self.cfg, remote, repo)
         repo = client.get(repo['_href'])
+
         self.assertIsNotNone(repo['_latest_version_href'])
+        self.assertEqual(len(get_content(repo)), PLUGIN_TEMPLATE_FIXTURE_COUNT)
+        self.assertEqual(len(get_added_content(repo)), PLUGIN_TEMPLATE_FIXTURE_COUNT)
 
         # Sync the repository again.
         latest_version_href = repo['_latest_version_href']
         sync(self.cfg, remote, repo)
         repo = client.get(repo['_href'])
+
         self.assertNotEqual(latest_version_href, repo['_latest_version_href'])
-
-
-class SyncChangeRepoVersionTestCase(unittest.TestCase):
-    """Verify whether sync of repository updates repository version."""
-
-    def test_all(self):
-        """Verify whether the sync of a repository updates its version.
-
-        This test explores the design choice stated in the `Pulp #3308`_ that a
-        new repository version is created even if the sync does not add or
-        remove any content units. Even without any changes to the remote if a
-        new sync occurs, a new repository version is created.
-
-        .. _Pulp #3308: https://pulp.plan.io/issues/3308
-
-        Do the following:
-
-        1. Create a repository, and a remote.
-        2. Sync the repository an arbitrary number of times.
-        3. Verify that the repository version is equal to the previous number
-           of syncs.
-        """
-        cfg = config.get_config()
-        client = api.Client(cfg, api.json_handler)
-
-        repo = client.post(REPO_PATH, gen_repo())
-        self.addCleanup(client.delete, repo['_href'])
-
-        body = gen_plugin_template_remote()
-        remote = client.post(PLUGIN_TEMPLATE_REMOTE_PATH, body)
-        self.addCleanup(client.delete, remote['_href'])
-
-        number_of_syncs = randint(1, 10)
-        for _ in range(number_of_syncs):
-            sync(cfg, remote, repo)
-
-        repo = client.get(repo['_href'])
-        path = urlsplit(repo['_latest_version_href']).path
-        latest_repo_version = int(path.split('/')[-2])
-        self.assertEqual(latest_repo_version, number_of_syncs)
-
-
-class MultiResourceLockingTestCase(unittest.TestCase):
-    """Verify multi-resourcing locking.
-
-    This test targets the following issues:
-
-    * `Pulp #3186 <https://pulp.plan.io/issues/3186>`_
-    * `Pulp Smash #879 <https://github.com/PulpQE/pulp-smash/issues/879>`_
-    """
-
-    def test_all(self):
-        """Verify multi-resourcing locking.
-
-        Do the following:
-
-        1. Create a repository, and a remote.
-        2. Update the remote to point to a different url.
-        3. Immediately run a sync. The sync should fire after the update and
-           sync from the second url.
-        4. Assert that remote url was updated.
-        5. Assert that the number of units present in the repository is
-           according to the updated url.
-        """
-        cfg = config.get_config()
-        client = api.Client(cfg, api.json_handler)
-
-        repo = client.post(REPO_PATH, gen_repo())
-        self.addCleanup(client.delete, repo['_href'])
-
-        body = gen_plugin_template_remote(url=PLUGIN_TEMPLATE_LARGE_FIXTURE_URL)
-        remote = client.post(PLUGIN_TEMPLATE_REMOTE_PATH, body)
-        self.addCleanup(client.delete, remote['_href'])
-
-        url = {'url': PLUGIN_TEMPLATE_FIXTURE_URL}
-        client.patch(remote['_href'], url)
-
-        sync(cfg, remote, repo)
-
-        repo = client.get(repo['_href'])
-        remote = client.get(remote['_href'])
-        self.assertEqual(remote['url'], url['url'])
         self.assertEqual(len(get_content(repo)), PLUGIN_TEMPLATE_FIXTURE_COUNT)
+        self.assertEqual(len(get_added_content(repo)), 0)
