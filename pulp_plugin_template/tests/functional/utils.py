@@ -87,7 +87,9 @@ def get_plugin_template_content_unit_paths(repo):
     :param repo: A dict of information about the repository.
     :returns: A list with the paths of units present in a given repository.
     """
-    # The "relative_path" is actually a file path and name
+    # FIXME: The "relative_path" is actually a file path and name
+    # It's just an example -- this needs to be replaced with an implementation that works
+    # for repositories of this content type.
     return [content_unit['relative_path'] for content_unit in get_content(repo)]
 
 
