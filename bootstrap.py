@@ -23,7 +23,7 @@ IGNORE_FILES = (
     'bootstrap.py',
     'Vagrantfile.example'
 )
-IGNORE_COPYTREE = ('.git*', '*.pyc', '*.egg-info', 'bootstrap.py', '__pycache__')
+IGNORE_COPYTREE = ('.git/*', '*.pyc', '*.egg-info', 'bootstrap.py', '__pycache__')
 
 
 def is_valid(name):

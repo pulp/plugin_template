@@ -19,5 +19,5 @@ pushd pulp/common/ && pip install -e . && popd
 pushd pulp/pulpcore/ && pip install -e . && popd
 pushd pulp/plugin/ && pip install -e .  && popd
 
-cd pulp_template
+cd pulp_plugin_template
 pip install -e .
