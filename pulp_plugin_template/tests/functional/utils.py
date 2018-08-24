@@ -63,7 +63,7 @@ def gen_plugin_template_remote(**kwargs):
     plugin_template_extra_fields = {
         **kwargs
     }
-    remote.update(plugin_template_extra_fields)
+    remote.update(**plugin_template_extra_fields)
     return remote
 
 
@@ -77,7 +77,7 @@ def gen_plugin_template_publisher(**kwargs):
     plugin_template_extra_fields = {
         **kwargs
     }
-    publisher.update(plugin_template_extra_fields)
+    publisher.update(**plugin_template_extra_fields)
     return publisher
 
 
