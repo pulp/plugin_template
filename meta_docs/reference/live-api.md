@@ -8,6 +8,4 @@ require this, but if they do, it's important to understand what the requirements
 Typically only published content needs to be discovered, so the "Live API" requirement is thought of
 as a publishing requirement.
 
-.. note::
-   Write down any requirements for a webserver to interact with a client to facilitate content
-   discovery.
+**NOTE:** Write down any requirements for a webserver to interact with a client to facilitate content discovery.

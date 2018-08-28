@@ -3,7 +3,7 @@ Documenting your API
 --------------------
 
 Each instance of Pulp optionally hosts dynamically generated API documentation located at
-`http://pulpserver/pulp/api/v3/docs/` if you install `drf-openapi <https://github.com/limdauto/drf_openapi/>`_.
+`http://pulpserver/pulp/api/v3/docs/`.
 
 The API endpoint description is generated from the docstring on the CRUD methods on a ViewSet.
 
@@ -12,8 +12,7 @@ A field's description is generated from the "help_text" kwarg when defining seri
 
 Response status codes can be generated through the `Meta` class on the serializer:
 
-.. code-block:: python
-
+```
     from rest_framework.status import HTTP_400_BAD_REQUEST
 
     class SnippetSerializerV1(serializers.Serializer):
@@ -23,3 +22,4 @@ Response status codes can be generated through the `Meta` class on the serialize
             error_status_codes = {
                 HTTP_400_BAD_REQUEST: 'Bad Request'
             }
+```

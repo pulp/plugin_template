@@ -5,7 +5,6 @@ Any action that can run for a long time should be an asynchronous task. Plugin w
 to understand the internals of the pulpcore tasking system, workers automatically execute tasks from
 RQ, including tasks deployed by plugins.
 
-More information on the tasking system can be found TODO(here, ??).
 
 Reservations
 ************
