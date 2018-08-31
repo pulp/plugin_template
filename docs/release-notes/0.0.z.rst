@@ -1,0 +1,5 @@
+===================================
+plugin-template 0.0.1 Release Notes
+===================================
+
+plugin-template was created, and there was much rejoicing.
