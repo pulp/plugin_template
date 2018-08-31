@@ -30,29 +30,6 @@ def set_up_module():
     require_pulp_plugins({'pulp_plugin_template'}, SkipTest)
 
 
-def populate_pulp(cfg, url=PLUGIN_TEMPLATE_FIXTURE_URL):
-    """Add plugin_template contents to Pulp.
-
-    :param pulp_smash.config.PulpSmashConfig: Information about a Pulp application.
-    :param url: The plugin_template repository URL. Defaults to
-        :data:`pulp_smash.constants.PLUGIN_TEMPLATE_FIXTURE_URL`
-    :returns: A list of dicts, where each dict describes one file content in Pulp.
-    """
-    client = api.Client(cfg, api.json_handler)
-    remote = {}
-    repo = {}
-    try:
-        remote.update(client.post(PLUGIN_TEMPLATE_REMOTE_PATH, gen_plugin_template_remote(url)))
-        repo.update(client.post(REPO_PATH, gen_repo()))
-        sync(cfg, remote, repo)
-    finally:
-        if remote:
-            client.delete(remote['_href'])
-        if repo:
-            client.delete(repo['_href'])
-    return client.get(PLUGIN_TEMPLATE_CONTENT_PATH)['results']
-
-
 def gen_plugin_template_remote(**kwargs):
     """Return a semi-random dict for use in creating a plugin_template Remote.
 
@@ -91,6 +68,29 @@ def get_plugin_template_content_unit_paths(repo):
     # It's just an example -- this needs to be replaced with an implementation that works
     # for repositories of this content type.
     return [content_unit['relative_path'] for content_unit in get_content(repo)]
+
+
+def populate_pulp(cfg, url=PLUGIN_TEMPLATE_FIXTURE_URL):
+    """Add plugin_template contents to Pulp.
+
+    :param pulp_smash.config.PulpSmashConfig: Information about a Pulp application.
+    :param url: The plugin_template repository URL. Defaults to
+        :data:`pulp_smash.constants.PLUGIN_TEMPLATE_FIXTURE_URL`
+    :returns: A list of dicts, where each dict describes one file content in Pulp.
+    """
+    client = api.Client(cfg, api.json_handler)
+    remote = {}
+    repo = {}
+    try:
+        remote.update(client.post(PLUGIN_TEMPLATE_REMOTE_PATH, gen_plugin_template_remote(url)))
+        repo.update(client.post(REPO_PATH, gen_repo()))
+        sync(cfg, remote, repo)
+    finally:
+        if remote:
+            client.delete(remote['_href'])
+        if repo:
+            client.delete(repo['_href'])
+    return client.get(PLUGIN_TEMPLATE_CONTENT_PATH)['results']
 
 
 skip_if = partial(selectors.skip_if, exc=SkipTest)
