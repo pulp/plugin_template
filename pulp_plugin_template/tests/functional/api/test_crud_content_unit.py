@@ -19,7 +19,11 @@ from pulp_plugin_template.tests.functional.constants import (
     PLUGIN_TEMPLATE_CONTENT_PATH,
     PLUGIN_TEMPLATE_REMOTE_PATH,
 )
-from pulp_plugin_template.tests.functional.utils import gen_plugin_template_remote, skip_if
+from pulp_plugin_template.tests.functional.utils import (
+    gen_plugin_template_content_attrs,
+    gen_plugin_template_remote,
+    skip_if
+)
 from pulp_plugin_template.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -51,7 +55,7 @@ class ContentUnitTestCase(unittest.TestCase):
 
     def test_01_create_content_unit(self):
         """Create content unit."""
-        attrs = _gen_content_unit_attrs(self.artifact)
+        attrs = gen_plugin_template_content_attrs(self.artifact)
         self.content_unit.update(self.client.post(PLUGIN_TEMPLATE_CONTENT_PATH, attrs))
         for key, val in attrs.items():
             with self.subTest(key=key):
@@ -84,7 +88,7 @@ class ContentUnitTestCase(unittest.TestCase):
 
         This HTTP method is not supported and a HTTP exception is expected.
         """
-        attrs = _gen_content_unit_attrs(self.artifact)
+        attrs = gen_plugin_template_content_attrs(self.artifact)
         with self.assertRaises(HTTPError):
             self.client.patch(self.content_unit['_href'], attrs)
 
@@ -94,19 +98,9 @@ class ContentUnitTestCase(unittest.TestCase):
 
         This HTTP method is not supported and a HTTP exception is expected.
         """
-        attrs = _gen_content_unit_attrs(self.artifact)
+        attrs = gen_plugin_template_content_attrs(self.artifact)
         with self.assertRaises(HTTPError):
             self.client.put(self.content_unit['_href'], attrs)
-
-
-def _gen_content_unit_attrs(artifact):
-    """Generate a dict with content unit attributes.
-
-    :param: artifact: A dict of info about the artifact.
-    :returns: A semi-random dict for use in creating a content unit.
-    """
-    # FIXME: Add content specific metadata here.
-    return {'artifact': artifact['_href']}
 
 
 # Implement sync support before enabling this test.

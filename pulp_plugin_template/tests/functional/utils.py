@@ -70,6 +70,16 @@ def get_plugin_template_content_unit_paths(repo):
     return [content_unit['relative_path'] for content_unit in get_content(repo)]
 
 
+def gen_plugin_template_content_attrs(artifact):
+    """Generate a dict with content unit attributes.
+
+    :param: artifact: A dict of info about the artifact.
+    :returns: A semi-random dict for use in creating a content unit.
+    """
+    # FIXME: Add content specific metadata here.
+    return {'artifact': artifact['_href']}
+
+
 def populate_pulp(cfg, url=PLUGIN_TEMPLATE_FIXTURE_URL):
     """Add plugin_template contents to Pulp.
 
