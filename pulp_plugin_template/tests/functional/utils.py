@@ -36,7 +36,7 @@ def gen_plugin_template_remote(**kwargs):
     :param url: The URL of an external content source.
     """
     remote = gen_remote(PLUGIN_TEMPLATE_FIXTURE_URL)
-    # FIXME: Add any fields specific to a plugin_teplate remote here
+    # FIXME: Add any fields specific to a plugin_template remote here
     plugin_template_extra_fields = {
         **kwargs
     }
