@@ -1,7 +1,7 @@
 from gettext import gettext as _
 import logging
 
-from pulpcore.plugin.models import Artifact, ProgressBar, Repository
+from pulpcore.plugin.models import Artifact, ProgressBar, Remote, Repository
 from pulpcore.plugin.stages import (
     DeclarativeArtifact,
     DeclarativeContent,
@@ -39,7 +39,10 @@ def synchronize(remote_pk, repository_pk, mirror):
     # Interpret policy to download Artifacts or not
     download_artifacts = (remote.policy == Remote.IMMEDIATE)
     first_stage = PluginTemplateFirstStage(remote)
-    DeclarativeVersion(first_stage, repository, mirror=mirror).create()
+    DeclarativeVersion(
+        first_stage, repository,
+        mirror=mirror, download_artifacts=download_artifacts
+    ).create()
 
 
 class PluginTemplateFirstStage(Stage):
@@ -66,7 +69,7 @@ class PluginTemplateFirstStage(Stage):
             out_q (asyncio.Queue): The out_q to send `DeclarativeContent` objects to
 
         """
-        downloader = self.remote.get_downloader(self.remote.url)
+        downloader = self.remote.get_downloader(url=self.remote.url)
         result = await downloader.run()
         # Use ProgressBar to report progress
         for entry in self.read_my_metadata_file_somehow(result.path):
