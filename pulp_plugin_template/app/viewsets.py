@@ -19,6 +19,18 @@ from rest_framework.decorators import detail_route
 from . import models, serializers, tasks
 
 
+class PluginTemplateContentFilter(core.ContentFilter):
+    """
+    FilterSet for FileContent.
+    """
+
+    class Meta:
+        model = models.PluginTemplateContent
+        fields = [
+            # ...
+        ]
+
+
 class PluginTemplateContentViewSet(core.ContentViewSet):
     """
     A ViewSet for PluginTemplateContent.
@@ -33,6 +45,7 @@ class PluginTemplateContentViewSet(core.ContentViewSet):
     endpoint_name = 'plugin-template'
     queryset = models.PluginTemplateContent.objects.all()
     serializer_class = serializers.PluginTemplateContentSerializer
+    filterset_class = PluginTemplateContentFilter
 
 
 class PluginTemplateRemoteViewSet(core.RemoteViewSet):
