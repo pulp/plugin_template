@@ -8,6 +8,12 @@ from pulp_smash.pulp3.constants import (
     CONTENT_PATH
 )
 
+# FIXME: list any download policies supported by your plugin type here.
+# If your plugin supports all download policies, you can import this
+# from pulp_smash.pulp3.constants instead.
+# DOWNLOAD_POLICIES = ['immediate', 'streamed', 'on_demand']
+DOWNLOAD_POLICIES = ['immediate']
+
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
 PLUGIN_TEMPLATE_CONTENT_PATH = urljoin(CONTENT_PATH, 'plugin_template/units/')
 
