@@ -18,6 +18,7 @@ from pulp_smash.pulp3.utils import (
 )
 
 from pulp_plugin_template.tests.functional.constants import (
+    PLUGIN_TEMPLATE_CONTENT_NAME,
     PLUGIN_TEMPLATE_CONTENT_PATH,
     PLUGIN_TEMPLATE_FIXTURE_URL,
     PLUGIN_TEMPLATE_REMOTE_PATH,
@@ -67,7 +68,10 @@ def get_plugin_template_content_unit_paths(repo):
     # FIXME: The "relative_path" is actually a file path and name
     # It's just an example -- this needs to be replaced with an implementation that works
     # for repositories of this content type.
-    return [content_unit['relative_path'] for content_unit in get_content(repo)]
+    return [
+        content_unit['relative_path']
+        for content_unit in get_content(repo)[PLUGIN_TEMPLATE_CONTENT_NAME]
+    ]
 
 
 def gen_plugin_template_content_attrs(artifact):
