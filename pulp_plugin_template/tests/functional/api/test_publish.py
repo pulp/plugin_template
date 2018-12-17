@@ -10,6 +10,7 @@ from pulp_smash import api, config
 from pulp_smash.pulp3.constants import REPO_PATH
 from pulp_smash.pulp3.utils import (
     gen_repo,
+    get_content,
     get_versions,
     publish,
     sync,
@@ -20,7 +21,7 @@ from pulp_plugin_template.tests.functional.utils import (
     gen_plugin_template_publisher,
 )
 from pulp_plugin_template.tests.functional.constants import (
-    PLUGIN_TEMPLATE_CONTENT_PATH,
+    PLUGIN_TEMPLATE_CONTENT_NAME,
     PLUGIN_TEMPLATE_REMOTE_PATH,
     PLUGIN_TEMPLATE_PUBLISHER_PATH,
 )
@@ -70,9 +71,8 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         self.addCleanup(self.client.delete, publisher['_href'])
 
         # Step 1
-        repo = self.client.post(REPO_PATH, gen_repo())
-        self.addCleanup(self.client.delete, repo['_href'])
-        for plugin_template_content in self.client.get(PLUGIN_TEMPLATE_CONTENT_PATH)['results']:
+        repo = self.client.get(repo['_href'])
+        for plugin_template_content in get_content(repo)[PLUGIN_TEMPLATE_CONTENT_NAME]:
             self.client.post(
                 repo['_versions_href'],
                 {'add_content_units': [plugin_template_content['_href']]}

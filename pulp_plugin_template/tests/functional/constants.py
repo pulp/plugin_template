@@ -15,6 +15,9 @@ from pulp_smash.pulp3.constants import (
 DOWNLOAD_POLICIES = ['immediate']
 
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
+PLUGIN_TEMPLATE_CONTENT_NAME = 'unit'
+
+# FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
 PLUGIN_TEMPLATE_CONTENT_PATH = urljoin(CONTENT_PATH, 'plugin_template/units/')
 
 PLUGIN_TEMPLATE_REMOTE_PATH = urljoin(BASE_REMOTE_PATH, 'plugin_template/')
@@ -27,6 +30,10 @@ PLUGIN_TEMPLATE_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, 'plugin_template/'
 
 # FIXME: replace this with the actual number of content units in your test fixture
 PLUGIN_TEMPLATE_FIXTURE_COUNT = 3
+
+PLUGIN_TEMPLATE_FIXTURE_SUMMARY = {
+    PLUGIN_TEMPLATE_CONTENT_NAME: PLUGIN_TEMPLATE_FIXTURE_COUNT
+}
 
 # FIXME: replace this with the location of one specific content unit of your choosing
 PLUGIN_TEMPLATE_URL = urljoin(PLUGIN_TEMPLATE_FIXTURE_URL, '')

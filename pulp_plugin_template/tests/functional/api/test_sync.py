@@ -6,13 +6,13 @@ from pulp_smash import api, cli, config, exceptions
 from pulp_smash.pulp3.constants import MEDIA_PATH, REPO_PATH
 from pulp_smash.pulp3.utils import (
     gen_repo,
-    get_content,
-    get_added_content,
+    get_content_summary,
+    get_added_content_summary,
     sync,
 )
 
 from pulp_plugin_template.tests.functional.constants import (
-    PLUGIN_TEMPLATE_FIXTURE_COUNT,
+    PLUGIN_TEMPLATE_FIXTURE_SUMMARY,
     PLUGIN_TEMPLATE_REMOTE_PATH
 )
 from pulp_plugin_template.tests.functional.utils import gen_plugin_template_remote
@@ -59,8 +59,8 @@ class BasicSyncTestCase(unittest.TestCase):
         repo = self.client.get(repo['_href'])
 
         self.assertIsNotNone(repo['_latest_version_href'])
-        self.assertEqual(len(get_content(repo)), PLUGIN_TEMPLATE_FIXTURE_COUNT)
-        self.assertEqual(len(get_added_content(repo)), PLUGIN_TEMPLATE_FIXTURE_COUNT)
+        self.assertDictEqual(get_content_summary(repo), PLUGIN_TEMPLATE_FIXTURE_SUMMARY)
+        self.assertDictEqual(get_added_content_summary(repo), PLUGIN_TEMPLATE_FIXTURE_SUMMARY)
 
         # Sync the repository again.
         latest_version_href = repo['_latest_version_href']
@@ -68,8 +68,8 @@ class BasicSyncTestCase(unittest.TestCase):
         repo = self.client.get(repo['_href'])
 
         self.assertNotEqual(latest_version_href, repo['_latest_version_href'])
-        self.assertEqual(len(get_content(repo)), PLUGIN_TEMPLATE_FIXTURE_COUNT)
-        self.assertEqual(len(get_added_content(repo)), 0)
+        self.assertDictEqual(get_content_summary(repo), PLUGIN_TEMPLATE_FIXTURE_SUMMARY)
+        self.assertDictEqual(get_added_content_summary(repo), {})
 
     # This test may not make sense for all plugins, but is likely to be useful
     # for most. Check that it makes sense for yours before enabling it.

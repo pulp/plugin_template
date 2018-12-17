@@ -48,6 +48,18 @@ class PluginTemplateContentViewSet(core.ContentViewSet):
     filterset_class = PluginTemplateContentFilter
 
 
+class PluginTemplateRemoteFilter(core.RemoteFilter):
+    """
+    A FilterSet for PluginTemplateRemote.
+    """
+
+    class Meta:
+        model = models.PluginTemplateRemote
+        fields = [
+            # ...
+        ]
+
+
 class PluginTemplateRemoteViewSet(core.RemoteViewSet):
     """
     A ViewSet for PluginTemplateRemote.
