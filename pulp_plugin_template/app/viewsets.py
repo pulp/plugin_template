@@ -21,7 +21,7 @@ from . import models, serializers, tasks
 
 class PluginTemplateContentFilter(core.ContentFilter):
     """
-    FilterSet for FileContent.
+    FilterSet for PluginTemplateContent.
     """
 
     class Meta:
