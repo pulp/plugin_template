@@ -46,7 +46,7 @@ def gen_plugin_template_remote(**kwargs):
 
 
 def gen_plugin_template_publisher(**kwargs):
-    """Return a semi-random dict for use in creating a Remote.
+    """Return a semi-random dict for use in creating a Publisher.
 
     :param url: The URL of an external content source.
     """

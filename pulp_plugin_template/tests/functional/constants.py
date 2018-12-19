@@ -38,7 +38,7 @@ PLUGIN_TEMPLATE_FIXTURE_SUMMARY = {
 # FIXME: replace this with the location of one specific content unit of your choosing
 PLUGIN_TEMPLATE_URL = urljoin(PLUGIN_TEMPLATE_FIXTURE_URL, '')
 
-# FIXME: replace this iwth your own fixture repository URL and metadata
+# FIXME: replace this with your own fixture repository URL and metadata
 PLUGIN_TEMPLATE_LARGE_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, 'plugin_template_large/')
 
 # FIXME: replace this with the actual number of content units in your test fixture
