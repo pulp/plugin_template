@@ -78,14 +78,17 @@ class DownloadContentTestCase(unittest.TestCase):
         distribution = client.using_handler(api.task_handler).post({{ plugin_caps_short }}_DISTRIBUTION_PATH, body)
         self.addCleanup(client.delete, distribution["pulp_href"])
 
-        # Pick a content unit, and download it from both Pulp Fixtures…
-        unit_path = choice(get_{{ plugin_app_label }}_content_paths(repo))
-        fixtures_hash = hashlib.sha256(
-            utils.http_get(urljoin({{ plugin_caps_short }}_FIXTURE_URL, unit_path))
-        ).hexdigest()
+        # Pick a content unit (of each type), and download it from both Pulp Fixtures…
+        unit_paths = [choice(paths) for paths in get_{{ plugin_app_label }}_content_paths(repo).values()]
+        fixtures_hashes = [
+            hashlib.sha256(utils.http_get(urljoin({{ plugin_caps_short }}_FIXTURE_URL, unit_path[0]))).hexdigest()
+            for unit_path in unit_paths
+        ]
 
         # …and Pulp.
-        content = download_content_unit(cfg, distribution, unit_path)
-        pulp_hash = hashlib.sha256(content).hexdigest()
+        pulp_hashes = []
+        for unit_path in unit_paths:
+            content = download_content_unit(cfg, distribution, unit_path[1])
+            pulp_hash.append(hashlib.sha256(content).hexdigest())
 
-        self.assertEqual(fixtures_hash, pulp_hash)
+        self.assertEqual(fixtures_hashes, pulp_hashes)
