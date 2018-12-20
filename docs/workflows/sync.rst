@@ -58,7 +58,7 @@ Response::
 
     {
         "_href": "http://localhost:8000/pulp/api/v3/tasks/3896447a-2799-4818-a3e5-df8552aeb903/",
-        "created": "2018-05-01T17:17:46.558997Z",
+        "_created": "2018-05-01T17:17:46.558997Z",
         "created_resources": [
             "http://localhost:8000/pulp/api/v3/repositories/593e2fa9-af64-4d4b-aa7b-7078c96f2443/versions/6/"
         ],
