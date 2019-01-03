@@ -39,12 +39,6 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
     * `Pulp Smash #897 <https://github.com/PulpQE/pulp-smash/issues/897>`_
     """
 
-    @classmethod
-    def setUpClass(cls):
-        """Create class-wide variables."""
-        cls.cfg = config.get_config()
-        cls.client = api.Client(cls.cfg, api.json_handler)
-
     def test_all(self):
         """Test whether a particular repository version can be published.
 
@@ -58,17 +52,20 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         6. Assert that an exception is raised when providing two different
            repository versions to be published at same time.
         """
+        cfg = config.get_config()
+        client = api.Client(cfg, api.json_handler)
+
         body = gen_plugin_template_remote()
-        remote = self.client.post(PLUGIN_TEMPLATE_REMOTE_PATH, body)
-        self.addCleanup(self.client.delete, remote['_href'])
+        remote = client.post(PLUGIN_TEMPLATE_REMOTE_PATH, body)
+        self.addCleanup(client.delete, remote['_href'])
 
-        repo = self.client.post(REPO_PATH, gen_repo())
-        self.addCleanup(self.client.delete, repo['_href'])
+        repo = client.post(REPO_PATH, gen_repo())
+        self.addCleanup(client.delete, repo['_href'])
 
-        sync(self.cfg, remote, repo)
+        sync(cfg, remote, repo)
 
-        publisher = self.client.post(PLUGIN_TEMPLATE_PUBLISHER_PATH, gen_plugin_template_publisher())
-        self.addCleanup(self.client.delete, publisher['_href'])
+        publisher = client.post(PLUGIN_TEMPLATE_PUBLISHER_PATH, gen_plugin_template_publisher())
+        self.addCleanup(client.delete, publisher['_href'])
 
         # Step 1
         repo = self.client.get(repo['_href'])
@@ -81,13 +78,13 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         non_latest = choice(version_hrefs[:-1])
 
         # Step 2
-        publication = publish(self.cfg, publisher, repo)
+        publication = publish(cfg, publisher, repo)
 
         # Step 3
         self.assertEqual(publication['repository_version'], version_hrefs[-1])
 
         # Step 4
-        publication = publish(self.cfg, publisher, repo, non_latest)
+        publication = publish(cfg, publisher, repo, non_latest)
 
         # Step 5
         self.assertEqual(publication['repository_version'], non_latest)
@@ -98,4 +95,4 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
                 'repository': repo['_href'],
                 'repository_version': non_latest
             }
-            self.client.post(urljoin(publisher['_href'], 'publish/'), body)
+            client.post(urljoin(publisher['_href'], 'publish/'), body)

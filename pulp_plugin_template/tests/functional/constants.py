@@ -15,7 +15,7 @@ from pulp_smash.pulp3.constants import (
 DOWNLOAD_POLICIES = ['immediate']
 
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
-PLUGIN_TEMPLATE_CONTENT_NAME = 'unit'
+PLUGIN_TEMPLATE_CONTENT_NAME = 'pulp_plugin_template.unit'
 
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
 PLUGIN_TEMPLATE_CONTENT_PATH = urljoin(CONTENT_PATH, 'plugin_template/units/')
