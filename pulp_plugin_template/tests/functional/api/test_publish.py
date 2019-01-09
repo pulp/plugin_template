@@ -68,9 +68,9 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         self.addCleanup(client.delete, publisher['_href'])
 
         # Step 1
-        repo = self.client.get(repo['_href'])
+        repo = client.get(repo['_href'])
         for plugin_template_content in get_content(repo)[PLUGIN_TEMPLATE_CONTENT_NAME]:
-            self.client.post(
+            client.post(
                 repo['_versions_href'],
                 {'add_content_units': [plugin_template_content['_href']]}
             )
