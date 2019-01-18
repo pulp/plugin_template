@@ -45,7 +45,7 @@ Response::
         "artifact": "http://localhost:8000/pulp/api/v3/artifacts/1/",
         "digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
         "filename": "my-content",
-        "type": "plugin-template"
+        "_type": "plugin-template"
     }
 
 Add content to a repository
