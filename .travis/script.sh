@@ -10,7 +10,7 @@ export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
 export PULP_CONTENT_HOST=localhost:8080
 pulp-manager migrate auth --noinput
 pulp-manager makemigrations pulp_app --noinput
-pulp-manager makemigrations pulp_plugin_template
+pulp-manager makemigrations plugin_template
 pulp-manager migrate --noinput
 
 # Run unit tests.

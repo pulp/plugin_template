@@ -40,11 +40,6 @@ change to create a 'real' plugin.
    ``$ ./bootstrap.py your_plugin_name``
 
 
-   **NOTE** : Whatever you choose for `your_plugin_name` will be prefixed with `pulp_`.
-   Therefore, for this argument it is best to just provide the content type
-   which you would like to support, e.g. `rubygem` or `maven`.
-
-
 In addition to the basic plugin boilerplate, this template also provides a basic set of
 functional tests using the [pulp_smash](https://pulp-smash.readthedocs.io/en/latest/) framework,
 and a Travis configuration file / scripts for continuous integration. These are highly recommended,
@@ -68,7 +63,7 @@ After bootstrapping, your plugin should be installable and discoverable by Pulp.
 
 3. Check that everything worked and you have a remote endpoint
 
-    `$ http GET http://localhost:8000/pulp/api/v3/remotes/plugin-template/`
+    `$ http GET http://localhost:8000/pulp/api/v3/remotes/plugin_template/plugin-template/`
 
 
 The plugin specific `/pulp/api/v3/publishers/plugin-template/` and `/pulp/api/v3/content/plugin-template/` endpoints
@@ -139,9 +134,9 @@ class PluginTemplateContent(Content):
 
 After adding the model, you can run the migration with
 
-`pulp-manager makemigrations pulp_plugin_template`
+`pulp-manager makemigrations plugin_template`
 
-And make sure all your fields are on the pulp_plugin_template database table.
+And make sure all your fields are on the plugin_template database table.
 
 ### Serializer
 
