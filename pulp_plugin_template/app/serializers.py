@@ -5,12 +5,18 @@ Check `Plugin Writer's Guide`_ for more details.
     http://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/index.html
 """
 from rest_framework import serializers
+
 from pulpcore.plugin import serializers as platform
 
 from . import models
 
 
-class PluginTemplateContentSerializer(platform.ContentSerializer):
+# FIXME: SingleArtifactContentSerializer might not be the right choice for you.
+# If your content type has no artifacts per content unit, use "NoArtifactContentSerializer".
+# If your content type has many artifacts per content unit, use "MultipleArtifactContentSerializer"
+# If you change this, make sure to do so on "fields" below, also.
+# Make sure your choice here matches up with the create() method of your viewset.
+class PluginTemplateContentSerializer(platform.SingleArtifactContentSerializer):
     """
     A Serializer for PluginTemplateContent.
 
@@ -24,12 +30,14 @@ class PluginTemplateContentSerializer(platform.ContentSerializer):
     field3 = serializers.CharField()
 
     class Meta:
-        fields = platform.ContentSerializer.Meta.fields + ('field1', 'field2', 'field3')
+        fields = platform.SingleArtifactContentSerializer.Meta.fields + (
+            'field1', 'field2', 'field3'
+        )
         model = models.PluginTemplateContent
     """
 
     class Meta:
-        fields = platform.ContentSerializer.Meta.fields
+        fields = platform.SingleArtifactContentSerializer.Meta.fields
         model = models.PluginTemplateContent
 
 
