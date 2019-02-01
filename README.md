@@ -39,6 +39,10 @@ change to create a 'real' plugin.
 
    ``$ ./bootstrap.py your_plugin_name``
 
+   **NOTE** : Whatever you choose for `your_plugin_name` will be prefixed with `pulp_`.
+   Therefore, for this argument it is best to just provide the content type
+   which you would like to support, e.g. `rubygem` or `maven`.
+
 
 In addition to the basic plugin boilerplate, this template also provides a basic set of
 functional tests using the [pulp_smash](https://pulp-smash.readthedocs.io/en/latest/) framework,
