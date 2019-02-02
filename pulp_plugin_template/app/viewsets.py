@@ -34,6 +34,23 @@ class PluginTemplateContentFilter(core.ContentFilter):
             # ...
         ]
 
+
+class PluginTemplateContentViewSet(core.ContentViewSet):
+    """
+    A ViewSet for PluginTemplateContent.
+
+    Define endpoint name which will appear in the API endpoint for this content type.
+    For example::
+        http://pulp.example.com/pulp/api/v3/content/plugin-template/units/
+
+    Also specify queryset and serializer for PluginTemplateContent.
+    """
+
+    endpoint_name = 'plugin-template'
+    queryset = models.PluginTemplateContent.objects.all()
+    serializer_class = serializers.PluginTemplateContentSerializer
+    filterset_class = PluginTemplateContentFilter
+
     @transaction.atomic
     def create(self, request):
         """
@@ -87,23 +104,6 @@ class PluginTemplateContentFilter(core.ContentFilter):
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
-class PluginTemplateContentViewSet(core.ContentViewSet):
-    """
-    A ViewSet for PluginTemplateContent.
-
-    Define endpoint name which will appear in the API endpoint for this content type.
-    For example::
-        http://pulp.example.com/pulp/api/v3/content/plugin-template/units/
-
-    Also specify queryset and serializer for PluginTemplateContent.
-    """
-
-    endpoint_name = 'plugin-template'
-    queryset = models.PluginTemplateContent.objects.all()
-    serializer_class = serializers.PluginTemplateContentSerializer
-    filterset_class = PluginTemplateContentFilter
 
 
 class PluginTemplateRemoteFilter(core.RemoteFilter):
