@@ -58,9 +58,10 @@ class PluginTemplateFirstStage(Stage):
             remote (FileRemote): The remote data to be used when syncing
 
         """
+        super().__init__()
         self.remote = remote
 
-    async def __call__(self, in_q, out_q):
+    async def run(self):
         """
         Build and emit `DeclarativeContent` from the Manifest data.
 
@@ -77,8 +78,7 @@ class PluginTemplateFirstStage(Stage):
             artifact = Artifact(entry)  # make Artifact in memory-only
             da = DeclarativeArtifact(artifact, entry.url, entry.relative_path, self.remote)
             dc = DeclarativeContent(content=unit, d_artifacts=[da])
-            await out_q.put(dc)
-        await out_q.put(None)
+            await self.put(dc)
 
     def read_my_metadata_file_somehow(path):
         """
