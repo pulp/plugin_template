@@ -80,7 +80,7 @@ class PluginTemplateFirstStage(Stage):
             dc = DeclarativeContent(content=unit, d_artifacts=[da])
             await self.put(dc)
 
-    def read_my_metadata_file_somehow(path):
+    def read_my_metadata_file_somehow(self, path):
         """
         Parse the metadata for plugin_template Content type.
 
