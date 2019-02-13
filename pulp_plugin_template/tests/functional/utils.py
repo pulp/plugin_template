@@ -4,17 +4,15 @@ from functools import partial
 from unittest import SkipTest
 
 from pulp_smash import api, selectors
-from pulp_smash.pulp3.constants import (
-    REPO_PATH
-)
+from pulp_smash.pulp3.constants import REPO_PATH
 from pulp_smash.pulp3.utils import (
+    gen_publisher,
     gen_remote,
     gen_repo,
-    gen_publisher,
     get_content,
     require_pulp_3,
     require_pulp_plugins,
-    sync
+    sync,
 )
 
 from pulp_plugin_template.tests.functional.constants import (
@@ -31,38 +29,29 @@ def set_up_module():
     require_pulp_plugins({'pulp_plugin_template'}, SkipTest)
 
 
-def gen_plugin_template_remote(**kwargs):
+def gen_plugin_template_remote(url=PLUGIN_TEMPLATE_FIXTURE_URL, **kwargs):
     """Return a semi-random dict for use in creating a plugin_template Remote.
 
     :param url: The URL of an external content source.
     """
-    remote = gen_remote(PLUGIN_TEMPLATE_FIXTURE_URL)
     # FIXME: Add any fields specific to a plugin_template remote here
-    plugin_template_extra_fields = {
-        **kwargs
-    }
-    remote.update(**plugin_template_extra_fields)
-    return remote
+    return gen_remote(url, **kwargs)
 
 
 def gen_plugin_template_publisher(**kwargs):
-    """Return a semi-random dict for use in creating a Publisher.
+    """Return a semi-random dict for use in creating a plugin_template Publisher.
 
     :param url: The URL of an external content source.
     """
-    publisher = gen_publisher()
     # FIXME: Add any fields specific to a plugin_teplate publisher here
-    plugin_template_extra_fields = {
-        **kwargs
-    }
-    publisher.update(**plugin_template_extra_fields)
-    return publisher
+    return gen_publisher(**kwargs)
 
 
-def get_plugin_template_content_unit_paths(repo):
+def get_plugin_template_content_paths(repo, version_href=None):
     """Return the relative path of content units present in a plugin_template repository.
 
     :param repo: A dict of information about the repository.
+    :param version_href: The repository version to read.
     :returns: A list with the paths of units present in a given repository.
     """
     # FIXME: The "relative_path" is actually a file path and name
@@ -70,14 +59,14 @@ def get_plugin_template_content_unit_paths(repo):
     # for repositories of this content type.
     return [
         content_unit['relative_path']
-        for content_unit in get_content(repo)[PLUGIN_TEMPLATE_CONTENT_NAME]
+        for content_unit in get_content(repo, version_href)[PLUGIN_TEMPLATE_CONTENT_NAME]
     ]
 
 
 def gen_plugin_template_content_attrs(artifact):
     """Generate a dict with content unit attributes.
 
-    :param: artifact: A dict of info about the artifact.
+    :param artifact: A dict of info about the artifact.
     :returns: A semi-random dict for use in creating a content unit.
     """
     # FIXME: Add content specific metadata here.
@@ -90,7 +79,7 @@ def populate_pulp(cfg, url=PLUGIN_TEMPLATE_FIXTURE_URL):
     :param pulp_smash.config.PulpSmashConfig: Information about a Pulp application.
     :param url: The plugin_template repository URL. Defaults to
         :data:`pulp_smash.constants.PLUGIN_TEMPLATE_FIXTURE_URL`
-    :returns: A list of dicts, where each dict describes one file content in Pulp.
+    :returns: A list of dicts, where each dict describes one plugin_template content in Pulp.
     """
     client = api.Client(cfg, api.json_handler)
     remote = {}
@@ -107,7 +96,7 @@ def populate_pulp(cfg, url=PLUGIN_TEMPLATE_FIXTURE_URL):
     return client.get(PLUGIN_TEMPLATE_CONTENT_PATH)['results']
 
 
-skip_if = partial(selectors.skip_if, exc=SkipTest)
+skip_if = partial(selectors.skip_if, exc=SkipTest)  # pylint:disable=invalid-name
 """The ``@skip_if`` decorator, customized for unittest.
 
 :func:`pulp_smash.selectors.skip_if` is test runner agnostic. This function is
