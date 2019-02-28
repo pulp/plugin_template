@@ -14,7 +14,7 @@ pulp-manager makemigrations plugin_template
 pulp-manager migrate --noinput
 
 # Run unit tests.
-(cd ../pulp && coverage run manage.py test pulp_plugin_template.tests.unit)
+(cd ../pulpcore && coverage run manage.py test pulp_plugin_template.tests.unit)
 
 # Run functional tests.
 pulp-manager reset-admin-password --password admin
