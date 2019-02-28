@@ -7,7 +7,7 @@ Applications, started like any other with
 Django's `django.apps.AppConfig` as seen
 [in the Django documentation](https://docs.djangoproject.com/en/1.8/ref/applications/#for-application-authors),
 Pulp Plugins identify themselves as plugins to the Pulp Core by
-subclassing [pulpcore.plugin.PulpPluginAppConfig](https://github.com/pulp/pulp/blob/master/plugin/pulpcore/plugin/__init__.py).
+subclassing [pulpcore.plugin.PulpPluginAppConfig](https://github.com/pulp/pulpcore/blob/master/plugin/pulpcore/plugin/__init__.py).
 
 `PulpPluginAppConfig` also provides the application autoloading
 behaviors, such as automatic registration of viewsets with the API
