@@ -8,21 +8,22 @@ from urllib.parse import urljoin
 from pulp_smash import api, config, utils
 from pulp_smash.pulp3.constants import DISTRIBUTION_PATH, REPO_PATH
 from pulp_smash.pulp3.utils import (
+    download_content_unit,
     gen_distribution,
     gen_repo,
     publish,
     sync,
 )
 
-from pulp_plugin_template.tests.functional.utils import (
-    gen_plugin_template_remote,
-    gen_plugin_template_publisher,
-    get_plugin_template_content_paths,
-)
 from pulp_plugin_template.tests.functional.constants import (
     PLUGIN_TEMPLATE_FIXTURE_URL,
-    PLUGIN_TEMPLATE_REMOTE_PATH,
     PLUGIN_TEMPLATE_PUBLISHER_PATH,
+    PLUGIN_TEMPLATE_REMOTE_PATH,
+)
+from pulp_plugin_template.tests.functional.utils import (
+    gen_plugin_template_publisher,
+    gen_plugin_template_remote,
+    get_plugin_template_content_paths,
 )
 from pulp_plugin_template.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
@@ -93,11 +94,7 @@ class DownloadContentTestCase(unittest.TestCase):
         ).hexdigest()
 
         # …and Pulp.
-        client.response_handler = api.safe_handler
+        content = download_content_unit(cfg, distribution, unit_path)
+        pulp_hash = hashlib.sha256(content).hexdigest()
 
-        unit_url = cfg.get_hosts('api')[0].roles['api']['scheme']
-        unit_url += '://' + distribution['base_url'] + '/'
-        unit_url = urljoin(unit_url, unit_path)
-
-        pulp_hash = hashlib.sha256(client.get(unit_url).content).hexdigest()
         self.assertEqual(fixtures_hash, pulp_hash)

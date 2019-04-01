@@ -16,14 +16,14 @@ from pulp_smash.pulp3.utils import (
     sync,
 )
 
-from pulp_plugin_template.tests.functional.utils import (
-    gen_plugin_template_remote,
-    gen_plugin_template_publisher,
-)
 from pulp_plugin_template.tests.functional.constants import (
     PLUGIN_TEMPLATE_CONTENT_NAME,
-    PLUGIN_TEMPLATE_REMOTE_PATH,
     PLUGIN_TEMPLATE_PUBLISHER_PATH,
+    PLUGIN_TEMPLATE_REMOTE_PATH,
+)
+from pulp_plugin_template.tests.functional.utils import (
+    gen_plugin_template_publisher,
+    gen_plugin_template_remote,
 )
 from pulp_plugin_template.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
@@ -68,9 +68,9 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         self.addCleanup(client.delete, publisher['_href'])
 
         # Step 1
-        repo = self.client.get(repo['_href'])
+        repo = client.get(repo['_href'])
         for plugin_template_content in get_content(repo)[PLUGIN_TEMPLATE_CONTENT_NAME]:
-            self.client.post(
+            client.post(
                 repo['_versions_href'],
                 {'add_content_units': [plugin_template_content['_href']]}
             )
@@ -93,6 +93,6 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         with self.assertRaises(HTTPError):
             body = {
                 'repository': repo['_href'],
-                'repository_version': non_latest
+                'repository_version': non_latest,
             }
             client.post(urljoin(publisher['_href'], 'publish/'), body)

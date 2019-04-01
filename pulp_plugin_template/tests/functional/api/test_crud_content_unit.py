@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Tests that CRUD plugin_template content units."""
+"""Tests that perform actions over content unit."""
 import unittest
 
 from requests.exceptions import HTTPError
@@ -9,12 +9,12 @@ from pulp_smash.pulp3.constants import ARTIFACTS_PATH
 from pulp_smash.pulp3.utils import delete_orphans
 
 from pulp_plugin_template.tests.functional.constants import (
-    PLUGIN_TEMPLATE_URL,
     PLUGIN_TEMPLATE_CONTENT_PATH,
+    PLUGIN_TEMPLATE_URL,
 )
 from pulp_plugin_template.tests.functional.utils import (
     gen_plugin_template_content_attrs,
-    skip_if
+    skip_if,
 )
 from pulp_plugin_template.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
