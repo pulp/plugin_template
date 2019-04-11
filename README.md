@@ -63,16 +63,16 @@ After bootstrapping, your plugin should be installable and discoverable by Pulp.
 
 2. Start/restart the Pulp Server
 
-    `django-admin runserver`
+    `django-admin runserver 24817`
 
 3. Check that everything worked and you have a remote endpoint
 
-    `$ http GET http://localhost:8000/pulp/api/v3/remotes/plugin_template/plugin-template/`
+    `$ http GET http://localhost:24817/pulp/api/v3/remotes/plugin_template/plugin-template/`
 
 
 The plugin specific `/pulp/api/v3/publishers/plugin-template/` and `/pulp/api/v3/content/plugin-template/` endpoints
 should now also be available, and you can validate this by checking the hosted docs
-http://localhost:8000/pulp/api/v3/docs
+http://localhost:24817/pulp/api/v3/docs
 
 Your plugin is discoverable by Pulp because it is [a Django application that subclasses
 pulpcore.plugin.PulpPluginAppConfig](pulp_plugin_template/app/__init__.py)
