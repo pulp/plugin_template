@@ -7,7 +7,7 @@ flake8 --config flake8.cfg || exit 1
 
 # Run migrations.
 export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
-export PULP_CONTENT_HOST=localhost:8080
+export PULP_CONTENT_HOST=localhost:24816
 pulp-manager migrate auth --noinput
 pulp-manager makemigrations pulp_app --noinput
 pulp-manager makemigrations plugin_template
@@ -19,7 +19,7 @@ pulp-manager migrate --noinput
 # Run functional tests.
 pulp-manager reset-admin-password --password admin
 pulp-manager runserver >> ~/django_runserver.log 2>&1 &
-gunicorn pulpcore.content:server --bind 'localhost:8080' --worker-class 'aiohttp.GunicornWebWorker' -w 2 >> ~/content_app.log 2>&1 &
+gunicorn pulpcore.content:server --bind 'localhost:24816' --worker-class 'aiohttp.GunicornWebWorker' -w 2 >> ~/content_app.log 2>&1 &
 rq worker -n 'resource-manager@%h' -w 'pulpcore.tasking.worker.PulpWorker' >> ~/resource_manager.log 2>&1 &
 rq worker -n 'reserved-resource-worker-1@%h' -w 'pulpcore.tasking.worker.PulpWorker' >> ~/reserved_worker-1.log 2>&1 &
 sleep 8
