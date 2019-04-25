@@ -1,3 +1,5 @@
+.. _workflows-index:
+
 Workflows
 =========
 
@@ -30,4 +32,5 @@ set is the hostname and port::
 
    sync
    upload
-   publish-host
+   publish
+
