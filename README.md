@@ -212,10 +212,16 @@ TODO
 
 # Documentation
 
-Your bootstrap template comes with a set of [prepopulated docs](docs/). You can host these on readthedocs when you are ready.
+Your bootstrap template comes with a set of [prepopulated docs](docs/). You can host these on
+readthedocs when you are ready.
 
-Pulp also comes with a set of [auto API docs](meta_docs/reference/documentation.md). When your plugin is installed endpoints in the live api docs will be automatically populate.
+Pulp also comes with a set of [auto API docs](meta_docs/reference/documentation.md). When your
+plugin is installed endpoints in the live api docs will be automatically populate.
 
+When you run 'make html' command to build the docs, you must have the pulp-api running on
+localhost. The 'make html' command first downloads the OpenAPI schema for the plugin and saves it
+in ``docs/_static/api.json``. You should add this file to git. This file will then provide data
+needed to display the restapi.html page in the root of the built docs. 
 
 # Additional Topics
 
