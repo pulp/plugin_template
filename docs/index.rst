@@ -9,6 +9,8 @@ hosting plugin-template packages. This plugin is a part of the `Pulp Project
 If you are just getting started, we recommend getting to know the :doc:`basic
 workflows<workflows/index>`.
 
+The REST API documentation for ``pulp_plugin_template`` is available `here <restapi.html>`_.
+
 
 Table of Contents
 -----------------
@@ -18,7 +20,7 @@ Table of Contents
 
    installation
    workflows/index
-   release-notes/3.0.z.rst
+   release-notes/0.0.z.rst
 
 
 Indices and tables
