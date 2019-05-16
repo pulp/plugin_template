@@ -2,60 +2,13 @@
 
 import argparse
 import os
-import re
 import shutil
 import sys
 import tempfile
 import textwrap
 
-TEMPLATE_SNAKE = 'pulp_plugin_template'
-TEMPLATE_SNAKE_SHORT = 'plugin_template'
-TEMPLATE_CAPS = 'PULP_PLUGIN_TEMPLATE'
-TEMPLATE_CAPS_SHORT = 'PLUGIN_TEMPLATE'
-TEMPLATE_CAMEL = 'PulpPluginTemplate'
-TEMPLATE_CAMEL_SHORT = 'PluginTemplate'
-TEMPLATE_DASH = 'pulp-plugin-template'
-TEMPLATE_DASH_SHORT = 'plugin-template'
-IGNORE_FILES = (
-    'LICENSE',
-    'COMMITMENT',
-    'pep8speaks.yml',
-    'bootstrap.py',
-    'Vagrantfile.example'
-)
-IGNORE_COPYTREE = ('.git', '*.pyc', '*.egg-info', 'bootstrap.py', '__pycache__', 'meta-docs')
-
-
-def is_valid(name):
-    """
-    Check if specified name is compliant with requirements for it.
-
-    The max length of the name is 16 characters. It seems reasonable to have this limitation
-    because the plugin name is used for directory name on the file system and it is also used
-    as a name of some Python objects, like class names, so it is expected to be relatively short.
-    """
-    return bool(re.match(r'^[a-z][0-9a-z_]{2,15}$', name))
-
-
-def to_camel(name):
-    """
-    Convert plugin name from snake to camel case
-    """
-    return name.title().replace('_', '')
-
-
-def to_caps(name):
-    """
-    Convert plugin name from snake to upper snake case
-    """
-    return name.upper()
-
-
-def to_dash(name):
-    """
-    Convert plugin name from snake case to dash representation
-    """
-    return name.replace('_', '-')
+import constants
+import utils
 
 
 def main():
@@ -74,20 +27,20 @@ def main():
     args = parser.parse_args()
     plugin_name = args.plugin_name
 
-    if not is_valid(plugin_name):
+    if not utils.is_valid(plugin_name):
         parser.print_help()
         return 2
 
     pulp_plugin_name = 'pulp_' + plugin_name
     replace_map = {
-        TEMPLATE_SNAKE: pulp_plugin_name,
-        TEMPLATE_SNAKE_SHORT: plugin_name,
-        TEMPLATE_CAPS: to_caps(pulp_plugin_name),
-        TEMPLATE_CAPS_SHORT: to_caps(plugin_name),
-        TEMPLATE_CAMEL_SHORT: to_camel(plugin_name),
-        TEMPLATE_CAMEL: to_camel(pulp_plugin_name),
-        TEMPLATE_DASH_SHORT: to_dash(plugin_name),
-        TEMPLATE_DASH: to_dash(pulp_plugin_name),
+        constants.TEMPLATE_SNAKE: pulp_plugin_name,
+        constants.TEMPLATE_SNAKE_SHORT: plugin_name,
+        constants.TEMPLATE_CAPS: utils.to_caps(pulp_plugin_name),
+        constants.TEMPLATE_CAPS_SHORT: utils.to_caps(plugin_name),
+        constants.TEMPLATE_CAMEL_SHORT: utils.to_camel(plugin_name),
+        constants.TEMPLATE_CAMEL: utils.to_camel(pulp_plugin_name),
+        constants.TEMPLATE_DASH_SHORT: utils.to_dash(plugin_name),
+        constants.TEMPLATE_DASH: utils.to_dash(pulp_plugin_name),
     }
 
     # copy template directory
@@ -95,7 +48,7 @@ def main():
     dst_root_dir = os.path.join(os.path.dirname(orig_root_dir), pulp_plugin_name)
     try:
         shutil.copytree(orig_root_dir, dst_root_dir,
-                        ignore=shutil.ignore_patterns(*IGNORE_COPYTREE))
+                        ignore=shutil.ignore_patterns(*constants.IGNORE_COPYTREE))
     except FileExistsError:
         print(textwrap.dedent('''
               It looks like plugin with such name already exists!
@@ -105,15 +58,15 @@ def main():
 
     # rename python package directory
     listed_dir = os.listdir(dst_root_dir)
-    if TEMPLATE_SNAKE in listed_dir:
-        os.rename(os.path.join(dst_root_dir, TEMPLATE_SNAKE),
+    if constants.TEMPLATE_SNAKE in listed_dir:
+        os.rename(os.path.join(dst_root_dir, constants.TEMPLATE_SNAKE),
                   os.path.join(dst_root_dir, pulp_plugin_name))
 
     # replace text
     for dir_path, dirs, files in os.walk(dst_root_dir):
         for file in files:
             # skip files which don't need any text replacement
-            if file in IGNORE_FILES:
+            if file in constants.IGNORE_FILES:
                 continue
 
             file_path = os.path.join(dir_path, file)

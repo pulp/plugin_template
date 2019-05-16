@@ -11,9 +11,8 @@ export PULP_ROLES_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\
 # dev_requirements should not be needed for testing; don't install them to make sure
 pip install -r test_requirements.txt
 
-# check the commit message
-# uncomment for plugins that use pulp.plan.io as issue tracker
-# ./.travis/check_commit.sh
+{% if not exclude_check_commit_message %}# check the commit message
+./.travis/check_commit.sh{% endif %}
 
 # Lint code.
 flake8 --config flake8.cfg || exit 1
@@ -66,8 +65,9 @@ else
 fi
 
 pip install ansible
-cp pulp_plugin_template/.travis/playbook.yml ansible-pulp/playbook.yml
-cp pulp_plugin_template/.travis/postgres.yml ansible-pulp/postgres.yml
-cp pulp_plugin_template/.travis/mariadb.yml ansible-pulp/mariadb.yml
+cp {{ plugin_snake_name }}/.travis/playbook.yml ansible-pulp/playbook.yml
+cp {{ plugin_snake_name }}/.travis/postgres.yml ansible-pulp/postgres.yml
+cp {{ plugin_snake_name }}/.travis/mariadb.yml ansible-pulp/mariadb.yml
 
-cd pulp_plugin_template
+cd {{ plugin_snake_name }}
+
