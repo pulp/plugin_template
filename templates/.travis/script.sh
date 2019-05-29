@@ -25,6 +25,14 @@ wait_for_pulp() {
   return 1
 }
 
+if [ "$TEST" = 'docs' ]; then
+  django-admin runserver 24817 >> ~/django_runserver.log 2>&1 &
+  sleep 5
+  cd docs
+  make html
+  exit
+fi
+
 if [ "$TEST" = 'bindings' ]; then
   COMMIT_MSG=$(git show HEAD^2 -s)
   export PULP_BINDINGS_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulp-swagger-codegen\/pull\/(\d+)' | awk -F'/' '{print $7}')
@@ -39,15 +47,15 @@ if [ "$TEST" = 'bindings' ]; then
   fi
 
   sudo ./generate.sh pulpcore python
-  sudo ./generate.sh pulp_plugin_template python
+  sudo ./generate.sh {{ plugin_snake_name }} python
   pip install ./pulpcore-client
-  pip install ./pulp_plugin_template-client
-  python test_bindings.py
+  pip install ./{{ plugin_snake_name }}-client
+  python $TRAVIS_BUILD_DIR/.travis/test_bindings.py
   exit
 fi
 
 # Run unit tests.
-django-admin test ./pulp_plugin_template/tests/unit/
+django-admin test ./{{ plugin_snake_name }}/tests/unit/
 
 # Run functional tests, and upload coverage report to codecov.
 show_logs_and_return_non_zero() {
@@ -72,4 +80,4 @@ wait_for_pulp 20
 
 # Run functional tests
 pytest -v -r sx --color=yes --pyargs pulpcore.tests.functional || show_logs_and_return_non_zero
-pytest -v -r sx --color=yes --pyargs pulp_plugin_template.tests.functional || show_logs_and_return_non_zero
+pytest -v -r sx --color=yes --pyargs {{ plugin_snake_name }}.tests.functional || show_logs_and_return_non_zero

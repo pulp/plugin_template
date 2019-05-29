@@ -1,0 +1,73 @@
+sudo: required
+# https://docs.travis-ci.com/user/trusty-ci-environment/
+dist: xenial
+language: python
+python:
+    # python versions used in el7 SCL & supported fedora
+    - "3.6"
+    - "3.7"
+env:
+  matrix:
+    - DB=postgres TEST=pulp
+{% if not exclude_docs_test  %}    - DB=postgres TEST=docs{% endif %}
+{% if not exclude_mariadb_test  %}    - DB=mariadb TEST=pulp{% endif %}
+{% if not exclude_test_bindings %}    - DB=postgres TEST=bindings{% endif %}
+{% if not exclude_mariadb_test or not exclude_test_bindings %}
+matrix:
+  exclude:
+{% if not exclude_mariadb_test %}    - python: '3.6'
+      env: DB=mariadb TEST=pulp{% endif %}
+{% if not exclude_test_bindings %}    - python: '3.7'
+      env: DB=postgres TEST=bindings{% endif %}
+{% if not exclude_docs_test %}    - python: '3.6'
+      env: DB=postgres TEST=docs{% endif %}
+  fast_finish: true{% endif %}
+services:
+    - postgresql
+    - redis-server
+    {% if not exclude_mariadb_test  %}- mariadb{% endif %}
+addons:
+  apt:
+    packages:
+      - httpie
+      - jq
+  # postgres versions provided by el7 RHSCL (lowest supportable version)
+  postgresql: '9.6'
+  {% if not exclude_mariadb_test  %}mariadb: '10.3'{% endif %}
+before_install: .travis/before_install.sh
+install: .travis/install.sh
+before_script: .travis/before_script.sh
+script: .travis/script.sh
+after_failure:
+  - sh -c "cat ~/django_runserver.log"
+  - sh -c "cat ~/resource_manager.log"
+  - sh -c "cat ~/reserved_workers-1.log"
+jobs:
+  include:
+{% if not exclude_deploy_to_pypi %}  - stage: deploy-plugin-to-pypi
+    script:  bash .travis/publish_plugin_pypi.sh
+    if: tag IS present{% endif %}
+{% if not exclude_deploy_daily_client_to_rubygems %}  - stage: publish-daily-client-gem
+    script: bash .travis/publish_client_gem.sh
+    env:
+      - DB=postgres
+      - TEST=bindings
+    if: type = cron{% endif %}
+{% if not exclude_deploy_daily_client_to_pypi %}  - stage: publish-daily-client-pypi
+    script: bash .travis/publish_client_pypi.sh
+    env:
+      - DB=postgres
+      - TEST=bindings
+    if: type = cron{% endif %}
+{% if not exclude_deploy_client_to_rubygems %}  - stage: publish-client-gem
+    script: bash .travis/publish_client_gem.sh
+    env:
+      - DB=postgres
+      - TEST=bindings
+    if: tag IS present{% endif %}
+{% if not exclude_deploy_client_to_pypi %}  - stage: publish-client-pypi
+    script: bash .travis/publish_client_pypi.sh
+    env:
+      - DB=postgres
+      - TEST=bindings
+    if: tag IS present{% endif %}
