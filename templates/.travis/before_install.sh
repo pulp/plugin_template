@@ -1,6 +1,17 @@
 #!/usr/bin/env sh
 set -v
 
+export BEFORE_BEFORE_INSTALL=$TRAVIS_BUILD_DIR/.travis/before_before_install.sh
+export AFTER_BEFORE_INSTALL=$TRAVIS_BUILD_DIR/.travis/after_before_install.sh
+export BEFORE_BEFORE_SCRIPT=$TRAVIS_BUILD_DIR/.travis/before_before_script.sh
+export AFTER_BEFORE_SCRIPT=$TRAVIS_BUILD_DIR/.travis/after_before_script.sh
+export AFTER_SCRIPT=$TRAVIS_BUILD_DIR/.travis/after_script.sh
+
+
+if [ -f $BEFORE_BEFORE_INSTALL ]; then
+    bash $BEFORE_BEFORE_INSTALL
+fi
+
 COMMIT_MSG=$(git show HEAD^2 -s)
 export COMMIT_MSG
 export PULP_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulpcore\/pull\/(\d+)' | awk -F'/' '{print $7}')
@@ -71,3 +82,6 @@ cp {{ plugin_snake_name }}/.travis/mariadb.yml ansible-pulp/mariadb.yml
 
 cd {{ plugin_snake_name }}
 
+if [ -f $AFTER_BEFORE_INSTALL ]; then
+    bash $AFTER_BEFORE_INSTALL
+fi
