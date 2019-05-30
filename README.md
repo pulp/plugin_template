@@ -248,6 +248,13 @@ $ touch ../pulp_<plugin_name>/.travis/test_bindings.py
 $ ./generate_travis_config.py --pypi-username your_pypi_username plugin_name
 ```
 
+The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
+writers by providing before_before_install.sh, after_before_install.sh,
+before_before_script.sh, after_before_script.sh, and after_script.sh in their .travis directories.
+The scripts will all be executed in the following order: before_before_install.sh,
+before_install.sh, after_before_install.sh, install.sh, before_before_script.sh, before_script.sh,
+after_before_script.sh, script.sh, after_script.sh.
+
 You can modify the pipeline with the following option:
 
 ```
