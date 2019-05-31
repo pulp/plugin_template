@@ -20,7 +20,8 @@ Table of Contents
 
    installation
    workflows/index
-   release-notes/0.0.z.rst
+   changes
+   contributing
 
 
 Indices and tables
