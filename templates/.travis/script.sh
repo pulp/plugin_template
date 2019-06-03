@@ -38,16 +38,16 @@ if [ "$TEST" = 'bindings' ]; then
   export PULP_BINDINGS_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulp-swagger-codegen\/pull\/(\d+)' | awk -F'/' '{print $7}')
 
   cd ..
-  git clone https://github.com/pulp/pulp-swagger-codegen.git
-  cd pulp-swagger-codegen
+  git clone https://github.com/pulp/pulp-openapi-generator.git
+  cd pulp-openapi-generator
 
   if [ -n "$PULP_BINDINGS_PR_NUMBER" ]; then
     git fetch origin +refs/pull/$PULP_BINDINGS_PR_NUMBER/merge
     git checkout FETCH_HEAD
   fi
 
-  sudo ./generate.sh pulpcore python
-  sudo ./generate.sh {{ plugin_snake_name }} python
+  ./generate.sh pulpcore python
+  ./generate.sh {{ plugin_snake_name }} python
   pip install ./pulpcore-client
   pip install ./{{ plugin_snake_name }}-client
   python $TRAVIS_BUILD_DIR/.travis/test_bindings.py

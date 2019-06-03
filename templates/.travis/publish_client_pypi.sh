@@ -26,8 +26,7 @@ cd
 git clone https://github.com/pulp/pulp-openapi-generator.git
 cd pulp-openapi-generator
 
-sudo ./generate.sh {{ plugin_snake_name }} python $VERSION
-sudo chown -R travis:travis {{ plugin_snake_name }}-client
+./generate.sh {{ plugin_snake_name }} python $VERSION
 cd {{ plugin_snake_name }}-client
 python setup.py sdist bdist_wheel --python-tag py3
 twine upload dist/* -u pulp -p $PYPI_PASSWORD
