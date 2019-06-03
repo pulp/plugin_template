@@ -8,7 +8,7 @@ requirements = [
 
 setup(
     name='pulp-plugin-template',
-    version='0.0.1a1.dev1',
+    version='0.1.0a1',
     description='pulp-plugin-template plugin for the Pulp Project',
     license='GPLv2+',
     author='AUTHOR',

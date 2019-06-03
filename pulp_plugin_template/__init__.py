@@ -1,5 +1,3 @@
-import pkg_resources
-
-__version__ = pkg_resources.get_distribution("pulp-plugin-template").version
+__version__ = '0.1.0a1'
 
 default_app_config = 'pulp_plugin_template.app.PulpPluginTemplatePluginAppConfig'
