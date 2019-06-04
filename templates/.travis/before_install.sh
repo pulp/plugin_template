@@ -6,6 +6,7 @@ export AFTER_BEFORE_INSTALL=$TRAVIS_BUILD_DIR/.travis/after_before_install.sh
 export BEFORE_BEFORE_SCRIPT=$TRAVIS_BUILD_DIR/.travis/before_before_script.sh
 export AFTER_BEFORE_SCRIPT=$TRAVIS_BUILD_DIR/.travis/after_before_script.sh
 export AFTER_SCRIPT=$TRAVIS_BUILD_DIR/.travis/after_script.sh
+export AFTER_DOCS_TEST=$TRAVIS_BUILD_DIR/.travis/after_docs_test.sh
 
 
 if [ -f $BEFORE_BEFORE_INSTALL ]; then

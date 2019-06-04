@@ -221,7 +221,7 @@ plugin is installed endpoints in the live api docs will be automatically populat
 When you run 'make html' command to build the docs, you must have the pulp-api running on
 localhost. The 'make html' command first downloads the OpenAPI schema for the plugin and saves it
 in ``docs/_static/api.json``. You should add this file to git. This file will then provide data
-needed to display the restapi.html page in the root of the built docs. 
+needed to display the restapi.html page in the root of the built docs.
 
 # Travis configuration
 
@@ -231,7 +231,7 @@ run with the following command.
    ``$ ./generate_travis_config.py --pypi-username your_pypi_username plugin_name``
 
 The default behavior enables two build stages that generate client libraries using the OpenAPI
-schema. One publishes to PyPI using ```--pypi-username``` setting and the secret environment
+schema. One publishes to PyPI using ``--pypi-username`` setting and the secret environment
 variable called $PYPI_PASSWORD. The other stage publishes the client to rubygems.org and requires
 the $RUBYGEMS_API_KEY environment variable to be set. Both environment variables can be created on
 the travis-ci.com settings page for the plugin[0]. The stage that publishes tagged builds to PyPI
@@ -317,45 +317,45 @@ optional arguments:
                         secure environment variable called PYPI_PASSWORD. The variable can
                         be added in the travis-ci.com settings page for the project[0]. The PYPI
                         username is specified using --pypi-username option.
-                        
+
                         This stage uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli. 
-                          
+                        client library using openapi-generator-cli.
+
   --exclude-deploy-client-to-rubygems
                         Exclude a Travis stage that publishes a client library to RubyGems.org.
-                        
+
                         This stage only executes when a tag is associated with the commit being
                         built. When enabling this stage, the user is expected to provide a
                         secure environment variable called RUBYGEMS_API_KEY. The variable can
                         be added in the travis-ci.com settings page for the project.
-                        
+
   --exclude-deploy-daily-client-to-pypi
                         Exclude a Travis stage that publishes a client library to PyPI.
-                        
+
                         This stage only executes when a tag is associated with the commit being
                         built. When enabling this stage, the user is expected to provide a
                         secure environment variable called PYPI_PASSWORD. The variable can
                         be added in the travis-ci.com settings page for the project[0]. The PYPI
                         username is specified using --pypi-username option.
-                        
+
                         This stage uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli. 
-                        
+                        client library using openapi-generator-cli.
+
                         [0] https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings
-                        
+
   --exclude-deploy-daily-client-to-rubygems
                         Exclude a Travis stage that publishes a client library to RubyGems.org
                         with each CRON build.
-                        
+
                         This stage only executes on builds trigerred by CRON. When enabling
                         this stage, the user is expected to provide a secure environment
                         variable called RUBYGEMS_API_KEY. The variable can be added in the
                         travis-ci.com settings page for the project.
-                        
+
   --exclude-check-commit-message
-                        Exclude inspection of commit message for a reference to an issue in 
+                        Exclude inspection of commit message for a reference to an issue in
                         pulp.plan.io.
-                        
+
 ```
 
 # Additional Topics

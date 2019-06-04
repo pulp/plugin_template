@@ -26,10 +26,13 @@ wait_for_pulp() {
 }
 
 if [ "$TEST" = 'docs' ]; then
-  django-admin runserver 24817 >> ~/django_runserver.log 2>&1 &
   sleep 5
   cd docs
   make html
+  if [ -f $AFTER_DOCS_TEST ]; then
+      source $AFTER_DOCS_TEST
+  fi
+
   exit
 fi
 
