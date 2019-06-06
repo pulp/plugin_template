@@ -221,7 +221,7 @@ plugin is installed endpoints in the live api docs will be automatically populat
 When you run 'make html' command to build the docs, you must have the pulp-api running on
 localhost. The 'make html' command first downloads the OpenAPI schema for the plugin and saves it
 in ``docs/_static/api.json``. You should add this file to git. This file will then provide data
-needed to display the restapi.html page in the root of the built docs. 
+needed to display the restapi.html page in the root of the built docs.
 
 # Travis configuration
 
@@ -249,11 +249,19 @@ $ ./generate_travis_config.py --pypi-username your_pypi_username plugin_name
 ```
 
 The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
-writers by providing before_before_install.sh, after_before_install.sh,
-before_before_script.sh, after_before_script.sh, and after_script.sh in their .travis directories.
-The scripts will all be executed in the following order: before_before_install.sh,
-before_install.sh, after_before_install.sh, install.sh, before_before_script.sh, before_script.sh,
-after_before_script.sh, script.sh, after_script.sh.
+writers by creating specially named scripts in their .travis directories. The scripts are executed
+in the following order, with optional plugin provided scripts in bold:
+
+1. **pre_before_install.sh**
+1. before_install.sh
+1. **post_before_install.sh**
+1. install.sh
+1. **pre_before_script.sh**
+1. before_script.sh
+1. **post_before_script.sh**
+1. script.sh
+1. **post_docs_test.sh**
+1. **post_script.sh**
 
 You can modify the pipeline with the following option:
 
@@ -317,45 +325,45 @@ optional arguments:
                         secure environment variable called PYPI_PASSWORD. The variable can
                         be added in the travis-ci.com settings page for the project[0]. The PYPI
                         username is specified using --pypi-username option.
-                        
+
                         This stage uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli. 
-                          
+                        client library using openapi-generator-cli.
+
   --exclude-deploy-client-to-rubygems
                         Exclude a Travis stage that publishes a client library to RubyGems.org.
-                        
+
                         This stage only executes when a tag is associated with the commit being
                         built. When enabling this stage, the user is expected to provide a
                         secure environment variable called RUBYGEMS_API_KEY. The variable can
                         be added in the travis-ci.com settings page for the project.
-                        
+
   --exclude-deploy-daily-client-to-pypi
                         Exclude a Travis stage that publishes a client library to PyPI.
-                        
+
                         This stage only executes when a tag is associated with the commit being
                         built. When enabling this stage, the user is expected to provide a
                         secure environment variable called PYPI_PASSWORD. The variable can
                         be added in the travis-ci.com settings page for the project[0]. The PYPI
                         username is specified using --pypi-username option.
-                        
+
                         This stage uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli. 
-                        
+                        client library using openapi-generator-cli.
+
                         [0] https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings
-                        
+
   --exclude-deploy-daily-client-to-rubygems
                         Exclude a Travis stage that publishes a client library to RubyGems.org
                         with each CRON build.
-                        
+
                         This stage only executes on builds trigerred by CRON. When enabling
                         this stage, the user is expected to provide a secure environment
                         variable called RUBYGEMS_API_KEY. The variable can be added in the
                         travis-ci.com settings page for the project.
-                        
+
   --exclude-check-commit-message
-                        Exclude inspection of commit message for a reference to an issue in 
+                        Exclude inspection of commit message for a reference to an issue in
                         pulp.plan.io.
-                        
+
 ```
 
 # Additional Topics
