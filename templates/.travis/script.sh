@@ -3,6 +3,8 @@
 
 set -mveuo pipefail
 
+export POST_SCRIPT=$TRAVIS_BUILD_DIR/.travis/post_script.sh
+
 # Needed for both starting the service and building the docs.
 # Gets set in .travis/settings.yml, but doesn't seem to inherited by
 # this script.
@@ -81,3 +83,7 @@ wait_for_pulp 20
 # Run functional tests
 pytest -v -r sx --color=yes --pyargs pulpcore.tests.functional || show_logs_and_return_non_zero
 pytest -v -r sx --color=yes --pyargs {{ plugin_snake_name }}.tests.functional || show_logs_and_return_non_zero
+
+if [ -x $POST_SCRIPT ]; then
+    $POST_SCRIPT
+fi
