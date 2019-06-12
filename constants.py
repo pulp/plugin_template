@@ -1,11 +1,11 @@
-TEMPLATE_SNAKE = 'pulp_plugin_template'
-TEMPLATE_SNAKE_SHORT = 'plugin_template'
-TEMPLATE_CAPS = 'PULP_PLUGIN_TEMPLATE'
-TEMPLATE_CAPS_SHORT = 'PLUGIN_TEMPLATE'
-TEMPLATE_CAMEL = 'PulpPluginTemplate'
-TEMPLATE_CAMEL_SHORT = 'PluginTemplate'
-TEMPLATE_DASH = 'pulp-plugin-template'
-TEMPLATE_DASH_SHORT = 'plugin-template'
+TEMPLATE_SNAKE = '{{ plugin_snake }}'
+TEMPLATE_SNAKE_SHORT = '{{ plugin_snake_short }}'
+TEMPLATE_CAPS = '{{ plugin_caps }}'
+TEMPLATE_CAPS_SHORT = '{{ plugin_caps_short }}'
+TEMPLATE_CAMEL = '{{ plugin_camel }}'
+TEMPLATE_CAMEL_SHORT = '{{ plugin_camel_short }}'
+TEMPLATE_DASH = '{{ plugin_dash }}'
+TEMPLATE_DASH_SHORT = '{{ plugin_dash_short }}'
 IGNORE_FILES = (
     'LICENSE',
     'COMMITMENT',

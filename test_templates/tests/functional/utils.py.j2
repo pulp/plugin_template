@@ -1,0 +1,104 @@
+# coding=utf-8
+"""Utilities for tests for the {{ plugin_snake_short }} plugin."""
+from functools import partial
+from unittest import SkipTest
+
+from pulp_smash import api, selectors
+from pulp_smash.pulp3.constants import REPO_PATH
+from pulp_smash.pulp3.utils import (
+    gen_publisher,
+    gen_remote,
+    gen_repo,
+    get_content,
+    require_pulp_3,
+    require_pulp_plugins,
+    sync,
+)
+
+from {{ plugin_snake }}.tests.functional.constants import (
+    {{ plugin_caps_short }}_CONTENT_NAME,
+    {{ plugin_caps_short }}_CONTENT_PATH,
+    {{ plugin_caps_short }}_FIXTURE_URL,
+    {{ plugin_caps_short }}_REMOTE_PATH,
+)
+
+
+def set_up_module():
+    """Skip tests Pulp 3 isn't under test or if {{ plugin_snake }} isn't installed."""
+    require_pulp_3(SkipTest)
+    require_pulp_plugins({'{{ plugin_snake }}'}, SkipTest)
+
+
+def gen_{{ plugin_snake_short }}_remote(url={{ plugin_caps_short }}_FIXTURE_URL, **kwargs):
+    """Return a semi-random dict for use in creating a {{ plugin_snake_short }} Remote.
+
+    :param url: The URL of an external content source.
+    """
+    # FIXME: Add any fields specific to a {{ plugin_snake_short }} remote here
+    return gen_remote(url, **kwargs)
+
+
+def gen_{{ plugin_snake_short }}_publisher(**kwargs):
+    """Return a semi-random dict for use in creating a {{ plugin_snake_short }} Publisher.
+
+    :param url: The URL of an external content source.
+    """
+    # FIXME: Add any fields specific to a plugin_teplate publisher here
+    return gen_publisher(**kwargs)
+
+
+def get_{{ plugin_snake_short }}_content_paths(repo, version_href=None):
+    """Return the relative path of content units present in a {{ plugin_snake_short }} repository.
+
+    :param repo: A dict of information about the repository.
+    :param version_href: The repository version to read.
+    :returns: A list with the paths of units present in a given repository.
+    """
+    # FIXME: The "relative_path" is actually a file path and name
+    # It's just an example -- this needs to be replaced with an implementation that works
+    # for repositories of this content type.
+    return [
+        content_unit['relative_path']
+        for content_unit in get_content(repo, version_href)[{{ plugin_caps_short }}_CONTENT_NAME]
+    ]
+
+
+def gen_{{ plugin_snake_short }}_content_attrs(artifact):
+    """Generate a dict with content unit attributes.
+
+    :param artifact: A dict of info about the artifact.
+    :returns: A semi-random dict for use in creating a content unit.
+    """
+    # FIXME: Add content specific metadata here.
+    return {'_artifact': artifact['_href']}
+
+
+def populate_pulp(cfg, url={{ plugin_caps_short }}_FIXTURE_URL):
+    """Add {{ plugin_snake_short }} contents to Pulp.
+
+    :param pulp_smash.config.PulpSmashConfig: Information about a Pulp application.
+    :param url: The {{ plugin_snake_short }} repository URL. Defaults to
+        :data:`pulp_smash.constants.{{ plugin_caps_short }}_FIXTURE_URL`
+    :returns: A list of dicts, where each dict describes one {{ plugin_snake_short }} content in Pulp.
+    """
+    client = api.Client(cfg, api.json_handler)
+    remote = {}
+    repo = {}
+    try:
+        remote.update(client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_snake_short }}_remote(url)))
+        repo.update(client.post(REPO_PATH, gen_repo()))
+        sync(cfg, remote, repo)
+    finally:
+        if remote:
+            client.delete(remote['_href'])
+        if repo:
+            client.delete(repo['_href'])
+    return client.get({{ plugin_caps_short }}_CONTENT_PATH)['results']
+
+
+skip_if = partial(selectors.skip_if, exc=SkipTest)  # pylint:disable=invalid-name
+"""The ``@skip_if`` decorator, customized for unittest.
+
+:func:`pulp_smash.selectors.skip_if` is test runner agnostic. This function is
+identical, except that ``exc`` has been set to ``unittest.SkipTest``.
+"""
