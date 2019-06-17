@@ -121,13 +121,23 @@ def main():
                             pulp.plan.io.
 
                         '''))
+    parser.add_argument('--exclude-coverage', action='store_true',
+                        help=textwrap.dedent('''\
+                            Exclude collection of coverage and reporting to coveralls.io
+                            pulp.plan.io.
+
+                        '''))
     args = parser.parse_args()
     config = {}
     for name, value in args._get_kwargs():
         config[name] = value
 
-    config['plugin_snake_name'] = 'pulp_' + config['plugin_name']
-    config['plugin_dash_name'] = 'pulp-' + config['plugin_name']
+    if config['plugin_name'] == 'pulpcore':
+        config['plugin_snake_name'] = 'pulpcore'
+        config['plugin_dash_name'] = 'pulpcore'
+    else:
+        config['plugin_snake_name'] = 'pulp_' + config['plugin_name']
+        config['plugin_dash_name'] = 'pulp-' + config['plugin_name']
 
     if not utils.is_valid(config['plugin_name']):
         parser.print_help()

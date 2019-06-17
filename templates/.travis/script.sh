@@ -34,9 +34,9 @@ if [ "$TEST" = 'docs' ]; then
   make html
   cd ..
 
-    if [ -x $POST_DOCS_TEST ]; then
-        $POST_DOCS_TEST
-    fi
+  if [ -x $POST_DOCS_TEST ]; then
+      $POST_DOCS_TEST
+  fi
   exit
 fi
 
@@ -62,7 +62,7 @@ if [ "$TEST" = 'bindings' ]; then
 fi
 
 # Run unit tests.
-django-admin test ./{{ plugin_snake_name }}/tests/unit/
+coverage run $(which django-admin) test ./{{ plugin_snake_name }}/tests/unit/
 
 # Run functional tests, and upload coverage report to codecov.
 show_logs_and_return_non_zero() {
@@ -87,8 +87,21 @@ wait_for_pulp 20
 
 # Run functional tests
 pytest -v -r sx --color=yes --pyargs pulpcore.tests.functional || show_logs_and_return_non_zero
-pytest -v -r sx --color=yes --pyargs {{ plugin_snake_name }}.tests.functional || show_logs_and_return_non_zero
+{% if plugin_name != 'pulpcore' %}pytest -v -r sx --color=yes --pyargs {{ plugin_snake_name }}.tests.functional || show_logs_and_return_non_zero
+{% else %}pytest -v -r sx --color=yes --pyargs pulp_file.tests.functional || show_logs_and_return_non_zero
+pytest -v -r sx --color=yes --pyargs pulp_certguard.tests.functional || show_logs_and_return_non_zero
+{% endif %}
 
+{% if not exclude_coverage %}# Stop services to write coverage
+kill -SIGINT %?runserver
+kill -SIGINT %?content_with_coverage
+kill -SIGINT %?reserved-resource-worker
+kill -SIGINT %?resource-manager
+wait || true
+
+coverage combine
+codecov
+{% endif %}
 if [ -x $POST_SCRIPT ]; then
     $POST_SCRIPT
 fi
