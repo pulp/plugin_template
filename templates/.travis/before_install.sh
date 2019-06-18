@@ -34,7 +34,7 @@ if [ -n "$PULP_ROLES_PR_NUMBER" ]; then
   popd
 fi
 
-git clone https://github.com/pulp/pulpcore.git
+{% if plugin_name != 'pulpcore' %}git clone https://github.com/pulp/pulpcore.git
 
 if [ -n "$PULP_PR_NUMBER" ]; then
   pushd pulpcore
@@ -42,7 +42,7 @@ if [ -n "$PULP_PR_NUMBER" ]; then
   git checkout FETCH_HEAD
   popd
 fi
-
+{% endif %}
 
 git clone https://github.com/pulp/pulpcore-plugin.git
 

@@ -47,6 +47,19 @@ jobs:
 {% if not exclude_deploy_to_pypi %}  - stage: deploy-plugin-to-pypi
     script:  bash .travis/publish_plugin_pypi.sh
     if: tag IS present{% endif %}
+{% if plugin_name == 'pulpcore' %}  - stage: publish-beta-docs
+    script: bash .travis/publish_docs.sh rc
+    env:
+      - DB=postgres
+      - TEST=docs
+    if: tag IS present
+  - stage: publish-continuous-docs
+    script: bash .travis/publish_docs.sh nightly
+    env:
+      - DB=postgres
+      - TEST=docs
+    if: type != pull_request
+{% endif %}
 {% if not exclude_deploy_daily_client_to_rubygems %}  - stage: publish-daily-client-gem
     script: bash .travis/publish_client_gem.sh
     env:
