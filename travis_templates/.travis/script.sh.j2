@@ -54,9 +54,11 @@ if [ "$TEST" = 'bindings' ]; then
   fi
 
   ./generate.sh pulpcore python
-  ./generate.sh {{ plugin_snake }} python
   pip install ./pulpcore-client
+{% if plugin_name == 'pulpcore' %}  ./generate.sh pulp_file python
+  pip install ./pulp_file-client{% else %}  ./generate.sh {{ plugin_snake }} python
   pip install ./{{ plugin_snake }}-client
+{% endif %}
   python $TRAVIS_BUILD_DIR/.travis/test_bindings.py
   exit
 fi
