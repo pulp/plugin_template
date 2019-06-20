@@ -165,7 +165,7 @@ def main():
     if config['plugin_name'] == 'pulpcore':
         config['plugin_snake'] = 'pulpcore'
     else:
-        config['plugin_snake_name'] = 'pulp_' + config['plugin_name']
+        config['plugin_snake'] = 'pulp_' + config['plugin_name']
 
     config['plugin_snake_short'] = config['plugin_name']
     config['plugin_caps'] = utils.to_caps(config['plugin_snake'])
