@@ -37,7 +37,7 @@ change to create a 'real' plugin.
    It will contain a ``setup.py``, expected plugin layout and stubs for necessary classes and methods, minimal docs,
    and tests.
 
-   ``$ ./bootstrap.py your_plugin_name``
+   ``$ ./bootstrap.py --bootsrap your_plugin_name``
 
    **NOTE** : Whatever you choose for `your_plugin_name` will be prefixed with `pulp_`.
    Therefore, for this argument it is best to just provide the content type
@@ -67,15 +67,15 @@ After bootstrapping, your plugin should be installable and discoverable by Pulp.
 
 3. Check that everything worked and you have a remote endpoint
 
-    `$ http GET http://localhost:24817/pulp/api/v3/remotes/plugin_template/plugin-template/`
+    `$ http GET http://localhost:24817/pulp/api/v3/remotes/{{ plugin_snake_short }}/{{ plugin_dash_short }}/`
 
 
-The plugin specific `/pulp/api/v3/publishers/plugin-template/` and `/pulp/api/v3/content/plugin-template/` endpoints
+The plugin specific `/pulp/api/v3/publishers/{{ plugin_dash_short }}/` and `/pulp/api/v3/content/{{ plugin_dash_short }}/` endpoints
 should now also be available, and you can validate this by checking the hosted docs
 http://localhost:24817/pulp/api/v3/docs
 
 Your plugin is discoverable by Pulp because it is [a Django application that subclasses
-pulpcore.plugin.PulpPluginAppConfig](pulp_plugin_template/app/__init__.py)
+pulpcore.plugin.PulpPluginAppConfig]({{ plugin_snake }}/app/__init__.py)
 
 For more information about plugin discoverability, including how it works and plugin
 entrypoints see [the discoverability documentation](meta_docs/discoverability.md)
@@ -121,15 +121,15 @@ Keep [namespacing](meta_docs/subclassing/namespacing.md) in mind when writing yo
 
 ### Model
 
-First model your content type. This file is located at [pulp_plugin_template/app/models.py](pulp_plugin_template/app/models.py).
+First model your content type. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
 Add any fields that correspond to the metadata of your content, the could be the project name, the author name, or any other type of metadata.
 
 The ``TYPE`` class attribute is used for filtering purposes.
 If a uniqueness constraint is needed, add a ``Meta`` class to the model like so:
 
 ```
-class PluginTemplateContent(Content):
-    TYPE = 'plugin-template'
+class {{ plugin_camel_short }}Content(Content):
+    TYPE = '{{ plugin_dash_short }}'
     filename = models.TextField(unique=True, db_index=True, blank=False)
 
     class Meta:
@@ -138,19 +138,19 @@ class PluginTemplateContent(Content):
 
 After adding the model, you can run the migration with
 
-`pulp-manager makemigrations plugin_template`
+`pulp-manager makemigrations {{ plugin_snake_short }}`
 
-And make sure all your fields are on the plugin_template database table.
+And make sure all your fields are on the {{ plugin_snake_short }} database table.
 
 ### Serializer
 
-Next, add a corresponding serializer field on the in [pulp_plugin_template/app/serializers.py](pulp_plugin_template/app/serializers.py).
+Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
 See the [DRF documentation on serializer fields to see what's available](http://www.django-rest-framework.org/api-guide/fields/)
 
 
 ### Viewset
 
-Last, add any additional routes to your [pulp_plugin_template/app/viewsets.py](pulp_plugin_template/app/viewsets.py).
+Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
 The content viewset usually doesn't require any additinal routes, so you can leave this alone for now.
 
 
@@ -162,35 +162,35 @@ them but is not required to.
 
 ### Model
 
-First model your remote. This file is located at [pulp_plugin_template/app/models.py](pulp_plugin_template/app/models.py).
+First model your remote. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
 Add any fields that correspond to the remote source.
 
 Remember to define the ``TYPE`` class attribute which is used for filtering purposes,
 
 ### Serializer
 
-Next, add a corresponding serializer field on the in [pulp_plugin_template/app/serializers.py](pulp_plugin_template/app/serializers.py).
+Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
 
 ### Viewset
 
-Last, add any additional routes to your [pulp_plugin_template/app/viewsets.py](pulp_plugin_template/app/viewsets.py).
-Note the sync route is predefined for you. This route kicks off a task [pulp_plugin_template.app.tasks.synchronizing.py](pulp_plugin_template.app.tasks.synchronizing.py).
+Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
+Note the sync route is predefined for you. This route kicks off a task [{{ plugin_snake }}.app.tasks.synchronizing.py]({{ plugin_snake }}.app.tasks.synchronizing.py).
 
 ## Publisher
 
 ### Model
-e. This file is located at [pulp_plugin_template/app/models.py](pulp_plugin_template/app/models.py).
+e. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
 Add any additional fields.
 
 Make sure you define the ``TYPE`` class attribute which is used for filtering purposes,
 
 ### Serializer
-Next, add a corresponding serializer field on the in [pulp_plugin_template/app/serializers.py](pulp_plugin_template/app/serializers.py).
+Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
 
 ### Viewset
 
-Last, add any additional routes to your [pulp_plugin_template/app/viewsets.py](pulp_plugin_template/app/viewsets.py).
-Note the publish route is predefined for you. This route kicks off a task [pulp_plugin_template.app.tasks.publishing.py](pulp_plugin_template.app.tasks.publishing.py).
+Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
+Note the publish route is predefined for you. This route kicks off a task [{{ plugin_snake }}.app.tasks.publishing.py]({{ plugin_snake }}.app.tasks.publishing.py).
 
 # Exporter
 
@@ -228,10 +228,10 @@ needed to display the restapi.html page in the root of the built docs.
 This repository also provides a script for generating a Travis configuration. The script should be
 run with the following command.
 
-   ``$ ./generate_travis_config.py --pypi-username your_pypi_username plugin_name``
+   ``$ ./bootstrap.py --travis --pypi-username your_pypi_username plugin_name``
 
 The default behavior enables two build stages that generate client libraries using the OpenAPI
-schema. One publishes to PyPI using ```--pypi-username``` setting and the secret environment
+schema. One publishes to PyPI using ``--pypi-username`` setting and the secret environment
 variable called $PYPI_PASSWORD. The other stage publishes the client to rubygems.org and requires
 the $RUBYGEMS_API_KEY environment variable to be set. Both environment variables can be created on
 the travis-ci.com settings page for the plugin[0]. The stage that publishes tagged builds to PyPI
@@ -239,13 +239,13 @@ uses the same configs as the client publishing stage. The default pipeline can b
 following commands:
 
 ```
-$ git clone git@github.com/pulp/plugin_template
-$ cd plugin_template
+$ git clone git@github.com/pulp/{{ plugin_snake_short }}
+$ cd {{ plugin_snake_short }}
 $ # copying the requirements file is only needed if plugin was created before this file was added
 $ # to the plugin template
 $ cp doc_requirements.txt ../pulp_<plugin_name>/
 $ touch ../pulp_<plugin_name>/.travis/test_bindings.py
-$ ./generate_travis_config.py --pypi-username your_pypi_username plugin_name
+$ ./bootstrap.py --travis --pypi-username your_pypi_username plugin_name
 ```
 
 The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
@@ -263,39 +263,49 @@ in the following order, with optional plugin provided scripts in bold:
 1. **post_docs_test.sh**
 1. **post_script.sh**
 
-You can modify the pipeline with the following option:
+The pipeline can be modified, see the help text for available options.
 
 ```
-$ ./generate_travis_config.py --help
-usage: generate_travis_config.py [-h] [--exclude-docs-test]
-                                 [--exclude-mariadb-test]
-                                 [--exclude-deploy-to-pypi]
-                                 [--exclude-test-bindings]
-                                 [--exclude-deploy-client-to-pypi]
-                                 [--exclude-deploy-client-to-rubygems]
-                                 [--exclude-deploy-daily-client-to-pypi]
-                                 [--exclude-deploy-daily-client-to-rubygems]
-                                 [--pypi-username PYPI_USERNAME]
-                                 [--exclude-check-commit-message]
-                                 plugin_name
+$ ./bootstrap.py --help
+usage: bootstrap.py [-h] [--bootstrap] [--test] [--travis] [--docs] [--all]
+                    [--verbose] [--pypi-username PYPI_USERNAME]
+                    [--exclude-docs-test] [--exclude-mariadb-test]
+                    [--exclude-deploy-to-pypi] [--exclude-test-bindings]
+                    [--exclude-deploy-client-to-pypi]
+                    [--exclude-deploy-client-to-rubygems]
+                    [--exclude-deploy-daily-client-to-pypi]
+                    [--exclude-deploy-daily-client-to-rubygems]
+                    [--exclude-check-commit-message] [--exclude-coverage]
+                    plugin_name
 
-Generate a .travis.yml and .travis directory for a specified plugin
+Generate a .travis.yml and .travis directoryfor a specified plugin
 
 positional arguments:
-  plugin_name           Update this plugin's' Travis config
-
-                        A plugin with this name must already exist.
+  plugin_name           Create or update this plugin.
 
 
 optional arguments:
   -h, --help            show this help message and exit
+  --bootstrap           Create a new plugin and template boilerplate code.
+
+  --test                Generate or update functional and unit tests.
+
+  --travis              Generate or update travis configuration files.
+
+  --docs                Generate or update plugin documentation.
+
+  --all                 Create a new plugin and template all non-excluded files.
+
+  --verbose             Include more output.
+
   --pypi-username PYPI_USERNAME
                         The username that should be used when uploading packages to PyPI. It
                         is required unless --exclude-deploy-client-to-pypi and
                         --exclude-deploy-daily-client-to-pypi and --exclude-deploy-to-pypi are
                         specified.
 
-  --exclude-docs-test   Exclude a Travis build for testing the 'make html' command for sphinx docs
+  --exclude-docs-test   Exclude a Travis build for testing the 'make html' command for sphinx
+                        docs
 
   --exclude-mariadb-test
                         Exclude a Travis build for testing against MariaDB.
@@ -349,7 +359,8 @@ optional arguments:
                         This stage uses the OpenAPI schema for the plugin to generate a Python
                         client library using openapi-generator-cli.
 
-                        [0] https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings
+                        [0] https://docs.travis-ci.com/user/environment-variables/
+                        #defining-variables-in-repository-settings
 
   --exclude-deploy-daily-client-to-rubygems
                         Exclude a Travis stage that publishes a client library to RubyGems.org
@@ -362,6 +373,9 @@ optional arguments:
 
   --exclude-check-commit-message
                         Exclude inspection of commit message for a reference to an issue in
+                        pulp.plan.io.
+
+  --exclude-coverage    Exclude collection of coverage and reporting to coveralls.io
                         pulp.plan.io.
 
 ```
@@ -389,8 +403,8 @@ optional arguments:
 
 
 <!-- TEMPLATE_REMOVE_END -->
-# pulp-plugin-template
+# {{ plugin_dash }}
 
-A Pulp plugin to support hosting your own plugin-template.
+A Pulp plugin to support hosting your own {{ plugin_dash_short }}.
 
 For more information, please see the [documentation](docs/index.rst) or the [Pulp project page](https://pulpproject.org/).
