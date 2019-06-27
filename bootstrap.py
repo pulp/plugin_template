@@ -156,6 +156,16 @@ def main():
                             pulp.plan.io.
 
                         '''))
+    parser.add_argument('--exclude-black', action='store_true',
+                        help=textwrap.dedent('''\
+                            Exclude black code style check in Travis CI
+
+                        '''))
+    parser.add_argument('--exclude-pydocstyle', action='store_true',
+                        help=textwrap.dedent('''\
+                            Exclude pydocstyle check in Travis CI
+
+                        '''))
     args = parser.parse_args()
 
     config = {}
