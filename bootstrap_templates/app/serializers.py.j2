@@ -53,6 +53,17 @@ class {{ plugin_camel_short }}RemoteSerializer(platform.RemoteSerializer):
 
     class Meta:
         validators = platform.RemoteSerializer.Meta.validators + [myValidator1, myValidator2]
+
+    By default the 'policy' field in platform.RemoteSerializer only validates the choice
+    'immediate'. To add on-demand support for more 'policy' options, e.g. 'streamed' or 'on_demand',
+    re-define the 'policy' option as follows::
+
+    policy = serializers.ChoiceField(
+        help_text="The policy to use when downloading content. The possible values include: "
+                  "'immediate', 'on_demand', and 'streamed'. 'immediate' is the default.",
+        choices=models.Remote.POLICY_CHOICES,
+        default=models.Remote.IMMEDIATE
+    )
     """
 
     class Meta:
