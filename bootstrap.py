@@ -207,9 +207,9 @@ def write_template_section(config, name, plugin_root_dir):
     """
     Template or copy all files for the section.
     """
-    section_template_dir = "{name}_templates".format(name=name)
+    section_template_dir = "templates/{name}".format(name=name)
     env = Environment(
-        loader=FileSystemLoader(section_template_dir)
+        loader=FileSystemLoader([section_template_dir, 'templates'])
     )
 
     files_templated = 0
