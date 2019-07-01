@@ -170,10 +170,10 @@ def main():
     config['plugin_snake_short'] = config['plugin_name']
     config['plugin_caps'] = utils.to_caps(config['plugin_snake'])
     config['plugin_caps_short'] = utils.to_caps(config['plugin_name'])
-    config['plugin_camel_short'] = utils.to_camel(config['plugin_snake'])
-    config['plugin_camel'] = utils.to_camel(config['plugin_name'])
-    config['plugin_dash_short'] = utils.to_dash(config['plugin_name'])
+    config['plugin_camel'] = utils.to_camel(config['plugin_snake'])
+    config['plugin_camel_short'] = utils.to_camel(config['plugin_name'])
     config['plugin_dash'] = utils.to_dash(config['plugin_snake'])
+    config['plugin_dash_short'] = utils.to_dash(config['plugin_name'])
 
     here = os.path.dirname(os.path.abspath(__file__))
     plugin_root_dir = os.path.join(os.path.dirname(here), config['plugin_snake'])
