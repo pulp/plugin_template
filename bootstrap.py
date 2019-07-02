@@ -177,16 +177,36 @@ def main():
     else:
         config['plugin_snake'] = 'pulp_' + config['plugin_name']
 
-    config['plugin_snake_short'] = config['plugin_name']
-    config['plugin_caps'] = utils.to_caps(config['plugin_snake'])
-    config['plugin_caps_short'] = utils.to_caps(config['plugin_name'])
-    config['plugin_camel'] = utils.to_camel(config['plugin_snake'])
-    config['plugin_camel_short'] = utils.to_camel(config['plugin_name'])
-    config['plugin_dash'] = utils.to_dash(config['plugin_snake'])
-    config['plugin_dash_short'] = utils.to_dash(config['plugin_name'])
-
     here = os.path.dirname(os.path.abspath(__file__))
     plugin_root_dir = os.path.join(os.path.dirname(here), config['plugin_snake'])
+
+    try:
+        with open(os.path.join(plugin_root_dir, 'template_config.yml')) as config_file:
+            try:
+                config_in_file = yaml.safe_load(config_file)
+                if config_in_file:
+                    # TODO: validate config
+                    config = config_in_file
+                    config['verbose'] = args.verbose
+                    config['travis'] = args.travis
+                    print("\nLoaded plugin template config from "
+                          "{path}/template_config.yml.\n".format(path=plugin_root_dir))
+            except yaml.YAMLError as exc:
+                print(exc)
+                exit()
+    except FileNotFoundError:
+        print("\nCould not find a plugin template config at {path}/template_config.yml.\n".format(
+            path=plugin_root_dir))
+        pass
+
+    if 'plugin_snake_short' not in config:
+        config['plugin_snake_short'] = config['plugin_name']
+        config['plugin_caps'] = utils.to_caps(config['plugin_snake'])
+        config['plugin_caps_short'] = utils.to_caps(config['plugin_name'])
+        config['plugin_camel'] = utils.to_camel(config['plugin_snake'])
+        config['plugin_camel_short'] = utils.to_camel(config['plugin_name'])
+        config['plugin_dash'] = utils.to_dash(config['plugin_snake'])
+        config['plugin_dash_short'] = utils.to_dash(config['plugin_name'])
 
     if config['travis']:
         if not config['pypi_username'] and not config['exclude_deploy_client_to_pypi'] and \
@@ -210,6 +230,8 @@ def main():
     with open(os.path.join(plugin_root_dir, 'template_config.yml'), 'w') as outfile:
         outfile.write("# This config represents the latest values used when running the "
                       "template.\n\n")
+        config.pop('verbose')
+        config.pop('travis')
         yaml.dump(config, outfile, default_flow_style=False)
 
 
