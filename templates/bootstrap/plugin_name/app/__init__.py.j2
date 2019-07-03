@@ -2,7 +2,7 @@ from pulpcore.plugin import PulpPluginAppConfig
 
 
 class {{ plugin_camel }}PluginAppConfig(PulpPluginAppConfig):
-    """Entry point for the {{ plugin_snake_short }} plugin."""
+    """Entry point for the {{ plugin_app_label }} plugin."""
 
     name = "{{ plugin_snake }}.app"
-    label = "{{ plugin_snake_short }}"
+    label = "{{ plugin_app_label }}"

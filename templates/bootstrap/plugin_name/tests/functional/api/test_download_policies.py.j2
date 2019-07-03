@@ -11,7 +11,7 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_REMOTE_PATH,
     DOWNLOAD_POLICIES,
 )
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_snake_short }}_remote, skip_if
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_remote, skip_if
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -64,7 +64,7 @@ class SyncDownloadPolicyTestCase(unittest.TestCase):
         repo = self.client.post(REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["_href"])
 
-        body = gen_{{ plugin_snake_short }}_remote(**{"policy": download_policy})
+        body = gen_{{ plugin_app_label }}_remote(**{"policy": download_policy})
         remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
         self.addCleanup(self.client.delete, remote["_href"])
 

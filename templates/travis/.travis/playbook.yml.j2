@@ -11,7 +11,7 @@
     pulp_plugin_source_dir: "{% raw %}{{ ansible_env.TRAVIS_BUILD_DIR | dirname }}{% endraw %}/pulpcore-plugin"
     pulp_install_plugins:
       {{ plugin_dash }}:
-        app_label: "{{ plugin_name }}"
+        app_label: "{{ plugin_app_label }}"
         source_dir: "$TRAVIS_BUILD_DIR"
     ansible_python_interpreter: '/opt/pyenv/shims/python3'
     pulp_user: 'travis'

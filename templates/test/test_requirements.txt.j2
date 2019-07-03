@@ -1,9 +1,9 @@
 coverage
 flake8
-{% if not exclude_black %}
+{% if black %}
 flake8-black
 {% endif %}
-{% if not exclude_pydocstyle %}
+{% if pydocstyle %}
 flake8-docstrings
 {% endif %}
 flake8-tuple

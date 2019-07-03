@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Tests that sync {{ plugin_snake_short }} plugin repositories."""
+"""Tests that sync {{ plugin_app_label }} plugin repositories."""
 import unittest
 
 from pulp_smash import api, cli, config
@@ -12,14 +12,14 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_INVALID_FIXTURE_URL,
     {{ plugin_caps_short }}_REMOTE_PATH,
 )
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_snake_short }}_remote
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_remote
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
 # Implement sync support before enabling this test.
 @unittest.skip("FIXME: plugin writer action required")
 class BasicSyncTestCase(unittest.TestCase):
-    """Sync a repository with the {{ plugin_snake_short }} plugin."""
+    """Sync a repository with the {{ plugin_app_label }} plugin."""
 
     @classmethod
     def setUpClass(cls):
@@ -28,7 +28,7 @@ class BasicSyncTestCase(unittest.TestCase):
         cls.client = api.Client(cls.cfg, api.json_handler)
 
     def test_sync(self):
-        """Sync repositories with the {{ plugin_snake_short }} plugin.
+        """Sync repositories with the {{ plugin_app_label }} plugin.
 
         In order to sync a repository a remote has to be associated within
         this repository. When a repository is created this version field is set
@@ -50,7 +50,7 @@ class BasicSyncTestCase(unittest.TestCase):
         repo = self.client.post(REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["_href"])
 
-        body = gen_{{ plugin_snake_short }}_remote()
+        body = gen_{{ plugin_app_label }}_remote()
         remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
         self.addCleanup(self.client.delete, remote["_href"])
 
@@ -99,7 +99,7 @@ class BasicSyncTestCase(unittest.TestCase):
         repo = self.client.post(REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["_href"])
 
-        remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_snake_short }}_remote())
+        remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote())
         self.addCleanup(self.client.delete, remote["_href"])
 
         sync(self.cfg, remote, repo)
@@ -130,7 +130,7 @@ class SyncInvalidTestCase(unittest.TestCase):
 
     # Provide an invalid repository and specify keywords in the anticipated error message
     @unittest.skip("FIXME: Plugin writer action required.")
-    def test_invalid_{{ plugin_snake_short }}_content(self):
+    def test_invalid_{{ plugin_app_label }}_content(self):
         """Sync a repository using an invalid plugin_content repository.
 
         Assert that an exception is raised, and that error message has
@@ -145,7 +145,7 @@ class SyncInvalidTestCase(unittest.TestCase):
         repo = self.client.post(REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["_href"])
 
-        body = gen_{{ plugin_snake_short }}_remote(url=url)
+        body = gen_{{ plugin_app_label }}_remote(url=url)
         remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
         self.addCleanup(self.client.delete, remote["_href"])
 

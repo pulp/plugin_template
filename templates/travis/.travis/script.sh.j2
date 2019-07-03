@@ -96,7 +96,7 @@ pytest -v -r sx --color=yes --pyargs pulpcore.tests.functional || show_logs_and_
 pytest -v -r sx --color=yes --pyargs pulp_certguard.tests.functional || show_logs_and_return_non_zero
 {% endif %}
 
-{% if not exclude_coverage %}# Stop services to write coverage
+{% if coverage %}# Stop services to write coverage
 kill -SIGINT %?runserver
 kill -SIGINT %?content_with_coverage
 kill -SIGINT %?reserved-resource-worker

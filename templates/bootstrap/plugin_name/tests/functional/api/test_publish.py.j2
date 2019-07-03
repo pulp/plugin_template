@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Tests that publish {{ plugin_snake_short }} plugin repositories."""
+"""Tests that publish {{ plugin_app_label }} plugin repositories."""
 import unittest
 from random import choice
 from urllib.parse import urljoin
@@ -15,7 +15,7 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_PUBLISHER_PATH,
     {{ plugin_caps_short }}_REMOTE_PATH,
 )
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_snake_short }}_publisher, gen_{{ plugin_snake_short }}_remote
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_publisher, gen_{{ plugin_app_label }}_remote
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -46,7 +46,7 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         cfg = config.get_config()
         client = api.Client(cfg, api.json_handler)
 
-        body = gen_{{ plugin_snake_short }}_remote()
+        body = gen_{{ plugin_app_label }}_remote()
         remote = client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
         self.addCleanup(client.delete, remote["_href"])
 
@@ -55,13 +55,13 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
 
         sync(cfg, remote, repo)
 
-        publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_snake_short }}_publisher())
+        publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_app_label }}_publisher())
         self.addCleanup(client.delete, publisher["_href"])
 
         # Step 1
         repo = client.get(repo["_href"])
-        for {{ plugin_snake_short }}_content in get_content(repo)[{{ plugin_caps_short }}_CONTENT_NAME]:
-            client.post(repo["_versions_href"], {"add_content_units": [{{ plugin_snake_short }}_content["_href"]]})
+        for {{ plugin_app_label }}_content in get_content(repo)[{{ plugin_caps_short }}_CONTENT_NAME]:
+            client.post(repo["_versions_href"], {"add_content_units": [{{ plugin_app_label }}_content["_href"]]})
         version_hrefs = tuple(ver["_href"] for ver in get_versions(repo))
         non_latest = choice(version_hrefs[:-1])
 

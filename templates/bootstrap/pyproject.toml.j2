@@ -6,7 +6,7 @@ title_format = "{version} ({project_date})"
 template = "CHANGES/.TEMPLATE.rst"
 issue_format = "`#{issue} <https://pulp.plan.io/issues/{issue}>`_"
 
-{% if not exclude_black %}
+{% if black %}
 [tool.black]
 line-length = 100
 target-version = ["py36", "py37"]

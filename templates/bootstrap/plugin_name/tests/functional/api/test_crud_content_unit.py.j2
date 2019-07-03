@@ -9,7 +9,7 @@ from pulp_smash.pulp3.constants import ARTIFACTS_PATH
 from pulp_smash.pulp3.utils import delete_orphans
 
 from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_CONTENT_PATH, {{ plugin_caps_short }}_URL
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_snake_short }}_content_attrs, skip_if
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_content_attrs, skip_if
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -42,7 +42,7 @@ class ContentUnitTestCase(unittest.TestCase):
 
     def test_01_create_content_unit(self):
         """Create content unit."""
-        attrs = gen_{{ plugin_snake_short }}_content_attrs(self.artifact)
+        attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
         self.content_unit.update(self.client.post({{ plugin_caps_short }}_CONTENT_PATH, attrs))
         for key, val in attrs.items():
             with self.subTest(key=key):
@@ -75,7 +75,7 @@ class ContentUnitTestCase(unittest.TestCase):
 
         This HTTP method is not supported and a HTTP exception is expected.
         """
-        attrs = gen_{{ plugin_snake_short }}_content_attrs(self.artifact)
+        attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
         with self.assertRaises(HTTPError) as exc:
             self.client.patch(self.content_unit["_href"], attrs)
         self.assertEqual(exc.exception.response.status_code, 405)
@@ -86,7 +86,7 @@ class ContentUnitTestCase(unittest.TestCase):
 
         This HTTP method is not supported and a HTTP exception is expected.
         """
-        attrs = gen_{{ plugin_snake_short }}_content_attrs(self.artifact)
+        attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
         with self.assertRaises(HTTPError) as exc:
             self.client.put(self.content_unit["_href"], attrs)
         self.assertEqual(exc.exception.response.status_code, 405)
