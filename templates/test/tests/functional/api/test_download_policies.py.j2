@@ -16,10 +16,7 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_REMOTE_PATH,
     DOWNLOAD_POLICIES,
 )
-from {{ plugin_snake }}.tests.functional.utils import (
-    gen_{{ plugin_snake_short }}_remote,
-    skip_if,
-)
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_snake_short }}_remote, skip_if
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -38,18 +35,18 @@ class SyncDownloadPolicyTestCase(unittest.TestCase):
         """Create class-wide variables."""
         cls.cfg = config.get_config()
         cls.client = api.Client(cls.cfg, api.json_handler)
-        cls.DP_ON_DEMAND = 'on_demand' in DOWNLOAD_POLICIES
-        cls.DP_STREAMED = 'streamed' in DOWNLOAD_POLICIES
+        cls.DP_ON_DEMAND = "on_demand" in DOWNLOAD_POLICIES
+        cls.DP_STREAMED = "streamed" in DOWNLOAD_POLICIES
 
-    @skip_if(bool, 'DP_ON_DEMAND', False)
+    @skip_if(bool, "DP_ON_DEMAND", False)
     def test_on_demand(self):
         """Sync with ``on_demand`` download policy. See :meth:`do_test`."""
-        self.do_test('on_demand')
+        self.do_test("on_demand")
 
-    @skip_if(bool, 'DP_STREAMED', False)
+    @skip_if(bool, "DP_STREAMED", False)
     def test_streamed(self):
         """Sync with ``streamend`` download policy.  See :meth:`do_test`."""
-        self.do_test('streamed')
+        self.do_test("streamed")
 
     def do_test(self, download_policy):
         """Sync repositories with the different ``download_policy``.
@@ -70,29 +67,26 @@ class SyncDownloadPolicyTestCase(unittest.TestCase):
            was synced again.
         """
         repo = self.client.post(REPO_PATH, gen_repo())
-        self.addCleanup(self.client.delete, repo['_href'])
+        self.addCleanup(self.client.delete, repo["_href"])
 
-        body = gen_{{ plugin_snake_short }}_remote(**{'policy': download_policy})
+        body = gen_{{ plugin_snake_short }}_remote(**{"policy": download_policy})
         remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(self.client.delete, remote['_href'])
+        self.addCleanup(self.client.delete, remote["_href"])
 
         # Sync the repository.
-        self.assertIsNone(repo['_latest_version_href'])
+        self.assertIsNone(repo["_latest_version_href"])
         sync(self.cfg, remote, repo)
-        repo = self.client.get(repo['_href'])
+        repo = self.client.get(repo["_href"])
 
-        self.assertIsNotNone(repo['_latest_version_href'])
+        self.assertIsNotNone(repo["_latest_version_href"])
         self.assertDictEqual(get_content_summary(repo), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
-        self.assertDictEqual(
-            get_added_content_summary(repo),
-            {{ plugin_caps_short }}_FIXTURE_SUMMARY
-        )
+        self.assertDictEqual(get_added_content_summary(repo), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
 
         # Sync the repository again.
-        latest_version_href = repo['_latest_version_href']
+        latest_version_href = repo["_latest_version_href"]
         sync(self.cfg, remote, repo)
-        repo = self.client.get(repo['_href'])
+        repo = self.client.get(repo["_href"])
 
-        self.assertNotEqual(latest_version_href, repo['_latest_version_href'])
+        self.assertNotEqual(latest_version_href, repo["_latest_version_href"])
         self.assertDictEqual(get_content_summary(repo), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
         self.assertDictEqual(get_added_content_summary(repo), {})
