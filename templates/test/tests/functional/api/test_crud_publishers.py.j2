@@ -63,9 +63,7 @@ class CRUDPublishersTestCase(unittest.TestCase):
     @skip_if(bool, "publisher", False)
     def test_02_read_publishers(self):
         """Read a publisher by its name."""
-        page = self.client.get(
-            {{ plugin_caps_short }}_PUBLISHER_PATH, params={"name": self.publisher["name"]}
-        )
+        page = self.client.get({{ plugin_caps_short }}_PUBLISHER_PATH, params={"name": self.publisher["name"]})
         self.assertEqual(len(page["results"]), 1)
         for key, val in self.publisher.items():
             with self.subTest(key=key):

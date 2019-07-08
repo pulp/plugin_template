@@ -6,7 +6,7 @@ from pulpcore.plugin.stages import (
     DeclarativeArtifact,
     DeclarativeContent,
     DeclarativeVersion,
-    Stage
+    Stage,
 )
 
 from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Content, {{ plugin_camel_short }}Remote
@@ -34,14 +34,13 @@ def synchronize(remote_pk, repository_pk, mirror):
     repository = Repository.objects.get(pk=repository_pk)
 
     if not remote.url:
-        raise ValueError(_('A remote must have a url specified to synchronize.'))
+        raise ValueError(_("A remote must have a url specified to synchronize."))
 
     # Interpret policy to download Artifacts or not
-    download_artifacts = (remote.policy == Remote.IMMEDIATE)
+    download_artifacts = remote.policy == Remote.IMMEDIATE
     first_stage = {{ plugin_camel_short }}FirstStage(remote)
     DeclarativeVersion(
-        first_stage, repository,
-        mirror=mirror, download_artifacts=download_artifacts
+        first_stage, repository, mirror=mirror, download_artifacts=download_artifacts
     ).create()
 
 

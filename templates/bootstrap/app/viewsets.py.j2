@@ -46,7 +46,7 @@ class {{ plugin_camel_short }}ContentViewSet(core.ContentViewSet):
     Also specify queryset and serializer for {{ plugin_camel_short }}Content.
     """
 
-    endpoint_name = '{{ plugin_dash_short }}'
+    endpoint_name = "{{ plugin_dash_short }}"
     queryset = models.{{ plugin_camel_short }}Content.objects.all()
     serializer_class = serializers.{{ plugin_camel_short }}ContentSerializer
     filterset_class = {{ plugin_camel_short }}ContentFilter
@@ -70,7 +70,7 @@ class {{ plugin_camel_short }}ContentViewSet(core.ContentViewSet):
 
         # A single artifact per content, serializer subclasses SingleArtifactContentSerializer
         # ======================================
-        # _artifact = serializer.validated_data.pop('_artifact')
+        # _artifact = serializer.validated_data.pop("_artifact")
         # # you can save model fields directly, e.g. .save(digest=_artifact.sha256)
         # content = serializer.save()
         #
@@ -84,11 +84,11 @@ class {{ plugin_camel_short }}ContentViewSet(core.ContentViewSet):
 
         # Many artifacts per content, serializer subclasses MultipleArtifactContentSerializer
         # =======================================
-        # _artifacts = serializer.validated_data.pop('_artifacts')
+        # _artifacts = serializer.validated_data.pop("_artifacts")
         # content = serializer.save()
         #
         # if content.pk:
-        #   # _artifacts is a dictionary of {'relative_path': 'artifact'}
+        #   # _artifacts is a dictionary of {"relative_path": "artifact"}
         #   for relative_path, artifact in _artifacts.items():
         #       ContentArtifact.objects.create(
         #           artifact=artifact,
@@ -126,7 +126,7 @@ class {{ plugin_camel_short }}RemoteViewSet(core.RemoteViewSet):
     queryset and serializer, at a minimum.
     """
 
-    endpoint_name = '{{ plugin_dash_short }}'
+    endpoint_name = "{{ plugin_dash_short }}"
     queryset = models.{{ plugin_camel_short }}Remote.objects.all()
     serializer_class = serializers.{{ plugin_camel_short }}RemoteSerializer
 
@@ -134,28 +134,24 @@ class {{ plugin_camel_short }}RemoteViewSet(core.RemoteViewSet):
     # the id and href of the sync task.
     @swagger_auto_schema(
         operation_description="Trigger an asynchronous task to sync content",
-        responses={202: AsyncOperationResponseSerializer}
+        responses={202: AsyncOperationResponseSerializer},
     )
-    @detail_route(methods=('post',), serializer_class=RepositorySyncURLSerializer)
+    @detail_route(methods=("post",), serializer_class=RepositorySyncURLSerializer)
     def sync(self, request, pk):
         """
         Synchronizes a repository. The ``repository`` field has to be provided.
         """
         remote = self.get_object()
-        serializer = RepositorySyncURLSerializer(data=request.data, context={'request': request})
+        serializer = RepositorySyncURLSerializer(data=request.data, context={"request": request})
 
         # Validate synchronously to return 400 errors.
         serializer.is_valid(raise_exception=True)
-        repository = serializer.validated_data.get('repository')
-        mirror = serializer.validated_data.get('mirror', True)
+        repository = serializer.validated_data.get("repository")
+        mirror = serializer.validated_data.get("mirror", True)
         result = enqueue_with_reservation(
             tasks.synchronize,
             [repository, remote],
-            kwargs={
-                'remote_pk': remote.pk,
-                'repository_pk': repository.pk,
-                'mirror': mirror
-            }
+            kwargs={"remote_pk": remote.pk, "repository_pk": repository.pk, "mirror": mirror},
         )
         return core.OperationPostponedResponse(result, request)
 
@@ -168,7 +164,7 @@ class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):
     queryset and serializer, at a minimum.
     """
 
-    endpoint_name = '{{ plugin_dash_short }}'
+    endpoint_name = "{{ plugin_dash_short }}"
     queryset = models.{{ plugin_camel_short }}Publisher.objects.all()
     serializer_class = serializers.{{ plugin_camel_short }}PublisherSerializer
 
@@ -176,9 +172,9 @@ class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):
     # the id and href of the publish task.
     @swagger_auto_schema(
         operation_description="Trigger an asynchronous task to publish content",
-        responses={202: AsyncOperationResponseSerializer}
+        responses={202: AsyncOperationResponseSerializer},
     )
-    @detail_route(methods=('post',), serializer_class=RepositoryPublishURLSerializer)
+    @detail_route(methods=("post",), serializer_class=RepositoryPublishURLSerializer)
     def publish(self, request, pk):
         """
         Publishes a repository.
@@ -187,19 +183,16 @@ class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):
         be provided but not both at the same time.
         """
         publisher = self.get_object()
-        serializer = RepositoryPublishURLSerializer(
-            data=request.data,
-            context={'request': request}
-        )
+        serializer = RepositoryPublishURLSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        repository_version = serializer.validated_data.get('repository_version')
+        repository_version = serializer.validated_data.get("repository_version")
 
         result = enqueue_with_reservation(
             tasks.publish,
             [repository_version.repository, publisher],
             kwargs={
-                'publisher_pk': str(publisher.pk),
-                'repository_version_pk': str(repository_version.pk)
-            }
+                "publisher_pk": str(publisher.pk),
+                "repository_version_pk": str(repository_version.pk),
+            },
         )
         return core.OperationPostponedResponse(result, request)

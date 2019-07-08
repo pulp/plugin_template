@@ -37,7 +37,7 @@ change to create a 'real' plugin.
    It will contain a ``setup.py``, expected plugin layout and stubs for necessary classes and methods, minimal docs,
    and tests.
 
-   ``$ ./bootstrap.py --bootsrap your_plugin_name``
+   ``$ ./bootstrap.py --bootstrap your_plugin_name``
 
    **NOTE** : Whatever you choose for `your_plugin_name` will be prefixed with `pulp_`.
    Therefore, for this argument it is best to just provide the content type
