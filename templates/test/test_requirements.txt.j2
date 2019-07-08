@@ -1,14 +1,13 @@
-{% if not exclude_black %}
-black
-{% endif %}
 coverage
 flake8
+{% if not exclude_black %}
+flake8-black
+{% endif %}
+{% if not exclude_pydocstyle %}
 flake8-docstrings
+{% endif %}
 flake8-tuple
 flake8-quotes
 mock
 git+https://github.com/PulpQE/pulp-smash.git#egg=pulp-smash
-{% if not exclude_pydocstyle %}
-pydocstyle
-{% endif %}
 pytest
