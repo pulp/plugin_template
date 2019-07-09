@@ -8,23 +8,14 @@ from requests.exceptions import HTTPError
 
 from pulp_smash import api, config
 from pulp_smash.pulp3.constants import REPO_PATH
-from pulp_smash.pulp3.utils import (
-    gen_repo,
-    get_content,
-    get_versions,
-    publish,
-    sync,
-)
+from pulp_smash.pulp3.utils import gen_repo, get_content, get_versions, publish, sync
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_CONTENT_NAME,
     {{ plugin_caps_short }}_PUBLISHER_PATH,
     {{ plugin_caps_short }}_REMOTE_PATH,
 )
-from {{ plugin_snake }}.tests.functional.utils import (
-    gen_{{ plugin_snake_short }}_publisher,
-    gen_{{ plugin_snake_short }}_remote,
-)
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_snake_short }}_publisher, gen_{{ plugin_snake_short }}_remote
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -57,42 +48,36 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
 
         body = gen_{{ plugin_snake_short }}_remote()
         remote = client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(client.delete, remote['_href'])
+        self.addCleanup(client.delete, remote["_href"])
 
         repo = client.post(REPO_PATH, gen_repo())
-        self.addCleanup(client.delete, repo['_href'])
+        self.addCleanup(client.delete, repo["_href"])
 
         sync(cfg, remote, repo)
 
         publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_snake_short }}_publisher())
-        self.addCleanup(client.delete, publisher['_href'])
+        self.addCleanup(client.delete, publisher["_href"])
 
         # Step 1
-        repo = client.get(repo['_href'])
+        repo = client.get(repo["_href"])
         for {{ plugin_snake_short }}_content in get_content(repo)[{{ plugin_caps_short }}_CONTENT_NAME]:
-            client.post(
-                repo['_versions_href'],
-                {'add_content_units': [{{ plugin_snake_short }}_content['_href']]}
-            )
-        version_hrefs = tuple(ver['_href'] for ver in get_versions(repo))
+            client.post(repo["_versions_href"], {"add_content_units": [{{ plugin_snake_short }}_content["_href"]]})
+        version_hrefs = tuple(ver["_href"] for ver in get_versions(repo))
         non_latest = choice(version_hrefs[:-1])
 
         # Step 2
         publication = publish(cfg, publisher, repo)
 
         # Step 3
-        self.assertEqual(publication['repository_version'], version_hrefs[-1])
+        self.assertEqual(publication["repository_version"], version_hrefs[-1])
 
         # Step 4
         publication = publish(cfg, publisher, repo, non_latest)
 
         # Step 5
-        self.assertEqual(publication['repository_version'], non_latest)
+        self.assertEqual(publication["repository_version"], non_latest)
 
         # Step 6
         with self.assertRaises(HTTPError):
-            body = {
-                'repository': repo['_href'],
-                'repository_version': non_latest,
-            }
-            client.post(urljoin(publisher['_href'], 'publish/'), body)
+            body = {"repository": repo["_href"], "repository_version": non_latest}
+            client.post(urljoin(publisher["_href"], "publish/"), body)

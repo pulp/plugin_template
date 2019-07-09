@@ -7,8 +7,8 @@
       include_vars: '{% raw %}{{ pulp_db_type }}{% endraw %}.yml'
   vars:
     pulp_default_admin_password: admin
-    pulp_source_dir: '/home/travis/build/pulp/pulpcore/'
-    pulp_plugin_source_dir: "/home/travis/build/pulp/pulpcore-plugin"
+    pulp_source_dir: '{% raw %}{{ ansible_env.TRAVIS_BUILD_DIR | dirname }}{% endraw %}/pulpcore/'
+    pulp_plugin_source_dir: "{% raw %}{{ ansible_env.TRAVIS_BUILD_DIR | dirname }}{% endraw %}/pulpcore-plugin"
     pulp_install_plugins:
       {{ plugin_dash }}:
         app_label: "{{ plugin_name }}"

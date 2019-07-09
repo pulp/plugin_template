@@ -7,13 +7,7 @@ from urllib.parse import urljoin
 
 from pulp_smash import api, config, utils
 from pulp_smash.pulp3.constants import DISTRIBUTION_PATH, REPO_PATH
-from pulp_smash.pulp3.utils import (
-    download_content_unit,
-    gen_distribution,
-    gen_repo,
-    publish,
-    sync,
-)
+from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo, publish, sync
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_FIXTURE_URL,
@@ -64,28 +58,28 @@ class DownloadContentTestCase(unittest.TestCase):
         client = api.Client(cfg, api.json_handler)
 
         repo = client.post(REPO_PATH, gen_repo())
-        self.addCleanup(client.delete, repo['_href'])
+        self.addCleanup(client.delete, repo["_href"])
 
         body = gen_{{ plugin_snake_short }}_remote()
         remote = client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(client.delete, remote['_href'])
+        self.addCleanup(client.delete, remote["_href"])
 
         sync(cfg, remote, repo)
-        repo = client.get(repo['_href'])
+        repo = client.get(repo["_href"])
 
         # Create a publisher.
         publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_snake_short }}_publisher())
-        self.addCleanup(client.delete, publisher['_href'])
+        self.addCleanup(client.delete, publisher["_href"])
 
         # Create a publication.
         publication = publish(cfg, publisher, repo)
-        self.addCleanup(client.delete, publication['_href'])
+        self.addCleanup(client.delete, publication["_href"])
 
         # Create a distribution.
         body = gen_distribution()
-        body['publication'] = publication['_href']
+        body["publication"] = publication["_href"]
         distribution = client.post(DISTRIBUTION_PATH, body)
-        self.addCleanup(client.delete, distribution['_href'])
+        self.addCleanup(client.delete, distribution["_href"])
 
         # Pick a content unit, and download it from both Pulp Fixtures…
         unit_path = choice(get_{{ plugin_snake_short }}_content_paths(repo))
