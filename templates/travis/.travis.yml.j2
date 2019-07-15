@@ -11,23 +11,23 @@ python:
 env:
   matrix:
     - DB=postgres TEST=pulp
-{% if not exclude_docs_test  %}    - DB=postgres TEST=docs{% endif %}
-{% if not exclude_mariadb_test  %}    - DB=mariadb TEST=pulp{% endif %}
-{% if not exclude_test_bindings %}    - DB=postgres TEST=bindings{% endif %}
-{% if not exclude_mariadb_test or not exclude_test_bindings %}
+{% if docs_test  %}    - DB=postgres TEST=docs{% endif %}
+{% if mariadb_test  %}    - DB=mariadb TEST=pulp{% endif %}
+{% if test_bindings %}    - DB=postgres TEST=bindings{% endif %}
+{% if mariadb_test or not test_bindings %}
 matrix:
   exclude:
-{% if not exclude_mariadb_test %}    - python: '3.6'
+{% if mariadb_test %}    - python: '3.6'
       env: DB=mariadb TEST=pulp{% endif %}
-{% if not exclude_test_bindings %}    - python: '3.7'
+{% if test_bindings %}    - python: '3.7'
       env: DB=postgres TEST=bindings{% endif %}
-{% if not exclude_docs_test %}    - python: '3.6'
+{% if docs_test %}    - python: '3.6'
       env: DB=postgres TEST=docs{% endif %}
   fast_finish: true{% endif %}
 services:
     - postgresql
     - redis-server
-    {% if not exclude_mariadb_test  %}- mariadb{% endif %}
+    {% if mariadb_test  %}- mariadb{% endif %}
 addons:
   apt:
     packages:
@@ -35,7 +35,7 @@ addons:
       - jq
   # postgres versions provided by el7 RHSCL (lowest supportable version)
   postgresql: '9.6'
-  {% if not exclude_mariadb_test  %}mariadb: '10.3'{% endif %}
+  {% if mariadb_test  %}mariadb: '10.3'{% endif %}
 before_install: .travis/before_install.sh
 install: .travis/install.sh
 before_script: .travis/before_script.sh
@@ -46,7 +46,7 @@ after_failure:
   - sh -c "cat ~/reserved_workers-1.log"
 jobs:
   include:
-{% if not exclude_deploy_to_pypi %}  - stage: deploy-plugin-to-pypi
+{% if deploy_to_pypi %}  - stage: deploy-plugin-to-pypi
     script:  bash .travis/publish_plugin_pypi.sh
     if: tag IS present{% endif %}
 {% if plugin_name == 'pulpcore' %}  - stage: publish-beta-docs
@@ -62,25 +62,25 @@ jobs:
       - TEST=docs
     if: type != pull_request
 {% endif %}
-{% if not exclude_deploy_daily_client_to_rubygems %}  - stage: publish-daily-client-gem
+{% if deploy_daily_client_to_rubygems %}  - stage: publish-daily-client-gem
     script: bash .travis/publish_client_gem.sh
     env:
       - DB=postgres
       - TEST=bindings
     if: type = cron{% endif %}
-{% if not exclude_deploy_daily_client_to_pypi %}  - stage: publish-daily-client-pypi
+{% if deploy_daily_client_to_pypi %}  - stage: publish-daily-client-pypi
     script: bash .travis/publish_client_pypi.sh
     env:
       - DB=postgres
       - TEST=bindings
     if: type = cron{% endif %}
-{% if not exclude_deploy_client_to_rubygems %}  - stage: publish-client-gem
+{% if deploy_client_to_rubygems %}  - stage: publish-client-gem
     script: bash .travis/publish_client_gem.sh
     env:
       - DB=postgres
       - TEST=bindings
     if: tag IS present{% endif %}
-{% if not exclude_deploy_client_to_pypi %}  - stage: publish-client-pypi
+{% if deploy_client_to_pypi %}  - stage: publish-client-pypi
     script: bash .travis/publish_client_pypi.sh
     env:
       - DB=postgres

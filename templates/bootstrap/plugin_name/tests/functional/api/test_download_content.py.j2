@@ -15,14 +15,14 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_REMOTE_PATH,
 )
 from {{ plugin_snake }}.tests.functional.utils import (
-    gen_{{ plugin_snake_short }}_publisher,
-    gen_{{ plugin_snake_short }}_remote,
-    get_{{ plugin_snake_short }}_content_paths,
+    gen_{{ plugin_app_label }}_publisher,
+    gen_{{ plugin_app_label }}_remote,
+    get_{{ plugin_app_label }}_content_paths,
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
-# Implement tests.functional.utils.get_{{ plugin_snake_short }}_content_unit_paths(),
+# Implement tests.functional.utils.get_{{ plugin_app_label }}_content_unit_paths(),
 # as well as sync and publish support before enabling this test.
 @unittest.skip("FIXME: plugin writer action required")
 class DownloadContentTestCase(unittest.TestCase):
@@ -60,7 +60,7 @@ class DownloadContentTestCase(unittest.TestCase):
         repo = client.post(REPO_PATH, gen_repo())
         self.addCleanup(client.delete, repo["_href"])
 
-        body = gen_{{ plugin_snake_short }}_remote()
+        body = gen_{{ plugin_app_label }}_remote()
         remote = client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
         self.addCleanup(client.delete, remote["_href"])
 
@@ -68,7 +68,7 @@ class DownloadContentTestCase(unittest.TestCase):
         repo = client.get(repo["_href"])
 
         # Create a publisher.
-        publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_snake_short }}_publisher())
+        publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_app_label }}_publisher())
         self.addCleanup(client.delete, publisher["_href"])
 
         # Create a publication.
@@ -82,7 +82,7 @@ class DownloadContentTestCase(unittest.TestCase):
         self.addCleanup(client.delete, distribution["_href"])
 
         # Pick a content unit, and download it from both Pulp Fixtures…
-        unit_path = choice(get_{{ plugin_snake_short }}_content_paths(repo))
+        unit_path = choice(get_{{ plugin_app_label }}_content_paths(repo))
         fixtures_hash = hashlib.sha256(
             utils.http_get(urljoin({{ plugin_caps_short }}_FIXTURE_URL, unit_path))
         ).hexdigest()

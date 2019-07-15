@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Utilities for tests for the {{ plugin_snake_short }} plugin."""
+"""Utilities for tests for the {{ plugin_app_label }} plugin."""
 from functools import partial
 from unittest import SkipTest
 
@@ -29,17 +29,17 @@ def set_up_module():
     require_pulp_plugins({"{{ plugin_snake }}"}, SkipTest)
 
 
-def gen_{{ plugin_snake_short }}_remote(url={{ plugin_caps_short }}_FIXTURE_URL, **kwargs):
-    """Return a semi-random dict for use in creating a {{ plugin_snake_short }} Remote.
+def gen_{{ plugin_app_label }}_remote(url={{ plugin_caps_short }}_FIXTURE_URL, **kwargs):
+    """Return a semi-random dict for use in creating a {{ plugin_app_label }} Remote.
 
     :param url: The URL of an external content source.
     """
-    # FIXME: Add any fields specific to a {{ plugin_snake_short }} remote here
+    # FIXME: Add any fields specific to a {{ plugin_app_label }} remote here
     return gen_remote(url, **kwargs)
 
 
-def gen_{{ plugin_snake_short }}_publisher(**kwargs):
-    """Return a semi-random dict for use in creating a {{ plugin_snake_short }} Publisher.
+def gen_{{ plugin_app_label }}_publisher(**kwargs):
+    """Return a semi-random dict for use in creating a {{ plugin_app_label }} Publisher.
 
     :param url: The URL of an external content source.
     """
@@ -47,8 +47,8 @@ def gen_{{ plugin_snake_short }}_publisher(**kwargs):
     return gen_publisher(**kwargs)
 
 
-def get_{{ plugin_snake_short }}_content_paths(repo, version_href=None):
-    """Return the relative path of content units present in a {{ plugin_snake_short }} repository.
+def get_{{ plugin_app_label }}_content_paths(repo, version_href=None):
+    """Return the relative path of content units present in a {{ plugin_app_label }} repository.
 
     :param repo: A dict of information about the repository.
     :param version_href: The repository version to read.
@@ -63,7 +63,7 @@ def get_{{ plugin_snake_short }}_content_paths(repo, version_href=None):
     ]
 
 
-def gen_{{ plugin_snake_short }}_content_attrs(artifact):
+def gen_{{ plugin_app_label }}_content_attrs(artifact):
     """Generate a dict with content unit attributes.
 
     :param artifact: A dict of info about the artifact.
@@ -74,18 +74,18 @@ def gen_{{ plugin_snake_short }}_content_attrs(artifact):
 
 
 def populate_pulp(cfg, url={{ plugin_caps_short }}_FIXTURE_URL):
-    """Add {{ plugin_snake_short }} contents to Pulp.
+    """Add {{ plugin_app_label }} contents to Pulp.
 
     :param pulp_smash.config.PulpSmashConfig: Information about a Pulp application.
-    :param url: The {{ plugin_snake_short }} repository URL. Defaults to
+    :param url: The {{ plugin_app_label }} repository URL. Defaults to
         :data:`pulp_smash.constants.{{ plugin_caps_short }}_FIXTURE_URL`
-    :returns: A list of dicts, where each dict describes one {{ plugin_snake_short }} content in Pulp.
+    :returns: A list of dicts, where each dict describes one {{ plugin_app_label }} content in Pulp.
     """
     client = api.Client(cfg, api.json_handler)
     remote = {}
     repo = {}
     try:
-        remote.update(client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_snake_short }}_remote(url)))
+        remote.update(client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote(url)))
         repo.update(client.post(REPO_PATH, gen_repo()))
         sync(cfg, remote, repo)
     finally:

@@ -21,11 +21,14 @@ This allows you to test your plugin at every step.
 
 It's also recommended that you go through the [planning guide](meta_docs/planning-guide.md) before starting to develop your plugin.
 
-# Bootstrap a new Pulp plugin
+# Generate a plugin template config for a new Pulp plugin
+ 
+The first step is to create a `template_config.yml` for your new plugin. This file contains
+settings used by the `./plugin-template` command when generating new plugins and for future updates.
 
-The first step is to bootstrap this template. This will create a functional but useless plugin,
-with minimal code, docs, and tests. Later on we'll discuss exactly what each part of this template does and what to
-change to create a 'real' plugin.
+The first time this file is generated. bootstrap this template. This will create a functional but useless plugin,
+with minimal code, docs, tests, and default Travis CI configuration. Later on we'll discuss
+exactly what each part of this template does and what to change to create a 'real' plugin.
 
 1. Clone this repository
 
@@ -33,25 +36,133 @@ change to create a 'real' plugin.
 
    ``$ cd plugin_template``
 
-2. Run the provided ``bootstrap.py`` script to create a skeleton for your plugin with the name of your choice.
-   It will contain a ``setup.py``, expected plugin layout and stubs for necessary classes and methods, minimal docs,
+2. Run the provided ``./plugin-template --generate-config `` 
+
+   ``$ ./plugin-template --generate-config --plugin-app-label <label> PLUGIN_NAME``
+
+   **NOTE** : The `plugin-app-label` should identify the content type which you would like to
+   support, e.g. `rubygem` or `maven`. The `PLUGIN_NAME` is usually `pulp_` or `pulp-` prepended
+   to the `--plugin-app-label`, e.g. `pulp_maven`.
+   
+The first time this command is run, a new directory by the name of PLUGIN_NAME is created inside
+the parent directory of the `plugin_template' directory. The `template_config.yml` is written to
+the root of this new directory. Subsequent uses of the command simply update that file.
+
+The following settings are stored in `template_config.yml`.
+
+```bash
+  pypi-username         The username that should be used when uploading packages to PyPI. It
+                        is required unless deploy-client-to-pypi and deploy-daily-client-to-pypi
+                        and deploy-to-pypi are specified.
+
+  docs-test             Include a Travis build for testing the 'make html' command for sphinx docs.
+
+  mariadb-test          Include a Travis build for testing against MariaDB.
+
+  deploy-to-pypi        Include a Travis stage that publishes builds to PyPI
+
+                        This stage only executes when a tag is associated with the commit being
+                        built. When enabling this stage, the user is expected to provide a
+                        secure environment variable called PYPI_PASSWORD. The variable can
+                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        username is specified using --pypi-username option.
+
+  test-bindings         Include a Travis stage that runs a script to test generated client
+                        library.
+
+                        This stage requires the plugin author to include a 'test_bindings.py'
+                        script in the .travis directory of the plugin repository. This script
+                        is supposed to exercise the generated client library.
+
+  deploy-client-to-pypi Include a Travis stage that publishes a client library to PyPI.
+
+                        This stage only executes when a tag is associated with the commit being
+                        built. When enabling this stage, the user is expected to provide a
+                        secure environment variable called PYPI_PASSWORD. The variable can
+                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        username is specified using --pypi-username option.
+
+                        This stage uses the OpenAPI schema for the plugin to generate a Python
+                        client library using openapi-generator-cli.
+
+  deploy-client-to-rubygems
+                        Include a Travis stage that publishes a client library to RubyGems.org.
+
+                        This stage only executes when a tag is associated with the commit being
+                        built. When enabling this stage, the user is expected to provide a
+                        secure environment variable called RUBYGEMS_API_KEY. The variable can
+                        be added in the travis-ci.com settings page for the project.
+
+  deploy-daily-client-to-pypi
+                        Include a Travis stage that publishes a client library to PyPI.
+
+                        This stage only executes when a tag is associated with the commit being
+                        built. When enabling this stage, the user is expected to provide a
+                        secure environment variable called PYPI_PASSWORD. The variable can
+                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        username is specified using --pypi-username option.
+
+                        This stage uses the OpenAPI schema for the plugin to generate a Python
+                        client library using openapi-generator-cli.
+
+                        [0] https://docs.travis-ci.com/user/environment-variables/
+                        #defining-variables-in-repository-settings
+
+  deploy-daily-client-to-rubygems
+                        Include a Travis stage that publishes a client library to RubyGems.org
+                        with each CRON build.
+
+                        This stage only executes on builds trigerred by CRON. When enabling
+                        this stage, the user is expected to provide a secure environment
+                        variable called RUBYGEMS_API_KEY. The variable can be added in the
+                        travis-ci.com settings page for the project.
+
+  check-commit-message  Include inspection of commit message for a reference to an issue in
+                        pulp.plan.io.
+
+  coverage              Include collection of coverage and reporting to coveralls.io
+
+``` 
+
+# Bootstrap a new Pulp plugin
+
+The next step is to bootstrap the plugin. This will create a functional but useless plugin, with
+minimal code and tests.
+
+1. Run the `plugin-template --bootstrap` command. This will create a skeleton for your plugin. It
+   will contain a ``setup.py``, expected plugin layout and stubs for necessary classes, methods,
    and tests.
 
-   ``$ ./bootstrap.py --bootstrap your_plugin_name``
-
-   **NOTE** : Whatever you choose for `your_plugin_name` will be prefixed with `pulp_`.
-   Therefore, for this argument it is best to just provide the content type
-   which you would like to support, e.g. `rubygem` or `maven`.
-
+   ``$ ./plugin-template --bootstrap PLUGIN_NAME``
 
 In addition to the basic plugin boilerplate, this template also provides a basic set of
-functional tests using the [pulp_smash](https://pulp-smash.readthedocs.io/en/latest/) framework,
-and a Travis configuration file / scripts for continuous integration. These are highly recommended,
-as they will make continuous verification of your plugin's functionality much easier.
+functional tests using the [pulp_smash](https://pulp-smash.readthedocs.io/en/latest/) framework.
 
 In order to use these tests, you will need to address the "FIXME" messages left in places where
 plugin-writer intervention is required.
 
+# Add Travis CI configuration to a Pulp plugin
+
+The next step is to add a Travis configuration file and scripts for continuous integration. These
+are highly recommended, as they will make continuous verification of your plugin's functionality
+much easier.
+
+1. Run the `./plugin-template --travis` command to generate the Travis CI config based on the
+   settings in `template_config.yml`.
+   
+   ``$ ./plugin-template --travis PLUGIN_NAME``
+   
+Running the command again will update the plugin with the latest Travis CI configuration provided
+by the plugin-template. 
+
+# Add Documentation to a Pulp plugin
+
+The next step is to add documentation that can be hosted on 
+[Read the Docs](https://readthedocs.org/). 
+
+1. Run the `./plugin-template --docs` command to generate the docs.
+
+   ``$ ./plugin-template --docs PLUGIN_NAME``    
 
 ## Discoverability
 
@@ -67,7 +178,7 @@ After bootstrapping, your plugin should be installable and discoverable by Pulp.
 
 3. Check that everything worked and you have a remote endpoint
 
-    `$ http GET http://localhost:24817/pulp/api/v3/remotes/{{ plugin_snake_short }}/{{ plugin_dash_short }}/`
+    `$ http GET http://localhost:24817/pulp/api/v3/remotes/{{ plugin_app_label }}/{{ plugin_dash_short }}/`
 
 
 The plugin specific `/pulp/api/v3/publishers/{{ plugin_dash_short }}/` and `/pulp/api/v3/content/{{ plugin_dash_short }}/` endpoints
@@ -138,9 +249,9 @@ class {{ plugin_camel_short }}Content(Content):
 
 After adding the model, you can run the migration with
 
-`pulp-manager makemigrations {{ plugin_snake_short }}`
+`pulp-manager makemigrations {{ plugin_app_label }}`
 
-And make sure all your fields are on the {{ plugin_snake_short }} database table.
+And make sure all your fields are on the {{ plugin_app_label }} database table.
 
 ### Serializer
 
@@ -228,10 +339,10 @@ needed to display the restapi.html page in the root of the built docs.
 This repository also provides a script for generating a Travis configuration. The script should be
 run with the following command.
 
-   ``$ ./bootstrap.py --travis --pypi-username your_pypi_username plugin_name``
+   ``$ ./plugin-template --travis plugin_name plugin_app_label``
 
 The default behavior enables two build stages that generate client libraries using the OpenAPI
-schema. One publishes to PyPI using ``--pypi-username`` setting and the secret environment
+schema. One publishes to PyPI using ``  pypi-username`` setting and the secret environment
 variable called $PYPI_PASSWORD. The other stage publishes the client to rubygems.org and requires
 the $RUBYGEMS_API_KEY environment variable to be set. Both environment variables can be created on
 the travis-ci.com settings page for the plugin[0]. The stage that publishes tagged builds to PyPI
@@ -239,13 +350,13 @@ uses the same configs as the client publishing stage. The default pipeline can b
 following commands:
 
 ```
-$ git clone git@github.com/pulp/{{ plugin_snake_short }}
-$ cd {{ plugin_snake_short }}
+$ git clone git@github.com/pulp/{{ plugin_app_label }}
+$ cd {{ plugin_app_label }}
 $ # copying the requirements file is only needed if plugin was created before this file was added
 $ # to the plugin template
 $ cp doc_requirements.txt ../pulp_<plugin_name>/
 $ touch ../pulp_<plugin_name>/.travis/test_bindings.py
-$ ./bootstrap.py --travis --pypi-username your_pypi_username plugin_name
+$ ./plugin-template --travis --pypi-username your_pypi_username plugin_name
 ```
 
 The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
@@ -266,22 +377,17 @@ in the following order, with optional plugin provided scripts in bold:
 The pipeline can be modified, see the help text for available options.
 
 ```
-$ ./bootstrap.py --help
-usage: bootstrap.py [-h] [--bootstrap] [--test] [--travis] [--docs] [--all]
-                    [--verbose] [--pypi-username PYPI_USERNAME]
-                    [--exclude-docs-test] [--exclude-mariadb-test]
-                    [--exclude-deploy-to-pypi] [--exclude-test-bindings]
-                    [--exclude-deploy-client-to-pypi]
-                    [--exclude-deploy-client-to-rubygems]
-                    [--exclude-deploy-daily-client-to-pypi]
-                    [--exclude-deploy-daily-client-to-rubygems]
-                    [--exclude-check-commit-message] [--exclude-coverage]
-                    plugin_name
+$ ./plugin-template --help
+usage: plugin-template [-h] [--generate-config] [--bootstrap] [--test]
+                       [--travis] [--docs] [--all] [--verbose]
+                       plugin_name plugin_app_label
 
 Generate a .travis.yml and .travis directoryfor a specified plugin
 
 positional arguments:
   plugin_name           Create or update this plugin.
+  plugin_app_label      the Django app label for the plugin - usually the part after pulp_ or
+                     pulp-
 
 
 optional arguments:
@@ -297,86 +403,6 @@ optional arguments:
   --all                 Create a new plugin and template all non-excluded files.
 
   --verbose             Include more output.
-
-  --pypi-username PYPI_USERNAME
-                        The username that should be used when uploading packages to PyPI. It
-                        is required unless --exclude-deploy-client-to-pypi and
-                        --exclude-deploy-daily-client-to-pypi and --exclude-deploy-to-pypi are
-                        specified.
-
-  --exclude-docs-test   Exclude a Travis build for testing the 'make html' command for sphinx
-                        docs
-
-  --exclude-mariadb-test
-                        Exclude a Travis build for testing against MariaDB.
-
-  --exclude-deploy-to-pypi
-                        Exclude a Travis stage that publishes builds to PyPI
-
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
-                        username is specified using --pypi-username option.
-
-  --exclude-test-bindings
-                        Exclude a Travis stage that runs a script to test generated client
-                        library.
-
-                        This stage requires the plugin author to include a 'test_bindings.py'
-                        script in the .travis directory of the plugin repository. This script
-                        is supposed to exercise the generated client library.
-
-  --exclude-deploy-client-to-pypi
-                        Exclude a Travis stage that publishes a client library to PyPI.
-
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
-                        username is specified using --pypi-username option.
-
-                        This stage uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli.
-
-  --exclude-deploy-client-to-rubygems
-                        Exclude a Travis stage that publishes a client library to RubyGems.org.
-
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
-                        secure environment variable called RUBYGEMS_API_KEY. The variable can
-                        be added in the travis-ci.com settings page for the project.
-
-  --exclude-deploy-daily-client-to-pypi
-                        Exclude a Travis stage that publishes a client library to PyPI.
-
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
-                        username is specified using --pypi-username option.
-
-                        This stage uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli.
-
-                        [0] https://docs.travis-ci.com/user/environment-variables/
-                        #defining-variables-in-repository-settings
-
-  --exclude-deploy-daily-client-to-rubygems
-                        Exclude a Travis stage that publishes a client library to RubyGems.org
-                        with each CRON build.
-
-                        This stage only executes on builds trigerred by CRON. When enabling
-                        this stage, the user is expected to provide a secure environment
-                        variable called RUBYGEMS_API_KEY. The variable can be added in the
-                        travis-ci.com settings page for the project.
-
-  --exclude-check-commit-message
-                        Exclude inspection of commit message for a reference to an issue in
-                        pulp.plan.io.
-
-  --exclude-coverage    Exclude collection of coverage and reporting to coveralls.io
-                        pulp.plan.io.
 
 ```
 

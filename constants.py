@@ -1,5 +1,5 @@
 TEMPLATE_SNAKE = '{{ plugin_snake }}'
-TEMPLATE_SNAKE_SHORT = '{{ plugin_snake_short }}'
+TEMPLATE_SNAKE_SHORT = '{{ plugin_app_label }}'
 TEMPLATE_CAPS = '{{ plugin_caps }}'
 TEMPLATE_CAPS_SHORT = '{{ plugin_caps_short }}'
 TEMPLATE_CAMEL = '{{ plugin_camel }}'

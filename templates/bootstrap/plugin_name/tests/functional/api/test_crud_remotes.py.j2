@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Tests that CRUD {{ plugin_snake_short }} remotes."""
+"""Tests that CRUD {{ plugin_app_label }} remotes."""
 from random import choice
 import unittest
 
@@ -8,7 +8,7 @@ from requests.exceptions import HTTPError
 from pulp_smash import api, config, utils
 
 from {{ plugin_snake }}.tests.functional.constants import DOWNLOAD_POLICIES, {{ plugin_caps_short }}_REMOTE_PATH
-from {{ plugin_snake }}.tests.functional.utils import skip_if, gen_{{ plugin_snake_short }}_remote
+from {{ plugin_snake }}.tests.functional.utils import skip_if, gen_{{ plugin_app_label }}_remote
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -38,7 +38,7 @@ class CRUDRemotesTestCase(unittest.TestCase):
         See: `Pulp Smash #1055
         <https://github.com/PulpQE/pulp-smash/issues/1055>`_.
         """
-        body = gen_{{ plugin_snake_short }}_remote()
+        body = gen_{{ plugin_app_label }}_remote()
         body["name"] = self.remote["name"]
         with self.assertRaises(HTTPError):
             self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
@@ -103,7 +103,7 @@ class CreateRemoteNoURLTestCase(unittest.TestCase):
         * `Pulp #3395 <https://pulp.plan.io/issues/3395>`_
         * `Pulp Smash #984 <https://github.com/PulpQE/pulp-smash/issues/984>`_
         """
-        body = gen_{{ plugin_snake_short }}_remote()
+        body = gen_{{ plugin_app_label }}_remote()
         del body["url"]
         with self.assertRaises(HTTPError):
             api.Client(config.get_config()).post({{ plugin_caps_short }}_REMOTE_PATH, body)
@@ -195,7 +195,7 @@ def _gen_verbose_remote():
 
     Note that 'username' and 'password' are write-only attributes.
     """
-    attrs = gen_{{ plugin_snake_short }}_remote()
+    attrs = gen_{{ plugin_app_label }}_remote()
     attrs.update(
         {
             "password": utils.uuid4(),

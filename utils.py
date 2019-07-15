@@ -33,3 +33,10 @@ def to_dash(name):
     Convert plugin name from snake case to dash representation
     """
     return name.replace('_', '-')
+
+
+def to_snake(name):
+    """
+    Convert plugin name from snake case to dash representation
+    """
+    return name.replace('-', '_')
