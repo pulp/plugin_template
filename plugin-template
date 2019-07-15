@@ -24,7 +24,6 @@ DEFAULT_SETTINGS = {
     'deploy_daily_client_to_rubygems': True,
     'deploy_to_pypi': True,
     'docs_test': True,
-    'mariadb_test': True,
     'pydocstyle': True,
     'test_bindings': True,
     'plugin_camel': None,
