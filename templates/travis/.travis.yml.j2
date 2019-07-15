@@ -13,7 +13,7 @@ env:
     - DB=postgres TEST=pulp
 {% if docs_test  %}    - DB=postgres TEST=docs{% endif %}
 {% if test_bindings %}    - DB=postgres TEST=bindings{% endif %}
-{% if not test_bindings %}
+{% if test_bindings or docs_test %}
 matrix:
   exclude:
 {% if test_bindings %}    - python: '3.7'
