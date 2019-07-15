@@ -69,21 +69,11 @@ if [ -n "$PULP_SMASH_PR_NUMBER" ]; then
   cd ..
 fi
 
-if [ "$DB" = 'mariadb' ]; then
-  # working around https://travis-ci.community/t/mariadb-build-error-with-xenial/3160
-  mysql -u root -e "DROP USER IF EXISTS 'travis'@'%';"
-  mysql -u root -e "CREATE USER 'travis'@'%';"
-  mysql -u root -e "CREATE DATABASE pulp;"
-  mysql -u root -e "ALTER DATABASE pulp CHARACTER SET utf8;"
-  mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'travis'@'%';";
-else
-  psql -c 'CREATE DATABASE pulp OWNER travis;'
-fi
+psql -c 'CREATE DATABASE pulp OWNER travis;'
 
 pip install ansible
 cp {{ plugin_snake }}/.travis/playbook.yml ansible-pulp/playbook.yml
 cp {{ plugin_snake }}/.travis/postgres.yml ansible-pulp/postgres.yml
-cp {{ plugin_snake }}/.travis/mariadb.yml ansible-pulp/mariadb.yml
 
 cd {{ plugin_snake }}
 

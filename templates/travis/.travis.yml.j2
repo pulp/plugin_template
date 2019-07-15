@@ -12,13 +12,10 @@ env:
   matrix:
     - DB=postgres TEST=pulp
 {% if docs_test  %}    - DB=postgres TEST=docs{% endif %}
-{% if mariadb_test  %}    - DB=mariadb TEST=pulp{% endif %}
 {% if test_bindings %}    - DB=postgres TEST=bindings{% endif %}
-{% if mariadb_test or not test_bindings %}
+{% if not test_bindings %}
 matrix:
   exclude:
-{% if mariadb_test %}    - python: '3.6'
-      env: DB=mariadb TEST=pulp{% endif %}
 {% if test_bindings %}    - python: '3.7'
       env: DB=postgres TEST=bindings{% endif %}
 {% if docs_test %}    - python: '3.6'
@@ -27,7 +24,6 @@ matrix:
 services:
     - postgresql
     - redis-server
-    {% if mariadb_test  %}- mariadb{% endif %}
 addons:
   apt:
     packages:
@@ -35,7 +31,6 @@ addons:
       - jq
   # postgres versions provided by el7 RHSCL (lowest supportable version)
   postgresql: '9.6'
-  {% if mariadb_test  %}mariadb: '10.3'{% endif %}
 before_install: .travis/before_install.sh
 install: .travis/install.sh
 before_script: .travis/before_script.sh

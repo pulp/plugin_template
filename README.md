@@ -57,8 +57,6 @@ The following settings are stored in `template_config.yml`.
 
   docs-test             Include a Travis build for testing the 'make html' command for sphinx docs.
 
-  mariadb-test          Include a Travis build for testing against MariaDB.
-
   deploy-to-pypi        Include a Travis stage that publishes builds to PyPI
 
                         This stage only executes when a tag is associated with the commit being
