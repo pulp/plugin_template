@@ -120,6 +120,9 @@ The following settings are stored in `template_config.yml`.
 
   coverage              Include collection of coverage and reporting to coveralls.io
 
+  travis-notifications  A yaml block that contains configuration for Travis build notifications. See
+                        https://docs.travis-ci.com/user/notifications/ for configuration options.
+
 ``` 
 
 # Bootstrap a new Pulp plugin

@@ -81,3 +81,6 @@ jobs:
       - DB=postgres
       - TEST=bindings
     if: tag IS present{% endif %}
+{% if travis_notifications %}
+{{ {"notifications": travis_notifications} | to_yaml }}
+{% endif %}
