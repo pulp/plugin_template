@@ -35,7 +35,8 @@ DEFAULT_SETTINGS = {
     'plugin_name': None,
     'plugin_snake': None,
     'plugin_app_label': None,
-    'pypi_username': None
+    'pypi_username': None,
+    'travis_notifications': None,
 }
 
 def main():
@@ -175,6 +176,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             os.makedirs(necessary_dir_structure)
 
         if relative_path.endswith('.j2'):
+            env.filters['to_yaml'] = yaml.dump
             template = env.get_template(relative_path)
             destination = destination_relative_path[:-len('.j2')]
             write_template_to_file(template, plugin_root_dir, destination, config)
