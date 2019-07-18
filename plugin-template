@@ -142,7 +142,7 @@ def main():
             print("If PyPI scripts are included, PyPI username is required.")
             return 2
 
-        if not config['test_bindings']:
+        if config['test_bindings']:
             if not os.path.isfile(os.path.join(plugin_root_dir, '.travis', 'test_bindings.py')):
                 print("If bindings are not excluded, `test_bindings.py` must exist.")
                 return 2
