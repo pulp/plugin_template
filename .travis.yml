@@ -3,6 +3,6 @@ python:
   - "3.7"
 install: pip install -r test_requirements.txt
 script:
-  - ./plugin-template --generate-config --plugin-app-label catdgo pulp_catdog
+  - ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
   - ./plugin-template --all pulp_catdog
   - cd ../pulp_catdog && black --diff --check --exclude docs/conf.py .
