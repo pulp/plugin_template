@@ -103,10 +103,14 @@ coverage run $(which django-admin) test ./{{ plugin_snake }}/tests/unit/
 # Run functional tests, and upload coverage report to codecov.
 show_logs_and_return_non_zero() {
     readonly local rc="$?"
-    cat ~/django_runserver.log
-    cat ~/content_app.log
-    cat ~/resource_manager.log
-    cat ~/reserved_worker-1.log
+
+    for logfile in "~/django_runserver.log" "~/content_app.log" "~/resource_manager.log" "~/reserved_worker-1.log"
+    do
+      echo -en "travis_fold:start:$logfile"'\\r'
+      cat $logfile
+      echo -en "travis_fold:end:$logfile"'\\r'
+    done
+
     return "${rc}"
 }
 
