@@ -4,7 +4,7 @@
 - hosts: all
   pre_tasks:
     - name: Load DB variables
-      include_vars: '{% raw %}{{ pulp_db_type }}{% endraw %}.yml'
+      include_vars: 'postgres.yml'
   vars:
     pulp_default_admin_password: admin
     pulp_source_dir: '{% raw %}{{ ansible_env.TRAVIS_BUILD_DIR | dirname }}{% endraw %}/pulpcore/'
@@ -23,7 +23,6 @@
       secret_key: 'secret'
       databases:
         default:
-          ENGINE: {% raw %}"{{ pulp_db_backend }}"{% endraw %}
           USER: 'travis'
           PASSWORD: ''
   environment:
