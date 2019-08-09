@@ -5,8 +5,9 @@ sudo: required
 dist: xenial
 language: python
 python:
-    # python versions used in el7 SCL & supported fedora
-    - "3.6"
+    # Fedora has 3.6 available (python36.x86_64), but pulp container images
+    # with it are not being built or published yet.
+    # - "3.6"
     - "3.7"
 env:
   matrix:
@@ -16,7 +17,7 @@ env:
 {% if test_bindings or docs_test %}
 matrix:
   exclude:
-{% if test_bindings %}    - python: '3.7'
+{% if test_bindings %}    - python: '3.6'
       env: DB=postgres TEST=bindings{% endif %}
 {% if docs_test %}    - python: '3.6'
       env: DB=postgres TEST=docs{% endif %}
@@ -24,6 +25,7 @@ matrix:
 services:
     - postgresql
     - redis-server
+    - docker
 addons:
   apt:
     packages:
@@ -36,9 +38,14 @@ install: .travis/install.sh
 before_script: .travis/before_script.sh
 script: .travis/script.sh
 after_failure:
-  - sh -c "cat ~/django_runserver.log"
-  - sh -c "cat ~/resource_manager.log"
-  - sh -c "cat ~/reserved_workers-1.log"
+  - http --timeout 30 --check-status --pretty format --print hb http://localhost:24817/pulp/api/v3/status/
+  - sudo docker images
+  - sudo kubectl logs -l name=pulp-operator -c ansible --tail=10000
+  - sudo kubectl logs -l name=pulp-operator -c operator --tail=10000
+  - sudo kubectl logs -l app=pulp-api --tail=10000
+  - sudo kubectl logs -l app=pulp-content --tail=10000
+  - sudo kubectl logs -l app=pulp-resource-manager --tail=10000
+  - sudo kubectl logs -l app=pulp-worker --tail=10000
 jobs:
   include:
 {% if deploy_to_pypi %}  - stage: deploy-plugin-to-pypi
