@@ -2,6 +2,8 @@
 
 {% include 'header.j2' %}
 
+set -euv
+
 pip install twine
 
 django-admin runserver 24817 >> ~/django_runserver.log 2>&1 &
