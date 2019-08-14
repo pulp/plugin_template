@@ -2,6 +2,8 @@
 
 {% include 'header.j2' %}
 
+set -euv
+
 # skip this check for everything but PRs
 if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
   exit 0
