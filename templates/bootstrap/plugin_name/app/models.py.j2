@@ -28,6 +28,7 @@ class {{ plugin_camel_short }}Content(Content):
         field3 = models.CharField()
 
         class Meta:
+            default_related_name = "%(app_label)s_%(model_name)s"
             unique_together = (field1, field2)
     """
 
@@ -43,6 +44,9 @@ class {{ plugin_camel_short }}Publisher(Publisher):
 
     TYPE = "{{ plugin_dash_short }}"
 
+    class Meta:
+        default_related_name = "%(app_label)s_%(model_name)s"
+
 
 class {{ plugin_camel_short }}Remote(Remote):
     """
@@ -52,3 +56,6 @@ class {{ plugin_camel_short }}Remote(Remote):
     """
 
     TYPE = "{{ plugin_dash_short }}"
+
+    class Meta:
+        default_related_name = "%(app_label)s_%(model_name)s"
