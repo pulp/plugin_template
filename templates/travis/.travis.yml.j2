@@ -1,31 +1,40 @@
-{% include 'header.j2' %}
-
+{%- include 'header.j2' %}
+---
 sudo: required
 # https://docs.travis-ci.com/user/trusty-ci-environment/
 dist: xenial
 language: python
 python:
-    # Fedora has 3.6 available (python36.x86_64), but pulp container images
-    # with it are not being built or published yet.
-    # - "3.6"
-    - "3.7"
+  # Fedora has 3.6 available (python36.x86_64), but pulp container images
+  # with it are not being built or published yet.
+  # - "3.6"
+  - "3.7"
 env:
   matrix:
     - DB=postgres TEST=pulp
-{% if docs_test  %}    - DB=postgres TEST=docs{% endif %}
-{% if test_bindings %}    - DB=postgres TEST=bindings{% endif %}
-{% if test_bindings or docs_test %}
+    {%- if docs_test %}
+    - DB=postgres TEST=docs
+    {%- endif %}
+    {%- if test_bindings %}
+    - DB=postgres TEST=bindings
+    {%- endif %}
+{%- if test_bindings or docs_test %}
 matrix:
   exclude:
-{% if test_bindings %}    - python: '3.6'
-      env: DB=postgres TEST=bindings{% endif %}
-{% if docs_test %}    - python: '3.6'
-      env: DB=postgres TEST=docs{% endif %}
-  fast_finish: true{% endif %}
+    {%- if test_bindings %}
+    - python: '3.6'
+      env: DB=postgres TEST=bindings
+    {%- endif %}
+    {%- if docs_test %}
+    - python: '3.6'
+      env: DB=postgres TEST=docs
+    {%- endif %}
+  fast_finish: true
+{%- endif %}
 services:
-    - postgresql
-    - redis-server
-    - docker
+  - postgresql
+  - redis-server
+  - docker
 addons:
   apt:
     packages:
@@ -48,46 +57,58 @@ after_failure:
   - sudo kubectl logs -l app=pulp-worker --tail=10000
 jobs:
   include:
-{% if deploy_to_pypi %}  - stage: deploy-plugin-to-pypi
-    script:  bash .travis/publish_plugin_pypi.sh
-    if: tag IS present{% endif %}
-{% if plugin_name == 'pulpcore' %}  - stage: publish-beta-docs
-    script: bash .travis/publish_docs.sh rc
-    env:
-      - DB=postgres
-      - TEST=docs
-    if: tag IS present
-  - stage: publish-continuous-docs
-    script: bash .travis/publish_docs.sh nightly
-    env:
-      - DB=postgres
-      - TEST=docs
-    if: type != pull_request
-{% endif %}
-{% if deploy_daily_client_to_rubygems %}  - stage: publish-daily-client-gem
-    script: bash .travis/publish_client_gem.sh
-    env:
-      - DB=postgres
-      - TEST=bindings
-    if: type = cron{% endif %}
-{% if deploy_daily_client_to_pypi %}  - stage: publish-daily-client-pypi
-    script: bash .travis/publish_client_pypi.sh
-    env:
-      - DB=postgres
-      - TEST=bindings
-    if: type = cron{% endif %}
-{% if deploy_client_to_rubygems %}  - stage: publish-client-gem
-    script: bash .travis/publish_client_gem.sh
-    env:
-      - DB=postgres
-      - TEST=bindings
-    if: tag IS present{% endif %}
-{% if deploy_client_to_pypi %}  - stage: publish-client-pypi
-    script: bash .travis/publish_client_pypi.sh
-    env:
-      - DB=postgres
-      - TEST=bindings
-    if: tag IS present{% endif %}
-{% if travis_notifications %}
+    {%- if deploy_to_pypi %}
+    - stage: deploy-plugin-to-pypi
+      script: bash .travis/publish_plugin_pypi.sh
+      if: tag IS present
+    {%- endif %}
+    {%- if plugin_name == 'pulpcore' %}
+    - stage: publish-beta-docs
+      script: bash .travis/publish_docs.sh rc
+      env:
+        - DB=postgres
+        - TEST=docs
+      if: tag IS present
+    - stage: publish-continuous-docs
+      script: bash .travis/publish_docs.sh nightly
+      env:
+        - DB=postgres
+        - TEST=docs
+      if: type != pull_request
+    {%- endif %}
+    {%- if deploy_daily_client_to_rubygems %}
+    - stage: publish-daily-client-gem
+      script: bash .travis/publish_client_gem.sh
+      env:
+        - DB=postgres
+        - TEST=bindings
+      if: type = cron
+    {%- endif %}
+    {%- if deploy_daily_client_to_pypi %}
+    - stage: publish-daily-client-pypi
+      script: bash .travis/publish_client_pypi.sh
+      env:
+        - DB=postgres
+        - TEST=bindings
+      if: type = cron
+    {%- endif %}
+    {%- if deploy_client_to_rubygems %}
+    - stage: publish-client-gem
+      script: bash .travis/publish_client_gem.sh
+      env:
+        - DB=postgres
+        - TEST=bindings
+      if: tag IS present
+    {%- endif %}
+    {%- if deploy_client_to_pypi %}
+    - stage: publish-client-pypi
+      script: bash .travis/publish_client_pypi.sh
+      env:
+        - DB=postgres
+        - TEST=bindings
+      if: tag IS present
+    {%- endif %}
+{%- if travis_notifications %}
 {{ {"notifications": travis_notifications} | to_yaml }}
-{% endif %}
+{%- endif -%}
+...
