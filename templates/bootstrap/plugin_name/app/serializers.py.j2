@@ -14,6 +14,7 @@ from . import models
 # FIXME: SingleArtifactContentSerializer might not be the right choice for you.
 # If your content type has no artifacts per content unit, use "NoArtifactContentSerializer".
 # If your content type has many artifacts per content unit, use "MultipleArtifactContentSerializer"
+# If you want create content through upload, use "SingleArtifactContentUploadSerializer"
 # If you change this, make sure to do so on "fields" below, also.
 # Make sure your choice here matches up with the create() method of your viewset.
 class {{ plugin_camel_short }}ContentSerializer(platform.SingleArtifactContentSerializer):
