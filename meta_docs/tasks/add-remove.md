@@ -58,4 +58,4 @@ One of the ways to perform synchronization:
     `~pulpcore.plugin.models.ContentArtifact`,
     `~pulpcore.plugin.models.RemoteArtifact`.
 
-* Use `~pulpcore.plugin.models.ProgressBar` to report the progress of some steps if needed.
+* Use `~pulpcore.plugin.models.ProgressReport` to report the progress of some steps if needed.

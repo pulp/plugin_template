@@ -18,4 +18,4 @@ One of the ways to perform publishing:
 * For each of the metadata objects create and save  instance of
   `~pulpcore.plugin.models.PublishedMetadata` which refers to a corresponding file and
   `~pulpcore.app.models.Publication` to which this metadata belongs.
-* Use `~pulpcore.plugin.models.ProgressBar` to report progress of some steps if needed.
+* Use `~pulpcore.plugin.models.ProgressReport` to report progress of some steps if needed.

@@ -1,7 +1,7 @@
 from gettext import gettext as _
 import logging
 
-from pulpcore.plugin.models import Artifact, ProgressBar, Remote, Repository
+from pulpcore.plugin.models import Artifact, ProgressReport, Remote, Repository
 from pulpcore.plugin.stages import (
     DeclarativeArtifact,
     DeclarativeContent,
@@ -71,7 +71,7 @@ class {{ plugin_camel_short }}FirstStage(Stage):
         """
         downloader = self.remote.get_downloader(url=self.remote.url)
         result = await downloader.run()
-        # Use ProgressBar to report progress
+        # Use ProgressReport to report progress
         for entry in self.read_my_metadata_file_somehow(result.path):
             unit = {{ plugin_camel_short }}Content(entry)  # make the content unit in memory-only
             artifact = Artifact(entry)  # make Artifact in memory-only
