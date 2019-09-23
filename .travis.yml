@@ -6,5 +6,6 @@ script:
   - ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
   - mkdir ../pulp_catdog/.travis
   - touch ../pulp_catdog/.travis/test_bindings.py
+  - "echo 'pypi_username: the_pypi_user' >> ../pulp_catdog/template_config.yml"
   - ./plugin-template --all pulp_catdog
   - cd ../pulp_catdog && black --diff --check --exclude docs/conf.py .
