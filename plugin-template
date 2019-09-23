@@ -133,8 +133,9 @@ def main():
         else:
             return 2
 
-    # Config key is used by the template_config.yml.j2 template
-    config['config'] = config
+    # Config key is used by the template_config.yml.j2 template to dump
+    # the config. (note: uses .copy() to avoid a self reference)
+    config['config'] = config.copy()
 
     if args.travis or args.all:
         if not config['pypi_username'] and (config['deploy_client_to_pypi'] or \
@@ -157,6 +158,11 @@ def main():
         print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
 
 
+def to_nice_yaml(data):
+    """Implement a filter for Jinja 2 templates to render human readable YAML."""
+    return yaml.dump(data, indent=2, allow_unicode=True, default_flow_style=False)
+
+
 def write_template_section(config, name, plugin_root_dir, verbose=False):
     """
     Template or copy all files for the section.
@@ -176,7 +182,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             os.makedirs(necessary_dir_structure)
 
         if relative_path.endswith('.j2'):
-            env.filters['to_yaml'] = yaml.dump
+            env.filters['to_yaml'] = to_nice_yaml
             template = env.get_template(relative_path)
             destination = destination_relative_path[:-len('.j2')]
             write_template_to_file(template, plugin_root_dir, destination, config)
