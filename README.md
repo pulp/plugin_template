@@ -22,7 +22,7 @@ This allows you to test your plugin at every step.
 It's also recommended that you go through the [planning guide](meta_docs/planning-guide.md) before starting to develop your plugin.
 
 # Generate a plugin template config for a new Pulp plugin
- 
+
 The first step is to create a `template_config.yml` for your new plugin. This file contains
 settings used by the `./plugin-template` command when generating new plugins and for future updates.
 
@@ -36,14 +36,14 @@ exactly what each part of this template does and what to change to create a 'rea
 
    ``$ cd plugin_template``
 
-2. Run the provided ``./plugin-template --generate-config `` 
+2. Run the provided ``./plugin-template --generate-config ``
 
    ``$ ./plugin-template --generate-config --plugin-app-label <label> PLUGIN_NAME``
 
    **NOTE** : The `plugin-app-label` should identify the content type which you would like to
    support, e.g. `rubygem` or `maven`. The `PLUGIN_NAME` is usually `pulp_` or `pulp-` prepended
    to the `--plugin-app-label`, e.g. `pulp_maven`.
-   
+
 The first time this command is run, a new directory by the name of PLUGIN_NAME is created inside
 the parent directory of the `plugin_template' directory. The `template_config.yml` is written to
 the root of this new directory. Subsequent uses of the command simply update that file.
@@ -71,6 +71,8 @@ The following settings are stored in `template_config.yml`.
                         This stage requires the plugin author to include a 'test_bindings.py'
                         script in the .travis directory of the plugin repository. This script
                         is supposed to exercise the generated client library.
+
+  test-performance      Include a Travis stage that runs a script to test performance.
 
   deploy-client-to-pypi Include a Travis stage that publishes a client library to PyPI.
 
@@ -123,7 +125,7 @@ The following settings are stored in `template_config.yml`.
   travis-notifications  A yaml block that contains configuration for Travis build notifications. See
                         https://docs.travis-ci.com/user/notifications/ for configuration options.
 
-``` 
+```
 
 # Bootstrap a new Pulp plugin
 
@@ -150,20 +152,20 @@ much easier.
 
 1. Run the `./plugin-template --travis` command to generate the Travis CI config based on the
    settings in `template_config.yml`.
-   
+
    ``$ ./plugin-template --travis PLUGIN_NAME``
-   
+
 Running the command again will update the plugin with the latest Travis CI configuration provided
-by the plugin-template. 
+by the plugin-template.
 
 # Add Documentation to a Pulp plugin
 
-The next step is to add documentation that can be hosted on 
-[Read the Docs](https://readthedocs.org/). 
+The next step is to add documentation that can be hosted on
+[Read the Docs](https://readthedocs.org/).
 
 1. Run the `./plugin-template --docs` command to generate the docs.
 
-   ``$ ./plugin-template --docs PLUGIN_NAME``    
+   ``$ ./plugin-template --docs PLUGIN_NAME``
 
 ## Discoverability
 
