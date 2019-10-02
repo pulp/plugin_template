@@ -11,14 +11,14 @@ def is_valid(name):
     because the plugin name is used for directory name on the file system and it is also used
     as a name of some Python objects, like class names, so it is expected to be relatively short.
     """
-    return bool(re.match(r'^[a-z][0-9a-z_]{2,15}$', name))
+    return bool(re.match(r"^[a-z][0-9a-z_]{2,15}$", name))
 
 
 def to_camel(name):
     """
     Convert plugin name from snake to camel case
     """
-    return name.title().replace('_', '')
+    return name.title().replace("_", "")
 
 
 def to_caps(name):
@@ -32,11 +32,11 @@ def to_dash(name):
     """
     Convert plugin name from snake case to dash representation
     """
-    return name.replace('_', '-')
+    return name.replace("_", "-")
 
 
 def to_snake(name):
     """
     Convert plugin name from snake case to dash representation
     """
-    return name.replace('-', '_')
+    return name.replace("-", "_")
