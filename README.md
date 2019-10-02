@@ -51,6 +51,8 @@ the root of this new directory. Subsequent uses of the command simply update tha
 The following settings are stored in `template_config.yml`.
 
 ```bash
+  additional_plugins    A list with additional plugin names to be installed on Travis.
+
   pypi-username         The username that should be used when uploading packages to PyPI. It
                         is required unless deploy-client-to-pypi and deploy-daily-client-to-pypi
                         and deploy-to-pypi are specified.
