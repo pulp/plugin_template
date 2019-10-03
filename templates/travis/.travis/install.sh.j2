@@ -53,9 +53,9 @@ PLUGIN={{ plugin_name }}
 # For pulpcore, and any other repo that might check out some plugin PR
 {% for item in additional_plugins %}
 if [ -e $TRAVIS_BUILD_DIR/../{{ item }} ]; then
-  {{ item|upper }}=./{{ item }}
+  {{ item|upper| replace("-", "_") }}=./{{ item }}
 else
-  {{ item|upper }}=git+https://github.com/pulp/{{ item }}.git
+  {{ item|upper| replace("-", "_") }}=git+https://github.com/pulp/{{ item }}.git
 fi
 {% endfor %}
 
@@ -83,7 +83,7 @@ images:
       pulpcore_plugin: ./pulpcore-plugin
       plugins:
         - ./$PLUGIN
-        {% for item in additional_plugins %}- ${{ item|upper }}
+        {% for item in additional_plugins %}- ${{ item|upper| replace("-", "_") }}
         {% endfor %}
 VARSYAML
 fi
