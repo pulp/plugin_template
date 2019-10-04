@@ -114,6 +114,13 @@ export PYTHONPATH=$TRAVIS_BUILD_DIR:${PYTHONPATH}
 export PYTHONPATH=$TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR/../pulpcore:${PYTHONPATH}
 {% endif %}
 set -u
+
+if [[ "$TEST" == "performance" ]]; then
+  echo "--- Performance Tests ---"
+  pytest -vv -r sx --color=yes --pyargs --durations=0 {{ plugin_snake }}.tests.performance || show_logs_and_return_non_zero
+  exit
+fi
+
 if [ -f $FUNC_TEST_SCRIPT ]; then
     $FUNC_TEST_SCRIPT
 else
