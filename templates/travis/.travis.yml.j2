@@ -120,8 +120,7 @@ jobs:
       if: tag IS present
     {%- endif %}
     {%- if test_performance %}
-    - stage: nightly-performance-test
-      script: bash .travis/performance_test_script.sh
+    - stage: daily-performance-test
       env:
         - DB=postgres
         - TEST=performance
