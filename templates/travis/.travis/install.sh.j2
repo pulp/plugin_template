@@ -112,7 +112,11 @@ spec:
     username: pulp
     password: pulp
     admin_password: pulp
-  content_host: $(hostname):24816
+{%- if pulp_settings %}
+  pulp_settings:
+    {%  for setting, value in pulp_settings.items() %} {{ setting }}: {{ value }}
+    {% endfor %}
+{%- endif %}
 CRYAML
 
 # Install k3s, lightweight Kubernetes
