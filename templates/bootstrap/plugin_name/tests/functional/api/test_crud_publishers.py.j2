@@ -30,7 +30,7 @@ class CRUDPublishersTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """Clean class-wide variable."""
-        cls.client.delete(cls.repo["_href"])
+        cls.client.delete(cls.repo["pulp_href"])
 
     def test_01_create_publisher(self):
         """Create a publisher."""
@@ -55,7 +55,7 @@ class CRUDPublishersTestCase(unittest.TestCase):
     @skip_if(bool, "publisher", False)
     def test_02_read_publisher(self):
         """Read a publisher by its href."""
-        publisher = self.client.get(self.publisher["_href"])
+        publisher = self.client.get(self.publisher["pulp_href"])
         for key, val in self.publisher.items():
             with self.subTest(key=key):
                 self.assertEqual(publisher[key], val)
@@ -73,8 +73,8 @@ class CRUDPublishersTestCase(unittest.TestCase):
     def test_03_partially_update(self):
         """Update a publisher using HTTP PATCH."""
         body = gen_{{ plugin_app_label }}_publisher()
-        self.client.patch(self.publisher["_href"], body)
-        type(self).publisher = self.client.get(self.publisher["_href"])
+        self.client.patch(self.publisher["pulp_href"], body)
+        type(self).publisher = self.client.get(self.publisher["pulp_href"])
         for key, val in body.items():
             with self.subTest(key=key):
                 self.assertEqual(self.publisher[key], val)
@@ -83,8 +83,8 @@ class CRUDPublishersTestCase(unittest.TestCase):
     def test_04_fully_update(self):
         """Update a publisher using HTTP PUT."""
         body = gen_{{ plugin_app_label }}_publisher()
-        self.client.put(self.publisher["_href"], body)
-        type(self).publisher = self.client.get(self.publisher["_href"])
+        self.client.put(self.publisher["pulp_href"], body)
+        type(self).publisher = self.client.get(self.publisher["pulp_href"])
         for key, val in body.items():
             with self.subTest(key=key):
                 self.assertEqual(self.publisher[key], val)
@@ -92,6 +92,6 @@ class CRUDPublishersTestCase(unittest.TestCase):
     @skip_if(bool, "publisher", False)
     def test_05_delete(self):
         """Delete a publisher."""
-        self.client.delete(self.publisher["_href"])
+        self.client.delete(self.publisher["pulp_href"])
         with self.assertRaises(HTTPError):
-            self.client.get(self.publisher["_href"])
+            self.client.get(self.publisher["pulp_href"])
