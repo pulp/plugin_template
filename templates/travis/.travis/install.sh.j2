@@ -69,8 +69,9 @@ images:
       tag: $TAG
       plugins:
         - ./$PLUGIN
-        {% for item in additional_plugins %}- {{ item }}
-        {% endfor %}
+        {%- for item in additional_plugins %}
+        - {{ item }}
+        {%- endfor %}
 VARSYAML
 else
   cat > vars/vars.yaml << VARSYAML
@@ -83,8 +84,9 @@ images:
       pulpcore_plugin: ./pulpcore-plugin
       plugins:
         - ./$PLUGIN
-        {% for item in additional_plugins %}- ${{ item|upper| replace("-", "_") }}
-        {% endfor %}
+        {%- for item in additional_plugins %}
+        - ${{ item|upper| replace("-", "_") }}
+        {%- endfor %}
 VARSYAML
 fi
 
