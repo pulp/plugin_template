@@ -19,7 +19,7 @@ if [[ -n $(echo -e $COMMIT_MSG | grep -P "Required PR:.*" | grep -v "https") ]];
   exit 1
 fi
 
-if [ "$TRAVIS_PULL_REQUEST" != "false" ]
+if [ "$TRAVIS_PULL_REQUEST" != "false" ] || [ -z "$TRAVIS_TAG" -a "$TRAVIS_BRANCH" != "master"]
 then
   export PULP_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulpcore\/pull\/(\d+)' | awk -F'/' '{print $7}')
   export PULP_PLUGIN_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulpcore-plugin\/pull\/(\d+)' | awk -F'/' '{print $7}')
@@ -40,11 +40,15 @@ fi
 # So install them here rather than in install.sh
 pip install -r test_requirements.txt
 
-{% if check_commit_message %}# check the commit message
-./.travis/check_commit.sh{% endif %}
+{% if check_commit_message -%}
+# check the commit message
+./.travis/check_commit.sh
+{%- endif %}
 
-{% if black %}# run black separately from flake8 to get a diff
-black --check --diff .{% endif %}
+{% if black -%}
+# run black separately from flake8 to get a diff
+black --check --diff .
+{%- endif %}
 
 # Lint code.
 flake8 --config flake8.cfg
@@ -68,7 +72,8 @@ if [ -n "$PULP_OPERATOR_PR_NUMBER" ]; then
 fi
 
 
-{% if plugin_name != 'pulpcore' %}git clone --depth=1 https://github.com/pulp/pulpcore.git
+{% if plugin_name != 'pulpcore' -%}
+git clone --depth=1 https://github.com/pulp/pulpcore.git
 
 if [ -n "$PULP_PR_NUMBER" ]; then
   cd pulpcore
