@@ -83,10 +83,10 @@ if [ -n "$PULP_PR_NUMBER" ]; then
 fi
 {% endif %}
 
-# When building a (release) tag, we don't need the development modules for the
+{% if plugin_name != 'pulpcore' %}# When building a (release) tag, we don't need the development modules for the
 # build (they will be installed as dependencies of the plugin).
 if [ -z "$TRAVIS_TAG" ]; then
-
+{% endif %}
   git clone --depth=1 https://github.com/pulp/pulpcore-plugin.git
 
   if [ -n "$PULP_PLUGIN_PR_NUMBER" ]; then
@@ -108,7 +108,9 @@ if [ -z "$TRAVIS_TAG" ]; then
 
   # pulp-smash already got installed via test_requirements.txt
   pip install --upgrade --force-reinstall ./pulp-smash
+{% if plugin_name != 'pulpcore' %}
 fi
+{% endif %}
 
 pip install ansible
 
