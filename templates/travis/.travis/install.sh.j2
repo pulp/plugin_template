@@ -59,7 +59,7 @@ else
 fi
 {% endfor %}
 
-if [ -n "$TRAVIS_TAG" ]; then
+{%- if plugin_name != 'pulpcore' %}if [ -n "$TRAVIS_TAG" ]; then
   # Install the plugin only and use published PyPI packages for the rest
   cat > vars/vars.yaml << VARSYAML
 ---
@@ -74,6 +74,7 @@ images:
         {%- endfor %}
 VARSYAML
 else
+{%- endif %}
   cat > vars/vars.yaml << VARSYAML
 ---
 images:
@@ -88,8 +89,9 @@ images:
         - ${{ item|upper| replace("-", "_") }}
         {%- endfor %}
 VARSYAML
+{%- if plugin_name != 'pulpcore' %}
 fi
-
+{%- endif %}
 ansible-playbook build.yaml
 
 cd $TRAVIS_BUILD_DIR/../pulp-operator
