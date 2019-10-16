@@ -69,7 +69,9 @@ jobs:
 {%- endif %}
     {%- if deploy_to_pypi %}
     - stage: deploy-plugin-to-pypi
+      before_install: skip
       install: skip
+      before_script: skip
       script: bash .travis/publish_plugin_pypi.sh
       if: tag IS present
     {%- endif %}
