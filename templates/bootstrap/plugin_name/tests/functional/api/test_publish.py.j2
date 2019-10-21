@@ -61,9 +61,7 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         # Step 1
         repo = client.get(repo["pulp_href"])
         for {{ plugin_app_label }}_content in get_content(repo)[{{ plugin_caps_short }}_CONTENT_NAME]:
-            client.post(
-                repo["_versions_href"], {"add_content_units": [{{ plugin_app_label }}_content["pulp_href"]]}
-            )
+            client.post(repo["versions_href"], {"add_content_units": [{{ plugin_app_label }}_content["pulp_href"]]})
         version_hrefs = tuple(ver["pulp_href"] for ver in get_versions(repo))
         non_latest = choice(version_hrefs[:-1])
 
