@@ -1,5 +1,3 @@
-<!-- TEMPLATE_REMOVE_START -->
-
 This is the ``plugin_template`` repository to help plugin writers get started and write their own
 plugin for [Pulp Project 3.0+](https://pypi.python.org/pypi/pulpcore/).
 
@@ -423,7 +421,6 @@ optional arguments:
 
 - [ ] Plugin django app is defined using PulpAppConfig as a parent
 - [ ] Plugin entry point is defined
-- [ ] pulpcore-plugin is specified as a requirement in setup.py
 - [ ] Necessary models/serializers/viewsets are defined. At a minimum:
     - [ ] models for plugin content type, remote, publisher
     - [ ] serializers for plugin content type, remote, publisher
@@ -431,11 +428,3 @@ optional arguments:
 
 - [ ] Errors are handled according to Pulp conventions
 - [ ] Docs for plugin are available (any location and format preferred and provided by plugin writer)
-
-
-<!-- TEMPLATE_REMOVE_END -->
-# {{ plugin_dash }}
-
-A Pulp plugin to support hosting your own {{ plugin_dash_short }}.
-
-For more information, please see the [documentation](docs/index.rst) or the [Pulp project page](https://pulpproject.org/).
