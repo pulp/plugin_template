@@ -11,23 +11,23 @@ python:
   - "3.7"
 env:
   matrix:
-    - DB=postgres TEST=pulp
+    - TEST=pulp
     {%- if docs_test %}
-    - DB=postgres TEST=docs
+    - TEST=docs
     {%- endif %}
     {%- if test_bindings %}
-    - DB=postgres TEST=bindings
+    - TEST=bindings
     {%- endif %}
 {%- if test_bindings or docs_test %}
 matrix:
   exclude:
     {%- if test_bindings %}
     - python: '3.6'
-      env: DB=postgres TEST=bindings
+      env: TEST=bindings
     {%- endif %}
     {%- if docs_test %}
     - python: '3.6'
-      env: DB=postgres TEST=docs
+      env: TEST=docs
     {%- endif %}
   fast_finish: true
 {%- endif %}
@@ -79,13 +79,11 @@ jobs:
     - stage: publish-beta-docs
       script: bash .travis/publish_docs.sh rc
       env:
-        - DB=postgres
         - TEST=docs
       if: tag IS present
     - stage: publish-continuous-docs
       script: bash .travis/publish_docs.sh nightly
       env:
-        - DB=postgres
         - TEST=docs
       if: type != pull_request
     {%- endif %}
@@ -93,7 +91,6 @@ jobs:
     - stage: publish-daily-client-gem
       script: bash .travis/publish_client_gem.sh
       env:
-        - DB=postgres
         - TEST=bindings
       if: type = cron
     {%- endif %}
@@ -101,7 +98,6 @@ jobs:
     - stage: publish-daily-client-pypi
       script: bash .travis/publish_client_pypi.sh
       env:
-        - DB=postgres
         - TEST=bindings
       if: type = cron
     {%- endif %}
@@ -109,7 +105,6 @@ jobs:
     - stage: publish-client-gem
       script: bash .travis/publish_client_gem.sh
       env:
-        - DB=postgres
         - TEST=bindings
       if: tag IS present
     {%- endif %}
@@ -117,14 +112,12 @@ jobs:
     - stage: publish-client-pypi
       script: bash .travis/publish_client_pypi.sh
       env:
-        - DB=postgres
         - TEST=bindings
       if: tag IS present
     {%- endif %}
     {%- if test_performance %}
     - stage: daily-performance-test
       env:
-        - DB=postgres
         - TEST=performance
       if: type = cron
     {%- endif %}

@@ -34,7 +34,7 @@ class Test{{ plugin_camel_short }}ContentSerializer(TestCase):
 
     def test_duplicate_data(self):
         """Test that the {{ plugin_camel_short }}ContentSerializer does not accept data."""
-        {{ plugin_camel_short }}Content.objects.create(artifact=artifact)
+        {{ plugin_camel_short }}Content.objects.create(artifact=self.artifact)
         data = {"_artifact": "/pulp/api/v3/artifacts/{}/".format(self.artifact.pk)}
         serializer = {{ plugin_camel_short }}ContentSerializer(data=data)
         self.assertFalse(serializer.is_valid())
