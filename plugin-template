@@ -37,7 +37,7 @@ DEFAULT_SETTINGS = {
     'plugin_name': None,
     'plugin_snake': None,
     'plugin_app_label': None,
-    'pulp_settings': None,
+    'pulp_settings': {"content_origin": "http://($hostname):24816"},
     'pypi_username': None,
     'travis_notifications': None,
 }
