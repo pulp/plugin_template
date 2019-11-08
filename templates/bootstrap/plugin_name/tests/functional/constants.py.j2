@@ -3,7 +3,12 @@
 from urllib.parse import urljoin
 
 from pulp_smash.constants import PULP_FIXTURES_BASE_URL
-from pulp_smash.pulp3.constants import BASE_PUBLISHER_PATH, BASE_REMOTE_PATH, CONTENT_PATH
+from pulp_smash.pulp3.constants import (
+    BASE_PUBLISHER_PATH,
+    BASE_REMOTE_PATH,
+    BASE_REPO_PATH,
+    CONTENT_PATH,
+)
 
 # FIXME: list any download policies supported by your plugin type here.
 # If your plugin supports all download policies, you can import this
@@ -18,6 +23,8 @@ DOWNLOAD_POLICIES = ["immediate"]
 {{ plugin_caps_short }}_CONTENT_PATH = urljoin(CONTENT_PATH, "{{ plugin_app_label }}/units/")
 
 {{ plugin_caps_short }}_REMOTE_PATH = urljoin(BASE_REMOTE_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+
+{{ plugin_caps_short }}_REPO_PATH = urljoin(BASE_REPO_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
 
 {{ plugin_caps_short }}_PUBLISHER_PATH = urljoin(BASE_PUBLISHER_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
 

@@ -72,6 +72,25 @@ class {{ plugin_camel_short }}RemoteSerializer(platform.RemoteSerializer):
         model = models.{{ plugin_camel_short }}Remote
 
 
+class {{ plugin_camel_short }}RepoairoeySerializer(platform.RepoairoeySerializer):
+    """
+    A Serializer for {{ plugin_camel_short }}Repository.
+
+    Add any new fields if defined on {{ plugin_camel_short }}Repository.
+    Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
+    Additional validators can be added to the parent validators list
+
+    For example::
+
+    class Meta:
+        validators = platform.RepositorySerializer.Meta.validators + [myValidator1, myValidator2]
+    """
+
+    class Meta:
+        fields = platform.RepositorySerializer.Meta.fields
+        model = models.{{ plugin_camel_short }}Repository
+
+
 class {{ plugin_camel_short }}PublisherSerializer(platform.PublisherSerializer):
     """
     A Serializer for {{ plugin_camel_short }}Publisher.

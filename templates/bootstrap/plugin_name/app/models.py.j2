@@ -9,7 +9,7 @@ from logging import getLogger
 
 from django.db import models
 
-from pulpcore.plugin.models import Content, ContentArtifact, Remote, Publisher
+from pulpcore.plugin.models import Content, ContentArtifact, Remote, Repository, Publisher
 
 logger = getLogger(__name__)
 
@@ -52,7 +52,20 @@ class {{ plugin_camel_short }}Remote(Remote):
     """
     A Remote for {{ plugin_camel_short }}Content.
 
-    Define any additional fields for your new importer if needed.
+    Define any additional fields for your new remote if needed.
+    """
+
+    TYPE = "{{ plugin_dash_short }}"
+
+    class Meta:
+        default_related_name = "%(app_label)s_%(model_name)s"
+
+
+class {{ plugin_camel_short }}Repository(Repository):
+    """
+    A Repository for {{ plugin_camel_short }}Content.
+
+    Define any additional fields for your new repository if needed.
     """
 
     TYPE = "{{ plugin_dash_short }}"

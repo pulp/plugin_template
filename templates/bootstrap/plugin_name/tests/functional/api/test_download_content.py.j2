@@ -6,13 +6,14 @@ from random import choice
 from urllib.parse import urljoin
 
 from pulp_smash import api, config, utils
-from pulp_smash.pulp3.constants import DISTRIBUTION_PATH, REPO_PATH
+from pulp_smash.pulp3.constants import DISTRIBUTION_PATH
 from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo, publish, sync
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_FIXTURE_URL,
     {{ plugin_caps_short }}_PUBLISHER_PATH,
     {{ plugin_caps_short }}_REMOTE_PATH,
+    {{ plugin_caps_short }}_REPO_PATH,
 )
 from {{ plugin_snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_publisher,
@@ -57,7 +58,7 @@ class DownloadContentTestCase(unittest.TestCase):
         cfg = config.get_config()
         client = api.Client(cfg, api.json_handler)
 
-        repo = client.post(REPO_PATH, gen_repo())
+        repo = client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
         self.addCleanup(client.delete, repo["pulp_href"])
 
         body = gen_{{ plugin_app_label }}_remote()

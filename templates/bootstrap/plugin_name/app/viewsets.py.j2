@@ -130,30 +130,42 @@ class {{ plugin_camel_short }}RemoteViewSet(core.RemoteViewSet):
     queryset = models.{{ plugin_camel_short }}Remote.objects.all()
     serializer_class = serializers.{{ plugin_camel_short }}RemoteSerializer
 
+
+class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet):
+    """
+    A ViewSet for {{ plugin_camel_short }}Repository.
+
+    Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
+    queryset and serializer, at a minimum.
+    """
+
+    endpoint_name = "{{ plugin_dash_short }}"
+    queryset = models.{{ plugin_camel_short }}Repository.objects.all()
+    serializer_class = serializers.{{ plugin_camel_short }}RepositorySerializer
+
     # This decorator is necessary since a sync operation is asyncrounous and returns
     # the id and href of the sync task.
     @swagger_auto_schema(
-        operation_description="Trigger an asynchronous task to sync content",
+        operation_description="Trigger an asynchronous task to sync content.",
+        operation_summary="Sync from remote",
         responses={202: AsyncOperationResponseSerializer},
     )
-    @detail_route(methods=("post",), serializer_class=RepositorySyncURLSerializer)
+    @action(detail=True, methods=["post"], serializer_class=RepositorySyncURLSerializer)
     def sync(self, request, pk):
         """
-        Synchronizes a repository. The ``repository`` field has to be provided.
+        Dispatches a sync task.
         """
-        remote = self.get_object()
+        repository = self.get_object()
         serializer = RepositorySyncURLSerializer(data=request.data, context={"request": request})
-
-        # Validate synchronously to return 400 errors.
         serializer.is_valid(raise_exception=True)
-        repository = serializer.validated_data.get("repository")
-        mirror = serializer.validated_data.get("mirror", True)
+        remote = serializer.validated_data.get("remote")
+
         result = enqueue_with_reservation(
             tasks.synchronize,
             [repository, remote],
-            kwargs={"remote_pk": remote.pk, "repository_pk": repository.pk, "mirror": mirror},
+            kwargs={"remote_pk": remote.pk, "repository_pk": repository.pk},
         )
-        return core.OperationPostponedResponse(result, request)
+        return OperationPostponedResponse(result, request)
 
 
 class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):

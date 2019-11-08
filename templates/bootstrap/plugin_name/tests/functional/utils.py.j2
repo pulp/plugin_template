@@ -4,7 +4,6 @@ from functools import partial
 from unittest import SkipTest
 
 from pulp_smash import api, selectors
-from pulp_smash.pulp3.constants import REPO_PATH
 from pulp_smash.pulp3.utils import (
     gen_publisher,
     gen_remote,
@@ -20,6 +19,7 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_CONTENT_PATH,
     {{ plugin_caps_short }}_FIXTURE_URL,
     {{ plugin_caps_short }}_REMOTE_PATH,
+    {{ plugin_caps_short }}_REPO_PATH,
 )
 
 
@@ -86,7 +86,7 @@ def populate_pulp(cfg, url={{ plugin_caps_short }}_FIXTURE_URL):
     repo = {}
     try:
         remote.update(client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote(url)))
-        repo.update(client.post(REPO_PATH, gen_repo()))
+        repo.update(client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo()))
         sync(cfg, remote, repo)
     finally:
         if remote:
