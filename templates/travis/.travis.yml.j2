@@ -116,10 +116,19 @@ jobs:
       if: tag IS present
     {%- endif %}
     {%- if test_performance %}
+      {%- if test_performance is iterable %}
+        {%- for test in test_performance %}
+    - stage: daily-performance-{{test}}-test
+      env:
+        - TEST=performance PERFORMANCE_TEST={{test}}
+      if: type = cron
+        {%- endfor %}
+      {%- else %}
     - stage: daily-performance-test
       env:
         - TEST=performance
       if: type = cron
+      {%- endif %}
     {%- endif %}
 {%- if travis_notifications %}
 {{ {"notifications": travis_notifications} | to_yaml }}
