@@ -5,10 +5,9 @@ import unittest
 from requests.exceptions import HTTPError
 
 from pulp_smash import api, config
-from pulp_smash.pulp3.constants import REPO_PATH
 from pulp_smash.pulp3.utils import gen_repo
 
-from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_PUBLISHER_PATH
+from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_PUBLISHER_PATH, {{ plugin_caps_short }}_REPO_PATH
 from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_publisher, skip_if
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
@@ -25,7 +24,7 @@ class CRUDPublishersTestCase(unittest.TestCase):
         cls.cfg = config.get_config()
         cls.client = api.Client(cls.cfg, api.json_handler)
         cls.publisher = {}
-        cls.repo = cls.client.post(REPO_PATH, gen_repo())
+        cls.repo = cls.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
 
     @classmethod
     def tearDownClass(cls):

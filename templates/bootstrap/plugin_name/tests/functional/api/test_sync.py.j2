@@ -4,13 +4,14 @@ import unittest
 
 from pulp_smash import api, cli, config
 from pulp_smash.exceptions import TaskReportError
-from pulp_smash.pulp3.constants import MEDIA_PATH, REPO_PATH
+from pulp_smash.pulp3.constants import MEDIA_PATH
 from pulp_smash.pulp3.utils import gen_repo, get_added_content_summary, get_content_summary, sync
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_FIXTURE_SUMMARY,
     {{ plugin_caps_short }}_INVALID_FIXTURE_URL,
     {{ plugin_caps_short }}_REMOTE_PATH,
+    {{ plugin_caps_short }}_REPO_PATH,
 )
 from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_remote
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
@@ -47,7 +48,7 @@ class BasicSyncTestCase(unittest.TestCase):
         8. Assert that the same number of are present and that no units were
            added.
         """
-        repo = self.client.post(REPO_PATH, gen_repo())
+        repo = self.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["pulp_href"])
 
         body = gen_{{ plugin_app_label }}_remote()
@@ -96,7 +97,7 @@ class BasicSyncTestCase(unittest.TestCase):
         if cli_client.run(("which", "lsof")).returncode != 0:
             raise unittest.SkipTest("lsof package is not present")
 
-        repo = self.client.post(REPO_PATH, gen_repo())
+        repo = self.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["pulp_href"])
 
         remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote())
@@ -142,7 +143,7 @@ class SyncInvalidTestCase(unittest.TestCase):
 
     def do_test(self, url):
         """Sync a repository given ``url`` on the remote."""
-        repo = self.client.post(REPO_PATH, gen_repo())
+        repo = self.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
         self.addCleanup(self.client.delete, repo["pulp_href"])
 
         body = gen_{{ plugin_app_label }}_remote(url=url)
