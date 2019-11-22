@@ -75,7 +75,7 @@ fi
 
 
 {% if plugin_name != 'pulpcore' -%}
-git clone --depth=1 https://github.com/pulp/pulpcore.git
+git clone --depth=1 https://github.com/pulp/pulpcore.git --branch {{ pulpcore_branch }}
 
 if [ -n "$PULP_PR_NUMBER" ]; then
   cd pulpcore
