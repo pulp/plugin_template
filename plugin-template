@@ -38,6 +38,7 @@ DEFAULT_SETTINGS = {
     'plugin_snake': None,
     'plugin_app_label': None,
     'pulp_settings': None,
+    'pulpcore_branch': 'master',
     'pypi_username': None,
     'travis_notifications': None,
 }
