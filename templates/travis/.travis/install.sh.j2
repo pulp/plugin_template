@@ -5,11 +5,11 @@
 set -euv
 
 if [ "$TEST" = 'docs' ]; then
-{% if plugin_name == 'pulpcore' %}
+{%- if plugin_name == 'pulpcore' %}
   pip install psycopg2-binary
-{% else %}
+{%- else %}
   pip install -r ../pulpcore/doc_requirements.txt
-{% endif %}
+{%- endif %}
   pip install -r doc_requirements.txt
 fi
 
@@ -44,14 +44,8 @@ else
   TAG=$(git rev-parse --abbrev-ref HEAD | tr / _)
 fi
 
-{% if plugin_name == 'pulpcore' %}
-PLUGIN=pulp_file
-{% else %}
-PLUGIN={{ plugin_name }}
-{% endif %}
-
-# For pulpcore, and any other repo that might check out some plugin PR
-{% for item in additional_plugins %}
+{# For pulpcore, and any other repo that might check out some plugin PR #}
+{%- for item in additional_plugins %}
 if [ -e $TRAVIS_BUILD_DIR/../{{ item.name }} ]; then
   {{ item.name|upper| replace("-", "_") }}=./{{ item.name }}
 else
@@ -59,37 +53,52 @@ else
 fi
 {% endfor %}
 
-{%- if plugin_name != 'pulpcore' %}if [ -n "$TRAVIS_TAG" ]; then
+{%- if plugin_name != 'pulpcore' %}
+if [ -n "$TRAVIS_TAG" ]; then
   # Install the plugin only and use published PyPI packages for the rest
   cat > vars/vars.yaml << VARSYAML
 ---
 images:
-  - ${PLUGIN}-${TAG}:
-      image_name: $PLUGIN
+  - {{ plugin_name }}-${TAG}:
+      image_name: {{ plugin_name }}
       tag: $TAG
       plugins:
-        - ./$PLUGIN
+        - ./{{ plugin_name }}
         {%- for item in additional_plugins %}
         - {{ item.name }}
         {%- endfor %}
 VARSYAML
 else
-{%- endif %}
   cat > vars/vars.yaml << VARSYAML
 ---
 images:
-  - ${PLUGIN}-${TAG}:
-      image_name: $PLUGIN
+  - {{ plugin_name }}-${TAG}:
+      image_name: {{ plugin_name }}
       tag: $TAG
       pulpcore: ./pulpcore
       plugins:
-        - ./$PLUGIN
+        - ./{{ plugin_name }}
         {%- for item in additional_plugins %}
         - ${{ item.name|upper| replace("-", "_") }}
         {%- endfor %}
 VARSYAML
-{%- if plugin_name != 'pulpcore' %}
 fi
+{%- else -%}
+{#- We are hardcoding pulp_file for pulpcore, but it must still be specified -#}
+{#- under additional_plugins for the loops to work. This is being done       -#}
+{#- for overall code clarity & simplicity.                                    #}
+cat > vars/vars.yaml << VARSYAML
+---
+images:
+  - pulp_file-${TAG}:
+      image_name: pulp_file
+      tag: $TAG
+      pulpcore: ./pulpcore
+      plugins:
+        {%- for item in additional_plugins %}
+        - ${{ item.name|upper| replace("-", "_") }}
+        {%- endfor %}
+VARSYAML
 {%- endif %}
 ansible-playbook -v build.yaml
 
@@ -106,7 +115,7 @@ spec:
     access_mode: "ReadWriteOnce"
     # We have a little over 40GB free on Travis VMs/instances
     size: "40Gi"
-  image: $PLUGIN
+  image: {% if plugin_name != 'pulpcore' %}{{ plugin_name }}{% else %}pulp_file{% endif %}
   tag: $TAG
   database_connection:
     username: pulp
