@@ -225,16 +225,19 @@ since `pulpcore.plugin` gurantees the plugin API semantic versioning
 
 Models:
  * model(s) for the specific content type(s) used in plugin, should be subclassed from [pulpcore.plugin.models.Content](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/content.py) model
+ * model(s) for the plugin specific repository(ies), should be subclassed from [pulpcore.plugin.models.Repository](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/repository.py) model
  * model(s) for the plugin specific remote(s), should be subclassed from [pulpcore.plugin.models.Remote](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/repository.py) model
  * model(s) for the plugin specific publisher(s), should be subclassed from [pulpcore.plugin.models.Publisher](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/repository.py) model
 
 Serializers:
  * serializer(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.serializers.ContentSerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/content.py)
  * serializer(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.serializers.RemoteSerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/repository.py)
+ * serializer(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.serializers.RepositorySerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/repository.py)
  * serializer(s) for plugin specific publisher(s), should be subclassed from [pulpcore.plugin.serializers.PublisherSerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/repository.py)
 
 Viewsets:
  * viewset(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.viewsets.ContentViewSet](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/content.py)
+ * viewset(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.viewsets.RepositoryViewset](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/repository.py)
  * viewset(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.viewsets.RemoteViewset](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/repository.py)
  * viewset(s) for plugin specific publisher(s), should be subclassed from [pulpcore.plugin.viewsets.PublisherViewset](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/repository.py)
 
@@ -274,21 +277,45 @@ See the [DRF documentation on serializer fields to see what's available](http://
 ### Viewset
 
 Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
-The content viewset usually doesn't require any additinal routes, so you can leave this alone for now.
+The content viewset usually doesn't require any additional routes, so you can leave this alone for now.
 
 
 ## Remote
 
-A remote knows specifics of the plugin Content to put it into Pulp. Remote defines how to synchronize remote content.
-Pulp Platform provides support for concurrent downloading of remote content. Plugin writer is encouraged to use one of
-them but is not required to.
+Remotes provide metadata about how content should be downloaded into Pulp, such as the URL of the remote source, the download policy, and some authentication settings. The base ``Remote`` class provided by Pulp Platform provides support for concurrent downloading of remote content. 
 
 ### Model
 
 First model your remote. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
 Add any fields that correspond to the remote source.
 
-Remember to define the ``TYPE`` class attribute which is used for filtering purposes,
+Remember to define the ``TYPE`` class attribute which is used for filtering purposes.
+
+### Serializer
+
+Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
+
+### Viewset
+
+Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
+The remote viewset usually doesn't require any additinal routes, so you can leave this alone for now.
+
+## Repository
+
+A Repository knows the specifics of which Content it supports and defines how to create new RepositoryVersions.
+It is also responsible for validating that those RepositoryVersions are valid.
+
+### Model
+
+First model your repository. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py). Add any fields as necessary for your specific content type.
+
+Remember to define the ``TYPE`` class attribute which is used for filtering purposes, and ``CONTENT_TYPES`` which 
+defines which types of content are supported by the Repository. This is a list of classes such as
+{{ plugin_camel_short }}Content representing the various content types your plugin supports (that you want
+this repository type to support, if there is more than one repository type in your plugin).
+
+Also, if you want to provide validation that the whole collection of the content in your RepositoryVersion makes sense 
+together, you do that by defining ``finalize_new_version`` on your repository model.
 
 ### Serializer
 
@@ -299,21 +326,9 @@ Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/ser
 Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
 Note the sync route is predefined for you. This route kicks off a task [{{ plugin_snake }}.app.tasks.synchronizing.py]({{ plugin_snake }}.app.tasks.synchronizing.py).
 
-## Publisher
+If you have more than one Repository type in your plugin, or you change the name of your existing one, you will also
+need to have a RepositoryVersionViewSet defined for it (just a viewset, no other objects needed). This hasfield, ``parent_viewset``, which should be set to the accompanying Repository class defined in your plugin.
 
-### Model
-e. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
-Add any additional fields.
-
-Make sure you define the ``TYPE`` class attribute which is used for filtering purposes,
-
-### Serializer
-Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
-
-### Viewset
-
-Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
-Note the publish route is predefined for you. This route kicks off a task [{{ plugin_snake }}.app.tasks.publishing.py]({{ plugin_snake }}.app.tasks.publishing.py).
 
 # Exporter
 
@@ -431,9 +446,9 @@ optional arguments:
 - [ ] Plugin django app is defined using PulpAppConfig as a parent
 - [ ] Plugin entry point is defined
 - [ ] Necessary models/serializers/viewsets are defined. At a minimum:
-    - [ ] models for plugin content type, remote, publisher
-    - [ ] serializers for plugin content type, remote, publisher
-    - [ ] viewset for plugin content type, remote, publisher
+    - [ ] models for plugin content type, repository, remote
+    - [ ] serializers for plugin content type, repository, remote
+    - [ ] viewset for plugin content type, repository, remote
 
 - [ ] Errors are handled according to Pulp conventions
 - [ ] Docs for plugin are available (any location and format preferred and provided by plugin writer)
