@@ -77,7 +77,7 @@ jobs:
     {%- endif %}
     {%- if plugin_name == 'pulpcore' %}
     - stage: publish-beta-docs
-      script: bash .travis/publish_docs.sh rc
+      script: bash .travis/publish_docs.sh tag
       env:
         - TEST=docs
       if: tag IS present
@@ -85,7 +85,7 @@ jobs:
       script: bash .travis/publish_docs.sh nightly
       env:
         - TEST=docs
-      if: type != pull_request AND branch = master
+      if: type != pull_request AND repo = pulp/pulpcore
     {%- endif %}
     {%- if deploy_daily_client_to_rubygems %}
     - stage: publish-daily-client-gem
