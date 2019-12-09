@@ -168,6 +168,15 @@ class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet):
         return OperationPostponedResponse(result, request)
 
 
+class {{ plugin_camel_short }}RepositoryVersionViewSet(RepositoryVersionViewSet):
+    """
+    A ViewSet for a {{ plugin_camel_short }}RepositoryVersion represents a single
+    {{ plugin_camel_short }} repository version.
+    """
+
+    parent_viewset = {{ plugin_camel_short }}RepositoryViewSet
+
+
 class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):
     """
     A ViewSet for {{ plugin_camel_short }}Publisher.
