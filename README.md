@@ -134,6 +134,19 @@ The following settings are stored in `template_config.yml`.
   travis-notifications  A yaml block that contains configuration for Travis build notifications. See
                         https://docs.travis-ci.com/user/notifications/ for configuration options.
 
+  cherry_pick_automation
+                        A boolean that will enable a cron job to automatically attempt to cherry
+                        pick changes to a stable release branch. This job will cherry pick any
+                        PRs that are merged and have the label "Needs Cherry Pick". Requires the
+                        template config setting `stable_branch` to be set. Also, requires a github
+                        user account (e.g. pulpbot) to open the cherry pick PR. `GITHUB_USER` and
+                        `GITHUB_TOKEN` must be defined as env variables in Travis. New tokens can be
+                        generated at
+                        [https://github.com/settings/tokens](https://github.com/settings/tokens).
+
+  stable_branch         A string that points to the latest stable branch (e.g. "3.0"). This is used
+                        for features like the cherry pick automation.
+
 ```
 
 # Bootstrap a new Pulp plugin

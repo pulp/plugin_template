@@ -18,6 +18,7 @@ DEFAULT_SETTINGS = {
     'additional_plugins': [],
     'black': True,
     'check_commit_message': True,
+    'cherry_pick_automation': False,
     'coverage': False,
     'deploy_client_to_pypi': True,
     'deploy_client_to_rubygems': True,
@@ -40,6 +41,7 @@ DEFAULT_SETTINGS = {
     'pulp_settings': None,
     'pulpcore_branch': 'master',
     'pypi_username': None,
+    'stable_branch': None,
     'travis_notifications': None,
 }
 
