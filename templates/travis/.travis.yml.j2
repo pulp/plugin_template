@@ -130,6 +130,14 @@ jobs:
       if: type = cron
       {%- endif %}
     {%- endif %}
+    {%- if cherry_pick_automation %}
+    - stage: cherry-pick
+      if: type = cron
+      before_install: skip
+      install: skip
+      before_script: skip
+      script: bash .travis/cherrypick.sh
+    {%- endif %}
 {%- if travis_notifications %}
 {{ {"notifications": travis_notifications} | to_yaml }}
 {%- endif %}
