@@ -29,6 +29,7 @@ DEFAULT_SETTINGS = {
     'pydocstyle': True,
     'test_bindings': True,
     'test_performance': False,
+    'local_fixture': False,
     'plugin_camel': None,
     'plugin_camel_short': None,
     'plugin_caps': None,

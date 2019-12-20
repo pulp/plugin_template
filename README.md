@@ -83,6 +83,8 @@ The following settings are stored in `template_config.yml`.
                         list, a separate stage will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
 
+  local_fixture         Whether to use  local fixtures or not.
+
   deploy_client_to_pypi Include a Travis stage that publishes a client library to PyPI.
 
                         This stage only executes when a tag is associated with the commit being
@@ -295,7 +297,7 @@ The content viewset usually doesn't require any additional routes, so you can le
 
 ## Remote
 
-Remotes provide metadata about how content should be downloaded into Pulp, such as the URL of the remote source, the download policy, and some authentication settings. The base ``Remote`` class provided by Pulp Platform provides support for concurrent downloading of remote content. 
+Remotes provide metadata about how content should be downloaded into Pulp, such as the URL of the remote source, the download policy, and some authentication settings. The base ``Remote`` class provided by Pulp Platform provides support for concurrent downloading of remote content.
 
 ### Model
 
@@ -322,12 +324,12 @@ It is also responsible for validating that those RepositoryVersions are valid.
 
 First model your repository. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py). Add any fields as necessary for your specific content type.
 
-Remember to define the ``TYPE`` class attribute which is used for filtering purposes, and ``CONTENT_TYPES`` which 
+Remember to define the ``TYPE`` class attribute which is used for filtering purposes, and ``CONTENT_TYPES`` which
 defines which types of content are supported by the Repository. This is a list of classes such as
 {{ plugin_camel_short }}Content representing the various content types your plugin supports (that you want
 this repository type to support, if there is more than one repository type in your plugin).
 
-Also, if you want to provide validation that the whole collection of the content in your RepositoryVersion makes sense 
+Also, if you want to provide validation that the whole collection of the content in your RepositoryVersion makes sense
 together, you do that by defining ``finalize_new_version`` on your repository model.
 
 ### Serializer
