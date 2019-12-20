@@ -58,13 +58,13 @@ The following settings are stored in `template_config.yml`.
                         "Required PR" in a commit message will override this.
                         Your requirements in "setup.py" may inadvertently override this as well.
 
-  pypi-username         The username that should be used when uploading packages to PyPI. It
-                        is required unless deploy-client-to-pypi and deploy-daily-client-to-pypi
-                        and deploy-to-pypi are specified.
+  pypi_username         The username that should be used when uploading packages to PyPI. It
+                        is required unless deploy_client_to_pypi and deploy_daily_client_to_pypi
+                        and deploy_to_pypi are specified.
 
-  docs-test             Include a Travis build for testing the 'make html' command for sphinx docs.
+  docs_test             Include a Travis build for testing the 'make html' command for sphinx docs.
 
-  deploy-to-pypi        Include a Travis stage that publishes builds to PyPI
+  deploy_to_pypi        Include a Travis stage that publishes builds to PyPI
 
                         This stage only executes when a tag is associated with the commit being
                         built. When enabling this stage, the user is expected to provide a
@@ -72,18 +72,18 @@ The following settings are stored in `template_config.yml`.
                         be added in the travis-ci.com settings page for the project[0]. The PYPI
                         username is specified using --pypi-username option.
 
-  test-bindings         Include a Travis stage that runs a script to test generated client
+  test_bindings         Include a Travis stage that runs a script to test generated client
                         library.
 
                         This stage requires the plugin author to include a 'test_bindings.py'
                         script in the .travis directory of the plugin repository. This script
                         is supposed to exercise the generated client library.
 
-  test-performance      Include a Travis stage that runs a script to test performance. If using a
+  test_performance      Include a Travis stage that runs a script to test performance. If using a
                         list, a separate stage will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
 
-  deploy-client-to-pypi Include a Travis stage that publishes a client library to PyPI.
+  deploy_client_to_pypi Include a Travis stage that publishes a client library to PyPI.
 
                         This stage only executes when a tag is associated with the commit being
                         built. When enabling this stage, the user is expected to provide a
@@ -94,7 +94,7 @@ The following settings are stored in `template_config.yml`.
                         This stage uses the OpenAPI schema for the plugin to generate a Python
                         client library using openapi-generator-cli.
 
-  deploy-client-to-rubygems
+  deploy_client_to_rubygems
                         Include a Travis stage that publishes a client library to RubyGems.org.
 
                         This stage only executes when a tag is associated with the commit being
@@ -102,7 +102,7 @@ The following settings are stored in `template_config.yml`.
                         secure environment variable called RUBYGEMS_API_KEY. The variable can
                         be added in the travis-ci.com settings page for the project.
 
-  deploy-daily-client-to-pypi
+  deploy_daily_client_to_pypi
                         Include a Travis stage that publishes a client library to PyPI.
 
                         This stage only executes when a tag is associated with the commit being
@@ -117,7 +117,7 @@ The following settings are stored in `template_config.yml`.
                         [0] https://docs.travis-ci.com/user/environment-variables/
                         #defining-variables-in-repository-settings
 
-  deploy-daily-client-to-rubygems
+  deploy_daily_client_to_rubygems
                         Include a Travis stage that publishes a client library to RubyGems.org
                         with each CRON build.
 
@@ -126,12 +126,12 @@ The following settings are stored in `template_config.yml`.
                         variable called RUBYGEMS_API_KEY. The variable can be added in the
                         travis-ci.com settings page for the project.
 
-  check-commit-message  Include inspection of commit message for a reference to an issue in
+  check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
   coverage              Include collection of coverage and reporting to coveralls.io
 
-  travis-notifications  A yaml block that contains configuration for Travis build notifications. See
+  travis_notifications  A yaml block that contains configuration for Travis build notifications. See
                         https://docs.travis-ci.com/user/notifications/ for configuration options.
 
   cherry_pick_automation
