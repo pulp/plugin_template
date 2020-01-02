@@ -206,7 +206,7 @@ After bootstrapping, your plugin should be installable and discoverable by Pulp.
     `$ http GET http://localhost:24817/pulp/api/v3/remotes/{{ plugin_app_label }}/{{ plugin_dash_short }}/`
 
 
-The plugin specific `/pulp/api/v3/publishers/{{ plugin_dash_short }}/` and `/pulp/api/v3/content/{{ plugin_dash_short }}/` endpoints
+The plugin specific `/pulp/api/v3/content/{{ plugin_dash_short }}/` endpoints
 should now also be available, and you can validate this by checking the hosted docs
 http://localhost:24817/pulp/api/v3/docs
 
@@ -221,7 +221,7 @@ entrypoints see [the discoverability documentation](meta_docs/discoverability.md
 
 First, look at the [overview](https://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/first-plugin.html#understanding-models) of Pulp Models to understand how Pulp fits these pieces together.
 
-Bootstrapping created three new endpoints (remote, publisher, and content). Additional information should be added to these
+Bootstrapping created three new endpoints (remote, and content). Additional information should be added to these
 to tell Pulp how to handle your content.
 
 For each of these three endpoints, the bootstrap has created a `model`, a `serializer` and a `viewset`.
@@ -229,7 +229,7 @@ The [model](https://docs.djangoproject.com/en/2.1/topics/db/models/) is how the 
 The [serializer](http://www.django-rest-framework.org/api-guide/serializers/) converts complex data to easily parsable types (XML, JSON).
 The [viewset](http://www.django-rest-framework.org/api-guide/viewsets/) provides the handlers to serve/receive the serialized data.
 
-## Subclassing Content, Remote, Publisher
+## Subclassing Content, Remote
 
 Always subclass the relevant model, serializer, and viewset from the `pulpcore.plugin`
 namespace. Pulp provides custom behavior for these, and although implementation details
@@ -240,19 +240,16 @@ Models:
  * model(s) for the specific content type(s) used in plugin, should be subclassed from [pulpcore.plugin.models.Content](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/content.py) model
  * model(s) for the plugin specific repository(ies), should be subclassed from [pulpcore.plugin.models.Repository](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/repository.py) model
  * model(s) for the plugin specific remote(s), should be subclassed from [pulpcore.plugin.models.Remote](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/repository.py) model
- * model(s) for the plugin specific publisher(s), should be subclassed from [pulpcore.plugin.models.Publisher](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/models/repository.py) model
 
 Serializers:
  * serializer(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.serializers.ContentSerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/content.py)
  * serializer(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.serializers.RemoteSerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/repository.py)
  * serializer(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.serializers.RepositorySerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/repository.py)
- * serializer(s) for plugin specific publisher(s), should be subclassed from [pulpcore.plugin.serializers.PublisherSerializer](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/serializers/repository.py)
 
 Viewsets:
  * viewset(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.viewsets.ContentViewSet](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/content.py)
  * viewset(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.viewsets.RepositoryViewset](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/repository.py)
  * viewset(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.viewsets.RemoteViewset](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/repository.py)
- * viewset(s) for plugin specific publisher(s), should be subclassed from [pulpcore.plugin.viewsets.PublisherViewset](https://github.com/pulp/pulpcore/blob/master/pulpcore/pulpcore/app/viewsets/repository.py)
 
 Keep [namespacing](meta_docs/subclassing/namespacing.md) in mind when writing your viewsets.
 
@@ -295,7 +292,7 @@ The content viewset usually doesn't require any additional routes, so you can le
 
 ## Remote
 
-Remotes provide metadata about how content should be downloaded into Pulp, such as the URL of the remote source, the download policy, and some authentication settings. The base ``Remote`` class provided by Pulp Platform provides support for concurrent downloading of remote content. 
+Remotes provide metadata about how content should be downloaded into Pulp, such as the URL of the remote source, the download policy, and some authentication settings. The base ``Remote`` class provided by Pulp Platform provides support for concurrent downloading of remote content.
 
 ### Model
 
@@ -322,12 +319,12 @@ It is also responsible for validating that those RepositoryVersions are valid.
 
 First model your repository. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py). Add any fields as necessary for your specific content type.
 
-Remember to define the ``TYPE`` class attribute which is used for filtering purposes, and ``CONTENT_TYPES`` which 
+Remember to define the ``TYPE`` class attribute which is used for filtering purposes, and ``CONTENT_TYPES`` which
 defines which types of content are supported by the Repository. This is a list of classes such as
 {{ plugin_camel_short }}Content representing the various content types your plugin supports (that you want
 this repository type to support, if there is more than one repository type in your plugin).
 
-Also, if you want to provide validation that the whole collection of the content in your RepositoryVersion makes sense 
+Also, if you want to provide validation that the whole collection of the content in your RepositoryVersion makes sense
 together, you do that by defining ``finalize_new_version`` on your repository model.
 
 ### Serializer

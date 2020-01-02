@@ -91,20 +91,39 @@ class {{ plugin_camel_short }}RepositorySerializer(platform.RepositorySerializer
         model = models.{{ plugin_camel_short }}Repository
 
 
-class {{ plugin_camel_short }}PublisherSerializer(platform.PublisherSerializer):
+class {{ plugin_camel_short }}PublicationSerializer(platform.PublicationSerializer):
     """
-    A Serializer for {{ plugin_camel_short }}Publisher.
+    A Serializer for {{ plugin_camel_short }}Publication.
 
-    Add any new fields if defined on {{ plugin_camel_short }}Publisher.
+    Add any new fields if defined on {{ plugin_camel_short }}Publication.
     Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
     Additional validators can be added to the parent validators list
 
     For example::
 
     class Meta:
-        validators = platform.PublisherSerializer.Meta.validators + [myValidator1, myValidator2]
+        validators = platform.PublicationSerializer.Meta.validators + [myValidator1, myValidator2]
     """
 
     class Meta:
-        fields = platform.PublisherSerializer.Meta.fields
-        model = models.{{ plugin_camel_short }}Publisher
+        fields = platform.PublicationSerializer.Meta.fields
+        model = models.{{ plugin_camel_short }}Publication
+
+
+class {{ plugin_camel_short }}DistributionSerializer(platform.PublicationDistributionSerializer):
+    """
+    A Serializer for {{ plugin_camel_short }}Distribution.
+
+    Add any new fields if defined on {{ plugin_camel_short }}Distribution.
+    Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
+    Additional validators can be added to the parent validators list
+
+    For example::
+
+    class Meta:
+        validators = platform.PublicationDistributionSerializer.Meta.validators + [myValidator1, myValidator2]
+    """
+
+    class Meta:
+        fields = platform.PublicationDistributionSerializer.Meta.fields
+        model = models.{{ plugin_camel_short }}Distribution

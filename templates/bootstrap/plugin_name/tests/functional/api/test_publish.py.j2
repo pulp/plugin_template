@@ -11,11 +11,11 @@ from pulp_smash.pulp3.utils import gen_repo, get_content, get_versions, modify_r
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_CONTENT_NAME,
-    {{ plugin_caps_short }}_PUBLISHER_PATH,
+    {{ plugin_caps_short }}_PUBLICATION_PATH,
     {{ plugin_caps_short }}_REMOTE_PATH,
     {{ plugin_caps_short }}_REPO_PATH,
 )
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_publisher, gen_{{ plugin_app_label }}_remote
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_remote, publish
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 
@@ -55,9 +55,6 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
 
         sync(cfg, remote, repo)
 
-        publisher = client.post({{ plugin_caps_short }}_PUBLISHER_PATH, gen_{{ plugin_app_label }}_publisher())
-        self.addCleanup(client.delete, publisher["pulp_href"])
-
         # Step 1
         repo = client.get(repo["pulp_href"])
         for {{ plugin_app_label }}_content in get_content(repo)[{{ plugin_caps_short }}_CONTENT_NAME]:
@@ -66,13 +63,13 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         non_latest = choice(version_hrefs[:-1])
 
         # Step 2
-        publication = publish(cfg, publisher, repo)
+        publication = publish(cfg, repo)
 
         # Step 3
         self.assertEqual(publication["repository_version"], version_hrefs[-1])
 
         # Step 4
-        publication = publish(cfg, publisher, repo, non_latest)
+        publication = publish(cfg, repo, non_latest)
 
         # Step 5
         self.assertEqual(publication["repository_version"], non_latest)
@@ -80,4 +77,4 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         # Step 6
         with self.assertRaises(HTTPError):
             body = {"repository": repo["pulp_href"], "repository_version": non_latest}
-            client.post(urljoin(publisher["pulp_href"], "publish/"), body)
+            client.post({{ plugin_caps_short }}_PUBLICATION_PATH, body)

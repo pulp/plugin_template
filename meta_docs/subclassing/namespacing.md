@@ -32,5 +32,5 @@ However, we recommend against this pattern as it makes defining more content typ
 impossible without introducing breaking changes. Instead use namespaced nesting described above.
 
 In addition to `~pulpcore.app.models.Content` endpoints, namespacing should also be
-considered when defining endpoints for `~pulpcore.app.models.Publisher`s and
+considered when defining endpoints for `~pulpcore.app.models.Publication`s and
 `~pulpcore.app.models.Remote`s.

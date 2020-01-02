@@ -9,7 +9,14 @@ from logging import getLogger
 
 from django.db import models
 
-from pulpcore.plugin.models import Content, ContentArtifact, Remote, Repository, Publisher
+from pulpcore.plugin.models import (
+    Content,
+    ContentArtifact,
+    Remote,
+    Repository,
+    Publication,
+    PublicationDistribution,
+)
 
 logger = getLogger(__name__)
 
@@ -34,12 +41,15 @@ class {{ plugin_camel_short }}Content(Content):
 
     TYPE = "{{ plugin_dash_short }}"
 
+    class Meta:
+        default_related_name = "%(app_label)s_%(model_name)s"
 
-class {{ plugin_camel_short }}Publisher(Publisher):
+
+class {{ plugin_camel_short }}Publication(Publication):
     """
-    A Publisher for {{ plugin_camel_short }}Content.
+    A Publication for {{ plugin_camel_short }}Content.
 
-    Define any additional fields for your new publisher if needed.
+    Define any additional fields for your new publication if needed.
     """
 
     TYPE = "{{ plugin_dash_short }}"
@@ -71,6 +81,19 @@ class {{ plugin_camel_short }}Repository(Repository):
     TYPE = "{{ plugin_dash_short }}"
 
     CONTENT_TYPES = [{{ plugin_camel_short }}Content]
+
+    class Meta:
+        default_related_name = "%(app_label)s_%(model_name)s"
+
+
+class {{ plugin_camel_short }}Distribution(PublicationDistribution):
+    """
+    A Distribution for {{ plugin_camel_short }}Content.
+
+    Define any additional fields for your new distribution if needed.
+    """
+
+    TYPE = "{{ plugin_dash_short }}"
 
     class Meta:
         default_related_name = "%(app_label)s_%(model_name)s"
