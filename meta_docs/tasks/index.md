@@ -14,5 +14,5 @@ same resources are not run at the same time. To ensure data correctness, any act
 content of a repository (thus creating a new version) must be run asynchronously, locking on the
 repository and any other models which cannot change during the action. For example, sync tasks must
 be asynchronous and lock on the repository and the remote. Publish should lock on the repository
-version being published as well as the publisher.
+version being published.
 

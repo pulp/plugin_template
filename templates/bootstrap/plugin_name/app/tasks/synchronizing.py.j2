@@ -37,11 +37,9 @@ def synchronize(remote_pk, repository_pk, mirror):
         raise ValueError(_("A remote must have a url specified to synchronize."))
 
     # Interpret policy to download Artifacts or not
-    download_artifacts = remote.policy == Remote.IMMEDIATE
-    first_stage = {{ plugin_camel_short }}FirstStage(remote)
-    DeclarativeVersion(
-        first_stage, repository, mirror=mirror, download_artifacts=download_artifacts
-    ).create()
+    deferred_download = remote.policy != Remote.IMMEDIATE
+    first_stage = {{ plugin_camel_short }}FirstStage(remote, deferred_download)
+    DeclarativeVersion(first_stage, repository, mirror=mirror).create()
 
 
 class {{ plugin_camel_short }}FirstStage(Stage):
@@ -49,16 +47,19 @@ class {{ plugin_camel_short }}FirstStage(Stage):
     The first stage of a {{ plugin_snake }} sync pipeline.
     """
 
-    def __init__(self, remote):
+    def __init__(self, remote, deferred_download):
         """
         The first stage of a {{ plugin_snake }} sync pipeline.
 
         Args:
             remote (FileRemote): The remote data to be used when syncing
+            deferred_download (bool): if True the downloading will not happen now. If False, it will
+                happen immediately.
 
         """
         super().__init__()
         self.remote = remote
+        self.deferred_download = deferred_download
 
     async def run(self):
         """
@@ -75,7 +76,13 @@ class {{ plugin_camel_short }}FirstStage(Stage):
         for entry in self.read_my_metadata_file_somehow(result.path):
             unit = {{ plugin_camel_short }}Content(entry)  # make the content unit in memory-only
             artifact = Artifact(entry)  # make Artifact in memory-only
-            da = DeclarativeArtifact(artifact, entry.url, entry.relative_path, self.remote)
+            da = DeclarativeArtifact(
+                artifact,
+                entry.url,
+                entry.relative_path,
+                self.remote,
+                deferred_download=self.deferred_download,
+            )
             dc = DeclarativeContent(content=unit, d_artifacts=[da])
             await self.put(dc)
 

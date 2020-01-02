@@ -4,10 +4,11 @@ from urllib.parse import urljoin
 
 from pulp_smash.constants import PULP_FIXTURES_BASE_URL
 from pulp_smash.pulp3.constants import (
-    BASE_PUBLISHER_PATH,
+    BASE_DISTRIBUTION_PATH,
+    BASE_PUBLICATION_PATH,
     BASE_REMOTE_PATH,
     BASE_REPO_PATH,
-    CONTENT_PATH,
+    BASE_CONTENT_PATH,
 )
 
 # FIXME: list any download policies supported by your plugin type here.
@@ -20,13 +21,15 @@ DOWNLOAD_POLICIES = ["immediate"]
 {{ plugin_caps_short }}_CONTENT_NAME = "{{ plugin_app_label }}.unit"
 
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
-{{ plugin_caps_short }}_CONTENT_PATH = urljoin(CONTENT_PATH, "{{ plugin_app_label }}/units/")
+{{ plugin_caps_short }}_CONTENT_PATH = urljoin(BASE_CONTENT_PATH, "{{ plugin_app_label }}/units/")
 
 {{ plugin_caps_short }}_REMOTE_PATH = urljoin(BASE_REMOTE_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
 
 {{ plugin_caps_short }}_REPO_PATH = urljoin(BASE_REPO_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
 
-{{ plugin_caps_short }}_PUBLISHER_PATH = urljoin(BASE_PUBLISHER_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+{{ plugin_caps_short }}_PUBLICATION_PATH = urljoin(BASE_PUBLICATION_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+
+{{ plugin_caps_short }}_DISTRIBUTION_PATH = urljoin(BASE_DISTRIBUTION_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
 
 # FIXME: replace this with your own fixture repository URL and metadata
 {{ plugin_caps_short }}_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}/")

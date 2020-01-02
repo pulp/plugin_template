@@ -8,13 +8,14 @@ Check `Plugin Writer's Guide`_ for more details.
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from pulpcore.app.viewsets import RemoteFilter
 from pulpcore.plugin import viewsets as core
+from pulpcore.plugin.actions import ModifyRepositoryActionMixin
 from pulpcore.plugin.serializers import (
     AsyncOperationResponseSerializer,
-    RepositoryPublishURLSerializer,
     RepositorySyncURLSerializer,
 )
 from pulpcore.plugin.tasking import enqueue_with_reservation
@@ -106,7 +107,7 @@ class {{ plugin_camel_short }}ContentViewSet(core.ContentViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class {{ plugin_camel_short }}RemoteFilter(core.RemoteFilter):
+class {{ plugin_camel_short }}RemoteFilter(RemoteFilter):
     """
     A FilterSet for {{ plugin_camel_short }}Remote.
     """
@@ -131,7 +132,7 @@ class {{ plugin_camel_short }}RemoteViewSet(core.RemoteViewSet):
     serializer_class = serializers.{{ plugin_camel_short }}RemoteSerializer
 
 
-class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet):
+class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet, ModifyRepositoryActionMixin):
     """
     A ViewSet for {{ plugin_camel_short }}Repository.
 
@@ -168,7 +169,7 @@ class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet):
         return OperationPostponedResponse(result, request)
 
 
-class {{ plugin_camel_short }}RepositoryVersionViewSet(RepositoryVersionViewSet):
+class {{ plugin_camel_short }}RepositoryVersionViewSet(core.RepositoryVersionViewSet):
     """
     A ViewSet for a {{ plugin_camel_short }}RepositoryVersion represents a single
     {{ plugin_camel_short }} repository version.
@@ -177,17 +178,17 @@ class {{ plugin_camel_short }}RepositoryVersionViewSet(RepositoryVersionViewSet)
     parent_viewset = {{ plugin_camel_short }}RepositoryViewSet
 
 
-class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):
+class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
     """
-    A ViewSet for {{ plugin_camel_short }}Publisher.
+    A ViewSet for {{ plugin_camel_short }}Publication.
 
     Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
     queryset and serializer, at a minimum.
     """
 
     endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Publisher.objects.all()
-    serializer_class = serializers.{{ plugin_camel_short }}PublisherSerializer
+    queryset = models.{{ plugin_camel_short }}Publication.objects.all()
+    serializer_class = serializers.{{ plugin_camel_short }}PublicationSerializer
 
     # This decorator is necessary since a publish operation is asyncrounous and returns
     # the id and href of the publish task.
@@ -195,25 +196,33 @@ class {{ plugin_camel_short }}PublisherViewSet(core.PublisherViewSet):
         operation_description="Trigger an asynchronous task to publish content",
         responses={202: AsyncOperationResponseSerializer},
     )
-    @detail_route(methods=("post",), serializer_class=RepositoryPublishURLSerializer)
-    def publish(self, request, pk):
+    def create(self, request):
         """
         Publishes a repository.
 
         Either the ``repository`` or the ``repository_version`` fields can
         be provided but not both at the same time.
         """
-        publisher = self.get_object()
-        serializer = RepositoryPublishURLSerializer(data=request.data, context={"request": request})
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         repository_version = serializer.validated_data.get("repository_version")
 
         result = enqueue_with_reservation(
             tasks.publish,
-            [repository_version.repository, publisher],
-            kwargs={
-                "publisher_pk": str(publisher.pk),
-                "repository_version_pk": str(repository_version.pk),
-            },
+            [repository_version.repository],
+            kwargs={"repository_version_pk": str(repository_version.pk),},
         )
         return core.OperationPostponedResponse(result, request)
+
+
+class {{ plugin_camel_short }}DistributionViewSet(core.BaseDistributionViewSet):
+    """
+    A ViewSet for {{ plugin_camel_short }}Distribution.
+
+    Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
+    queryset and serializer, at a minimum.
+    """
+
+    endpoint_name = "{{ plugin_dash_short }}"
+    queryset = models.{{ plugin_camel_short }}Distribution.objects.all()
+    serializer_class = serializers.{{ plugin_camel_short }}DistributionSerializer
