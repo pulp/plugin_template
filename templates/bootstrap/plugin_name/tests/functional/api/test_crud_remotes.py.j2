@@ -141,6 +141,7 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
         cls.cfg = config.get_config()
         cls.client = api.Client(cls.cfg, api.json_handler)
         cls.remote = {}
+        cls.policies = DOWNLOAD_POLICIES
         cls.body = _gen_verbose_remote()
 
     @classmethod
@@ -158,14 +159,14 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
         self.remote.update(self.client.post({{ plugin_caps_short }}_REMOTE_PATH, self.body))
         self.assertEqual(self.remote["policy"], "immediate", self.remote)
 
-    @skip_if(bool, "remote", False)
+    @skip_if(len, "policies", 1)
     def test_02_change_policy(self):
         """Verify ability to change policy to value other than the default.
 
         Update the remote policy to a valid value other than `immedaite`
         and verify the new set value.
         """
-        changed_policy = choice([item for item in DOWNLOAD_POLICIES if item != "immediate"])
+        changed_policy = choice([item for item in self.policies if item != "immediate"])
         self.client.patch(self.remote["pulp_href"], {"policy": changed_policy})
         self.remote.update(self.client.get(self.remote["pulp_href"]))
         self.assertEqual(self.remote["policy"], changed_policy, self.remote)
@@ -197,11 +198,6 @@ def _gen_verbose_remote():
     """
     attrs = gen_{{ plugin_app_label }}_remote()
     attrs.update(
-        {
-            "password": utils.uuid4(),
-            "username": utils.uuid4(),
-            "policy": choice(DOWNLOAD_POLICIES),
-            "validate": choice((False, True)),
-        }
+        {"password": utils.uuid4(), "username": utils.uuid4(), "policy": choice(DOWNLOAD_POLICIES),}
     )
     return attrs
