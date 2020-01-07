@@ -43,15 +43,18 @@ def get_{{ plugin_app_label }}_content_paths(repo, version_href=None):
 
     :param repo: A dict of information about the repository.
     :param version_href: The repository version to read.
-    :returns: A list with the paths of units present in a given repository.
+    :returns: A dict of lists with the paths of units present in a given repository.
+        Paths are given as pairs with the remote and the local version for different content types.
     """
     # FIXME: The "relative_path" is actually a file path and name
     # It's just an example -- this needs to be replaced with an implementation that works
     # for repositories of this content type.
-    return [
-        content_unit["relative_path"]
-        for content_unit in get_content(repo, version_href)[{{ plugin_caps_short }}_CONTENT_NAME]
-    ]
+    return {
+        {{ plugin_caps_short }}_CONTENT_NAME: [
+            (content_unit["relative_path"], content_unit["relative_path"])
+            for content_unit in get_content(repo, version_href)[{{ plugin_caps_short }}_CONTENT_NAME]
+        ],
+    }
 
 
 def gen_{{ plugin_app_label }}_content_attrs(artifact):
