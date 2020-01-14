@@ -83,6 +83,9 @@ The following settings are stored in `template_config.yml`.
                         list, a separate stage will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
 
+  docker_fixtures       In Travis, use the pulp-fixtures docker container to serve up fixtures
+                        instead of using fedorapeople.org.
+
   deploy_client_to_pypi Include a Travis stage that publishes a client library to PyPI.
 
                         This stage only executes when a tag is associated with the commit being
