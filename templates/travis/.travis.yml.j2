@@ -118,7 +118,7 @@ jobs:
       script: bash .travis/publish_docs.sh nightly
       env:
         - TEST=docs
-      if: type != pull_request AND repo = pulp/pulpcore
+      if: type != pull_request AND repo = pulp/pulpcore AND branch = master
     {%- endif %}
     {%- if test_performance %}
       {%- if test_performance is iterable %}
