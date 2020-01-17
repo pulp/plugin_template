@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 pip install -r test_requirements.txt
+mv ./.travis/test_bindings.py.j2 ./templates/travis/.travis/
 ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
 mkdir ../pulp_catdog/.travis
 touch ../pulp_catdog/.travis/test_bindings.py

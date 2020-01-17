@@ -17,6 +17,12 @@ python:
 env:
   matrix:
     - TEST=pulp
+    - TEST=bindings
+matrix:
+  exclude:
+    - python: "3.6"
+      env: TEST=bindings
+  fast_finish: true
 services:
   - postgresql
   - redis-server
