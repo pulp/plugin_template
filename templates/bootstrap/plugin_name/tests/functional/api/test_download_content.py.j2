@@ -5,22 +5,26 @@ import unittest
 from random import choice
 from urllib.parse import urljoin
 
-from pulp_smash import api, config, utils
-from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo, sync
+from pulp_smash import config, utils
+from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo
 
-from {{ plugin_snake }}.tests.functional.constants import (
-    {{ plugin_caps_short }}_DISTRIBUTION_PATH,
-    {{ plugin_caps_short }}_FIXTURE_URL,
-    {{ plugin_caps_short }}_PUBLICATION_PATH,
-    {{ plugin_caps_short }}_REMOTE_PATH,
-    {{ plugin_caps_short }}_REPO_PATH,
-)
+from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_FIXTURE_URL
 from {{ plugin_snake }}.tests.functional.utils import (
-    publish,
-    gen_{{ plugin_app_label }}_remote,
+    gen_{{ plugin_app_label }}_client,
     get_{{ plugin_app_label }}_content_paths,
+    gen_{{ plugin_app_label }}_remote,
+    monitor_task,
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+
+from pulpcore.client.{{ plugin_snake }} import (
+    Distributions{{ plugin_camel_short }}Api,
+    Publications{{ plugin_camel_short }}Api,
+    Repositories{{ plugin_camel_short }}Api,
+    RepositorySyncURL,
+    Remotes{{ plugin_camel_short }}Api,
+    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
+)
 
 
 # Implement tests.functional.utils.get_{{ plugin_app_label }}_content_unit_paths(),
@@ -55,28 +59,37 @@ class DownloadContentTestCase(unittest.TestCase):
         * `Pulp #2895 <https://pulp.plan.io/issues/2895>`_
         * `Pulp Smash #872 <https://github.com/pulp/pulp-smash/issues/872>`_
         """
-        cfg = config.get_config()
-        client = api.Client(cfg, api.json_handler)
+        client = gen_{{ plugin_app_label }}_client()
+        repo_api = Repositories{{ plugin_camel_short }}Api(client)
+        remote_api = Remotes{{ plugin_camel_short }}Api(client)
+        publications = Publications{{ plugin_camel_short }}Api(client)
+        distributions = Distributions{{ plugin_camel_short }}Api(client)
 
-        repo = client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
-        self.addCleanup(client.delete, repo["pulp_href"])
+        repo = repo_api.create(gen_repo())
+        self.addCleanup(repo_api.delete, repo.pulp_href)
 
         body = gen_{{ plugin_app_label }}_remote()
-        remote = client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(client.delete, remote["pulp_href"])
+        remote = remote_api.create(body)
+        self.addCleanup(remote_api.delete, remote.pulp_href)
 
-        sync(cfg, remote, repo)
-        repo = client.get(repo["pulp_href"])
+        # Sync a Repository
+        repository_sync_data = RepositorySyncURL(remote=remote.pulp_href)
+        sync_response = repo_api.sync(repo.pulp_href, repository_sync_data)
+        monitor_task(sync_response.task)
+        repo = repo_api.read(repo.pulp_href)
 
         # Create a publication.
-        publication = publish(cfg, repo)
-        self.addCleanup(client.delete, publication["pulp_href"])
+        publish_data = {{ plugin_camel_short }}{{ plugin_camel_short }}Publication(repository=repo.pulp_href)
+        publish_response = publications.create(publish_data)
+        created_resources = monitor_task(publish_response.task)
+        publication_href = created_resources[0]
+        self.addCleanup(publications.delete, publication_href)
 
         # Create a distribution.
         body = gen_distribution()
-        body["publication"] = publication["pulp_href"]
-        distribution = client.using_handler(api.task_handler).post({{ plugin_caps_short }}_DISTRIBUTION_PATH, body)
-        self.addCleanup(client.delete, distribution["pulp_href"])
+        body["publication"] = publication_href
+        distribution = distributions.create(body)
+        self.addCleanup(distributions.delete, distribution.pulp_href)
 
         # Pick a content unit (of each type), and download it from both Pulp Fixtures…
         unit_paths = [choice(paths) for paths in get_{{ plugin_app_label }}_content_paths(repo).values()]
@@ -87,8 +100,9 @@ class DownloadContentTestCase(unittest.TestCase):
 
         # …and Pulp.
         pulp_hashes = []
+        cfg = config.get_config()
         for unit_path in unit_paths:
-            content = download_content_unit(cfg, distribution, unit_path[1])
-            pulp_hash.append(hashlib.sha256(content).hexdigest())
+            content = download_content_unit(cfg, distribution.to_dict(), unit_path[1])
+            pulp_hashes.append(hashlib.sha256(content).hexdigest())
 
         self.assertEqual(fixtures_hashes, pulp_hashes)

@@ -2,19 +2,26 @@
 """Tests that sync {{ plugin_app_label }} plugin repositories."""
 import unittest
 
-from pulp_smash import api, cli, config
-from pulp_smash.exceptions import TaskReportError
+from pulp_smash import cli
 from pulp_smash.pulp3.constants import MEDIA_PATH
-from pulp_smash.pulp3.utils import gen_repo, get_added_content_summary, get_content_summary, sync
+from pulp_smash.pulp3.utils import gen_repo, get_added_content_summary, get_content_summary
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_FIXTURE_SUMMARY,
     {{ plugin_caps_short }}_INVALID_FIXTURE_URL,
-    {{ plugin_caps_short }}_REMOTE_PATH,
-    {{ plugin_caps_short }}_REPO_PATH,
 )
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_remote
+from {{ plugin_snake }}.tests.functional.utils import (
+    gen_{{ plugin_app_label }}_client,
+    gen_{{ plugin_app_label }}_remote,
+    monitor_task,
+)
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+
+from pulpcore.client.{{ plugin_snake }} import (
+    Repositories{{ plugin_camel_short }}Api,
+    RepositorySyncURL,
+    Remotes{{ plugin_camel_short }}Api,
+)
 
 
 # Implement sync support before enabling this test.
@@ -25,8 +32,7 @@ class BasicSyncTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create class-wide variables."""
-        cls.cfg = config.get_config()
-        cls.client = api.Client(cls.cfg, api.json_handler)
+        cls.client = gen_{{ plugin_app_label }}_client()
 
     def test_sync(self):
         """Sync repositories with the {{ plugin_app_label }} plugin.
@@ -48,29 +54,33 @@ class BasicSyncTestCase(unittest.TestCase):
         8. Assert that the same number of are present and that no units were
            added.
         """
-        repo = self.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
-        self.addCleanup(self.client.delete, repo["pulp_href"])
+        repo_api = Repositories{{ plugin_camel_short }}Api(self.client)
+        remote_api = Remotes{{ plugin_camel_short }}Api(self.client)
+
+        repo = repo_api.create(gen_repo())
+        self.addCleanup(repo_api.delete, repo.pulp_href)
 
         body = gen_{{ plugin_app_label }}_remote()
-        remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(self.client.delete, remote["pulp_href"])
+        remote = remote_api.create(body)
+        self.addCleanup(remote_api.delete, remote.pulp_href)
 
         # Sync the repository.
-        self.assertEqual(repo["latest_version_href"], f"{repo['pulp_href']}versions/0/")
-        sync(self.cfg, remote, repo)
-        repo = self.client.get(repo["pulp_href"])
+        self.assertEqual(repo.latest_version_href, f"{repo.pulp_href}versions/0/")
+        repository_sync_data = RepositorySyncURL(remote=remote.pulp_href)
+        sync_response = repo_api.sync(repo.pulp_href, repository_sync_data)
+        monitor_task(sync_response.task)
+        repo = repo_api.read(repo.pulp_href)
 
-        self.assertIsNotNone(repo["latest_version_href"])
-        self.assertDictEqual(get_content_summary(repo), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
-        self.assertDictEqual(get_added_content_summary(repo), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
+        self.assertIsNotNone(repo.latest_version_href)
+        self.assertDictEqual(get_content_summary(repo.to_dict()), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
+        self.assertDictEqual(get_added_content_summary(repo.to_dict()), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
 
         # Sync the repository again.
-        latest_version_href = repo["latest_version_href"]
-        sync(self.cfg, remote, repo)
-        repo = self.client.get(repo["pulp_href"])
-
-        self.assertEqual(latest_version_href, repo["latest_version_href"])
-        self.assertDictEqual(get_content_summary(repo), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
+        self.assertEqual(repo.latest_version_href, f"{repo.pulp_href}versions/0/")
+        repository_sync_data = RepositorySyncURL(remote=remote.pulp_href)
+        sync_response = repo_api.sync(repo.pulp_href, repository_sync_data)
+        monitor_task(sync_response.task)
+        repo = repo_api.read(repo.pulp_href)
 
     # This test may not make sense for all plugins, but is likely to be useful
     # for most. Check that it makes sense for yours before enabling it.
@@ -96,13 +106,17 @@ class BasicSyncTestCase(unittest.TestCase):
         if cli_client.run(("which", "lsof")).returncode != 0:
             raise unittest.SkipTest("lsof package is not present")
 
-        repo = self.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
-        self.addCleanup(self.client.delete, repo["pulp_href"])
+        repo_api = Repositories{{ plugin_camel_short }}Api(self.client)
+        repo = repo_api.create(gen_repo())
+        self.addCleanup(repo_api.delete, repo.pulp_href)
 
-        remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote())
-        self.addCleanup(self.client.delete, remote["pulp_href"])
+        remote_api = Remotes{{ plugin_camel_short }}Api(self.client)
+        remote = remote_api.create(gen_{{ plugin_app_label }}_remote())
+        self.addCleanup(remote_api.delete, remote.pulp_href)
 
-        sync(self.cfg, remote, repo)
+        repository_sync_data = RepositorySyncURL(remote=remote.pulp_href)
+        sync_response = repo_api.sync(repo.pulp_href, repository_sync_data)
+        monitor_task(sync_response.task)
 
         cmd = "lsof -t +D {}".format(MEDIA_PATH).split()
         response = cli_client.run(cmd).stdout
@@ -117,16 +131,15 @@ class SyncInvalidTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create class-wide variables."""
-        cls.cfg = config.get_config()
-        cls.client = api.Client(cls.cfg, api.json_handler)
+        cls.client = gen_{{ plugin_app_label }}_client()
 
     def test_invalid_url(self):
         """Sync a repository using a remote url that does not exist.
 
         Test that we get a task failure. See :meth:`do_test`.
         """
-        context = self.do_test("http://i-am-an-invalid-url.com/invalid/")
-        self.assertIsNotNone(context.exception.task["error"]["description"])
+        task = self.do_test("http://i-am-an-invalid-url.com/invalid/")
+        self.assertIsNotNone(task["error"]["description"])
 
     # Provide an invalid repository and specify keywords in the anticipated error message
     @unittest.skip("FIXME: Plugin writer action required.")
@@ -136,19 +149,22 @@ class SyncInvalidTestCase(unittest.TestCase):
         Assert that an exception is raised, and that error message has
         keywords related to the reason of the failure. See :meth:`do_test`.
         """
-        context = self.do_test({{ plugin_caps_short }}_INVALID_FIXTURE_URL)
+        task = self.do_test({{ plugin_caps_short }}_INVALID_FIXTURE_URL)
         for key in ("mismached", "empty"):
-            self.assertIn(key, context.exception.task["error"]["description"])
+            self.assertIn(key, task["error"]["description"])
 
     def do_test(self, url):
         """Sync a repository given ``url`` on the remote."""
-        repo = self.client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
-        self.addCleanup(self.client.delete, repo["pulp_href"])
+        repo_api = Repositories{{ plugin_camel_short }}Api(self.client)
+        remote_api = Remotes{{ plugin_camel_short }}Api(self.client)
+
+        repo = repo_api.create(gen_repo())
+        self.addCleanup(repo_api.delete, repo.pulp_href)
 
         body = gen_{{ plugin_app_label }}_remote(url=url)
-        remote = self.client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(self.client.delete, remote["pulp_href"])
+        remote = remote_api.create(body)
+        self.addCleanup(remote_api.delete, remote.pulp_href)
 
-        with self.assertRaises(TaskReportError) as context:
-            sync(self.cfg, remote, repo)
-        return context
+        repository_sync_data = RepositorySyncURL(remote=remote.pulp_href)
+        sync_response = repo_api.sync(repo.pulp_href, repository_sync_data)
+        return monitor_task(sync_response.task)

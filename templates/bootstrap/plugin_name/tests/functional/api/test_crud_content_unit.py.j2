@@ -2,15 +2,21 @@
 """Tests that perform actions over content unit."""
 import unittest
 
-from requests.exceptions import HTTPError
-
-from pulp_smash import api, config, utils
-from pulp_smash.pulp3.constants import ARTIFACTS_PATH
+from pulp_smash import utils
 from pulp_smash.pulp3.utils import delete_orphans
 
-from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_CONTENT_PATH, {{ plugin_caps_short }}_URL
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_content_attrs, skip_if
+from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_URL
+from {{ plugin_snake }}.tests.functional.utils import (
+    core_client,
+    gen_{{ plugin_app_label }}_client,
+    gen_{{ plugin_app_label }}_content_attrs,
+    skip_if,
+)
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+
+from pulpcore.client.pulpcore import ArtifactsApi
+from pulpcore.client.{{ plugin_snake }} import Content{{ plugin_camel_short }}Api
+from pulpcore.client.{{ plugin_snake }}.exceptions import ApiException
 
 
 # Read the instructions provided below for the steps needed to enable this test (see: FIXME's).
@@ -28,22 +34,22 @@ class ContentUnitTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create class-wide variable."""
-        cls.cfg = config.get_config()
-        delete_orphans(cls.cfg)
+        delete_orphans()
         cls.content_unit = {}
-        cls.client = api.Client(cls.cfg, api.json_handler)
+        cls.api = Content{{ plugin_camel_short }}Api(gen_{{ plugin_app_label }}_client())
         files = {"file": utils.http_get({{ plugin_caps_short }}_URL)}
-        cls.artifact = cls.client.post(ARTIFACTS_PATH, files=files)
+        cls.artifact = ArtifactsApi(core_client).create(file=files).to_dict()
 
     @classmethod
     def tearDownClass(cls):
         """Clean class-wide variable."""
-        delete_orphans(cls.cfg)
+        delete_orphans()
 
     def test_01_create_content_unit(self):
         """Create content unit."""
         attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
-        self.content_unit.update(self.client.post({{ plugin_caps_short }}_CONTENT_PATH, attrs))
+        content_unit = self.api.create(attrs)
+        self.content_unit.update(content_unit.to_dict())
         for key, val in attrs.items():
             with self.subTest(key=key):
                 self.assertEqual(self.content_unit[key], val)
@@ -51,7 +57,7 @@ class ContentUnitTestCase(unittest.TestCase):
     @skip_if(bool, "content_unit", False)
     def test_02_read_content_unit(self):
         """Read a content unit by its href."""
-        content_unit = self.client.get(self.content_unit["pulp_href"])
+        content_unit = self.api.read(self.content_unit["pulp_href"]).to_dict()
         for key, val in self.content_unit.items():
             with self.subTest(key=key):
                 self.assertEqual(content_unit[key], val)
@@ -61,13 +67,11 @@ class ContentUnitTestCase(unittest.TestCase):
         """Read a content unit by its relative_path."""
         # FIXME: "relative_path" is an attribute specific to the File plugin. It is only an
         # example. You should replace this with some other field specific to your content type.
-        page = self.client.get(
-            {{ plugin_caps_short }}_CONTENT_PATH, params={"relative_path": self.content_unit["relative_path"]}
-        )
-        self.assertEqual(len(page["results"]), 1)
+        page = self.api.list(relative_path=self.content_unit["relative_path"])
+        self.assertEqual(len(page.results), 1)
         for key, val in self.content_unit.items():
             with self.subTest(key=key):
-                self.assertEqual(page["results"][0][key], val)
+                self.assertEqual(page.results[0].to_dict()[key], val)
 
     @skip_if(bool, "content_unit", False)
     def test_03_partially_update(self):
@@ -76,8 +80,8 @@ class ContentUnitTestCase(unittest.TestCase):
         This HTTP method is not supported and a HTTP exception is expected.
         """
         attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
-        with self.assertRaises(HTTPError) as exc:
-            self.client.patch(self.content_unit["pulp_href"], attrs)
+        with self.assertRaises(ApiException) as exc:
+            self.api.partial_update(self.content_unit["pulp_href"], attrs)
         self.assertEqual(exc.exception.response.status_code, 405)
 
     @skip_if(bool, "content_unit", False)
@@ -87,8 +91,8 @@ class ContentUnitTestCase(unittest.TestCase):
         This HTTP method is not supported and a HTTP exception is expected.
         """
         attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
-        with self.assertRaises(HTTPError) as exc:
-            self.client.put(self.content_unit["pulp_href"], attrs)
+        with self.assertRaises(ApiException) as exc:
+            self.api.update(self.content_unit["pulp_href"], attrs)
         self.assertEqual(exc.exception.response.status_code, 405)
 
     @skip_if(bool, "content_unit", False)
@@ -97,6 +101,6 @@ class ContentUnitTestCase(unittest.TestCase):
 
         This HTTP method is not supported and a HTTP exception is expected.
         """
-        with self.assertRaises(HTTPError) as exc:
-            self.client.delete(self.content_unit["pulp_href"])
+        with self.assertRaises(ApiException) as exc:
+            self.api.delete(self.content_unit["pulp_href"])
         self.assertEqual(exc.exception.response.status_code, 405)
