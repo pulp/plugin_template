@@ -166,7 +166,7 @@ class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet, ModifyRe
             [repository, remote],
             kwargs={"remote_pk": remote.pk, "repository_pk": repository.pk},
         )
-        return OperationPostponedResponse(result, request)
+        return core.OperationPostponedResponse(result, request)
 
 
 class {{ plugin_camel_short }}RepositoryVersionViewSet(core.RepositoryVersionViewSet):

@@ -2,21 +2,26 @@
 """Tests that publish {{ plugin_app_label }} plugin repositories."""
 import unittest
 from random import choice
-from urllib.parse import urljoin
 
-from requests.exceptions import HTTPError
+from pulp_smash import config
+from pulp_smash.pulp3.utils import gen_repo, get_content, get_versions, modify_repo
 
-from pulp_smash import api, config
-from pulp_smash.pulp3.utils import gen_repo, get_content, get_versions, modify_repo, publish, sync
-
-from {{ plugin_snake }}.tests.functional.constants import (
-    {{ plugin_caps_short }}_CONTENT_NAME,
-    {{ plugin_caps_short }}_PUBLICATION_PATH,
-    {{ plugin_caps_short }}_REMOTE_PATH,
-    {{ plugin_caps_short }}_REPO_PATH,
+from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_CONTENT_NAME
+from {{ plugin_snake }}.tests.functional.utils import (
+    gen_{{ plugin_app_label }}_client,
+    gen_{{ plugin_app_label }}_remote,
+    monitor_task,
 )
-from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_remote, publish
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+
+from pulpcore.client.{{ plugin_snake }} import (
+    Publications{{ plugin_camel_short }}Api,
+    Repositories{{ plugin_camel_short }}Api,
+    RepositorySyncURL,
+    Remotes{{ plugin_camel_short }}Api,
+    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
+)
+from pulpcore.client.{{ plugin_snake }}.exceptions import ApiException
 
 
 # Implement sync and publish support before enabling this test.
@@ -44,37 +49,50 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
            repository versions to be published at same time.
         """
         cfg = config.get_config()
-        client = api.Client(cfg, api.json_handler)
+        client = gen_{{ plugin_app_label }}_client()
+        repo_api = Repositories{{ plugin_camel_short }}Api(client)
+        remote_api = Remotes{{ plugin_camel_short }}Api(client)
+        publications = Publications{{ plugin_camel_short }}Api(client)
 
         body = gen_{{ plugin_app_label }}_remote()
-        remote = client.post({{ plugin_caps_short }}_REMOTE_PATH, body)
-        self.addCleanup(client.delete, remote["pulp_href"])
+        remote = remote_api.create(body)
+        self.addCleanup(remote_api.delete, remote.pulp_href)
 
-        repo = client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo())
-        self.addCleanup(client.delete, repo["pulp_href"])
+        repo = repo_api.create(gen_repo())
+        self.addCleanup(repo_api.delete, repo.pulp_href)
 
-        sync(cfg, remote, repo)
+        repository_sync_data = RepositorySyncURL(remote=remote.pulp_href)
+        sync_response = repo_api.sync(repo.pulp_href, repository_sync_data)
+        monitor_task(sync_response.task)
 
         # Step 1
-        repo = client.get(repo["pulp_href"])
-        for {{ plugin_app_label }}_content in get_content(repo)[{{ plugin_caps_short }}_CONTENT_NAME]:
-            modify_repo(cfg, repo, add_units=[{{ plugin_app_label }}_content])
-        version_hrefs = tuple(ver["pulp_href"] for ver in get_versions(repo))
+        repo = repo_api.read(repo.pulp_href)
+        for {{ plugin_app_label }}_content in get_content(repo.to_dict())[{{ plugin_caps_short }}_CONTENT_NAME]:
+            modify_repo(cfg, repo.to_dict(), add_units=[{{ plugin_app_label }}_content])
+        version_hrefs = tuple(ver["pulp_href"] for ver in get_versions(repo.to_dict()))
         non_latest = choice(version_hrefs[:-1])
 
         # Step 2
-        publication = publish(cfg, repo)
+        publish_data = {{ plugin_camel_short }}{{ plugin_camel_short }}Publication(repository=repo.pulp_href)
+        publish_response = publications.create(publish_data)
+        created_resources = monitor_task(publish_response.task)
+        publication_href = created_resources[0]
+        self.addCleanup(publications.delete, publication_href)
+        publication = publications.read(publication_href)
 
         # Step 3
-        self.assertEqual(publication["repository_version"], version_hrefs[-1])
+        self.assertEqual(publication.repository_version, version_hrefs[-1])
 
         # Step 4
-        publication = publish(cfg, repo, non_latest)
+        publish_response = publications.create(publish_data)
+        created_resources = monitor_task(publish_response.task)
+        publication_href = created_resources[0]
+        publication = publications.read(publication_href)
 
         # Step 5
-        self.assertEqual(publication["repository_version"], non_latest)
+        self.assertEqual(publication.repository_version, non_latest)
 
         # Step 6
-        with self.assertRaises(HTTPError):
-            body = {"repository": repo["pulp_href"], "repository_version": non_latest}
-            client.post({{ plugin_caps_short }}_PUBLICATION_PATH, body)
+        with self.assertRaises(ApiException):
+            body = {"repository": repo.pulp_href, "repository_version": non_latest}
+            publications.create(body)
