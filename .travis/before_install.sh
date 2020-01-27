@@ -80,6 +80,7 @@ if [ -n "$PULP_BINDINGS_PR_NUMBER" ]; then
   cd pulp-openapi-generator
   git fetch origin +refs/pull/$PULP_BINDINGS_PR_NUMBER/merge
   git checkout FETCH_HEAD
+  sed -i 's/podman/docker/g' generate.sh
   cd ..
 fi
 

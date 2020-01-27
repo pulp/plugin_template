@@ -38,6 +38,7 @@ if [ -n "$PULP_BINDINGS_PR_NUMBER" ]; then
   git checkout $PULP_BINDINGS_PR_NUMBER
 fi
 
+sed -i 's/podman/docker/g' generate.sh
 ./generate.sh pulpcore python
 pip install ./pulpcore-client
 {% if plugin_name == 'pulpcore' %}  ./generate.sh pulp_file python
