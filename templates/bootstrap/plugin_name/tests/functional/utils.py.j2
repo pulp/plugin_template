@@ -1,8 +1,10 @@
 # coding=utf-8
 """Utilities for tests for the {{ plugin_app_label }} plugin."""
 from functools import partial
+import requests
 from unittest import SkipTest
 from time import sleep
+from tempfile import NamedTemporaryFile
 
 from pulp_smash import api, selectors
 from pulp_smash.pulp3.utils import (
@@ -21,10 +23,12 @@ from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_PUBLICATION_PATH,
     {{ plugin_caps_short }}_REMOTE_PATH,
     {{ plugin_caps_short }}_REPO_PATH,
+    {{ plugin_caps_short }}_URL,
 )
 
 from pulpcore.client.pulpcore import (
     ApiClient as CoreApiClient,
+    ArtifactsApi,
     Configuration,
     TasksApi,
 )
@@ -138,6 +142,15 @@ identical, except that ``exc`` has been set to ``unittest.SkipTest``.
 
 core_client = CoreApiClient(configuration)
 tasks = TasksApi(core_client)
+
+
+def gen_artifact(url={{ plugin_caps_short }}_URL):
+    """Creates an artifact."""
+    response = requests.get(url)
+    with NamedTemporaryFile() as temp_file:
+        temp_file.write(response.content)
+        artifact = ArtifactsApi(core_client).create(file=temp_file.name)
+        return artifact.to_dict()
 
 
 def monitor_task(task_href):
