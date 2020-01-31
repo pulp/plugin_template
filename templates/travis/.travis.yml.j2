@@ -19,17 +19,6 @@ env:
     - TEST=bindings
     {%- endif %}
 {%- if test_bindings or docs_test %}
-matrix:
-  exclude:
-    {%- if test_bindings %}
-    - python: '3.6'
-      env: TEST=bindings
-    {%- endif %}
-    {%- if docs_test %}
-    - python: '3.6'
-      env: TEST=docs
-    {%- endif %}
-  fast_finish: true
 {%- endif %}
 services:
   - postgresql
