@@ -24,12 +24,12 @@ class CRUDRemotesTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create class-wide variables."""
-        cls.api = Remotes{{ plugin_camel_short }}Api(gen_{{ plugin_app_label }}_client())
+        cls.remote_api = Remotes{{ plugin_camel_short }}Api(gen_{{ plugin_app_label }}_client())
 
     def test_01_create_remote(self):
         """Create a remote."""
         body = _gen_verbose_remote()
-        type(self).remote = self.api.create(body)
+        type(self).remote = self.remote_api.create(body)
         for key in ("username", "password"):
             del body[key]
         for key, val in body.items():
@@ -46,12 +46,12 @@ class CRUDRemotesTestCase(unittest.TestCase):
         body = gen_{{ plugin_app_label }}_remote()
         body["name"] = self.remote.name
         with self.assertRaises(ApiException):
-            self.api.create(body)
+            self.remote_api.create(body)
 
     @skip_if(bool, "remote", False)
     def test_02_read_remote(self):
         """Read a remote by its href."""
-        remote = self.api.read(self.remote.pulp_href)
+        remote = self.remote_api.read(self.remote.pulp_href)
         for key, val in self.remote.to_dict().items():
             with self.subTest(key=key):
                 self.assertEqual(remote.to_dict()[key], val, key)
@@ -59,7 +59,7 @@ class CRUDRemotesTestCase(unittest.TestCase):
     @skip_if(bool, "remote", False)
     def test_02_read_remotes(self):
         """Read a remote by its name."""
-        page = self.api.list(name=self.remote.name)
+        page = self.remote_api.list(name=self.remote.name)
         self.assertEqual(len(page.results), 1)
         for key, val in self.remote.to_dict().items():
             with self.subTest(key=key):
@@ -69,11 +69,11 @@ class CRUDRemotesTestCase(unittest.TestCase):
     def test_03_partially_update(self):
         """Update a remote using HTTP PATCH."""
         body = _gen_verbose_remote()
-        response = self.api.partial_update(self.remote.pulp_href, body)
+        response = self.remote_api.partial_update(self.remote.pulp_href, body)
         monitor_task(response.task)
         for key in ("username", "password"):
             del body[key]
-        type(self).remote = self.api.read(self.remote.pulp_href)
+        type(self).remote = self.remote_api.read(self.remote.pulp_href)
         for key, val in body.items():
             with self.subTest(key=key):
                 self.assertEqual(self.remote.to_dict()[key], val, key)
@@ -82,11 +82,11 @@ class CRUDRemotesTestCase(unittest.TestCase):
     def test_04_fully_update(self):
         """Update a remote using HTTP PUT."""
         body = _gen_verbose_remote()
-        response = self.api.update(self.remote.pulp_href, body)
+        response = self.remote_api.update(self.remote.pulp_href, body)
         monitor_task(response.task)
         for key in ("username", "password"):
             del body[key]
-        type(self).remote = self.api.read(self.remote.pulp_href)
+        type(self).remote = self.remote_api.read(self.remote.pulp_href)
         for key, val in body.items():
             with self.subTest(key=key):
                 self.assertEqual(self.remote.to_dict()[key], val, key)
@@ -94,10 +94,10 @@ class CRUDRemotesTestCase(unittest.TestCase):
     @skip_if(bool, "remote", False)
     def test_05_delete(self):
         """Delete a remote."""
-        response = self.api.delete(self.remote.pulp_href)
+        response = self.remote_api.delete(self.remote.pulp_href)
         monitor_task(response.task)
         with self.assertRaises(ApiException):
-            self.api.read(self.remote.pulp_href)
+            self.remote_api.read(self.remote.pulp_href)
 
 
 class CreateRemoteNoURLTestCase(unittest.TestCase):
@@ -146,7 +146,7 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create class-wide variables."""
-        cls.api = Remotes{{ plugin_camel_short }}Api(gen_{{ plugin_app_label }}_client())
+        cls.remote_api = Remotes{{ plugin_camel_short }}Api(gen_{{ plugin_app_label }}_client())
         cls.remote = {}
         cls.policies = DOWNLOAD_POLICIES
         cls.body = _gen_verbose_remote()
@@ -154,9 +154,9 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """Clean class-wide variable."""
-        results = cls.api.list().to_dict()["results"]
+        results = cls.remote_api.list().to_dict()["results"]
         for result in results:
-            cls.api.delete(result["pulp_href"])
+            cls.remote_api.delete(result["pulp_href"])
 
     def test_01_no_defined_policy(self):
         """Verify the default policy `immediate`.
@@ -165,7 +165,7 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
         is applied.
         """
         del self.body["policy"]
-        self.remote.update(self.api.create(self.body).to_dict())
+        self.remote.update(self.remote_api.create(self.body).to_dict())
         self.assertEqual(self.remote["policy"], "immediate", self.remote)
 
     @skip_if(len, "policies", 1)
@@ -176,8 +176,11 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
         and verify the new set value.
         """
         changed_policy = choice([item for item in self.policies if item != "immediate"])
-        self.api.partial_update(self.remote["pulp_href"], {"policy": changed_policy})
-        self.remote.update(self.api.read(self.remote["pulp_href"]).to_dict())
+        response = self.remote_api.partial_update(
+            self.remote["pulp_href"], {"policy": changed_policy}
+        )
+        monitor_task(response.task)
+        self.remote.update(self.remote_api.read(self.remote["pulp_href"]).to_dict())
         self.assertEqual(self.remote["policy"], changed_policy, self.remote)
 
     @skip_if(bool, "remote", False)
@@ -188,10 +191,10 @@ class RemoteDownloadPolicyTestCase(unittest.TestCase):
         Attempt to update the remote policy to an invalid value.
         Verify the policy remains the same.
         """
-        remote = self.api.read(self.remote["pulp_href"]).to_dict()
+        remote = self.remote_api.read(self.remote["pulp_href"]).to_dict()
         with self.assertRaises(ApiException):
-            self.api.partial_update(self.remote["pulp_href"], {"policy": utils.uuid4()})
-        self.remote.update(self.api.read(self.remote["pulp_href"]).to_dict())
+            self.remote_api.partial_update(self.remote["pulp_href"], {"policy": utils.uuid4()})
+        self.remote.update(self.remote_api.read(self.remote["pulp_href"]).to_dict())
         self.assertEqual(remote["policy"], self.remote["policy"], self.remote)
 
 
