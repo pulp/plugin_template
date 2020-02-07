@@ -149,6 +149,7 @@ def gen_artifact(url={{ plugin_caps_short }}_URL):
     response = requests.get(url)
     with NamedTemporaryFile() as temp_file:
         temp_file.write(response.content)
+        temp_file.flush()
         artifact = ArtifactsApi(core_client).create(file=temp_file.name)
         return artifact.to_dict()
 
