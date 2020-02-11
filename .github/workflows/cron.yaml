@@ -1,0 +1,60 @@
+name: Cron jobs
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '15 1 * * *'
+jobs:
+  pulp:
+    runs-on: ubuntu-latest
+    env:
+      TEST: pulp
+    services:
+      postgres:
+        image: postgres:9.6
+      redis:
+        image: redis
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+      - name: Install httpie
+        run: |
+          echo ::group::HTTPIE
+          sudo apt-get update -yq
+          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
+          echo ::endgroup::
+      - name: Before Install
+        run: |
+          .github/before_install.sh
+          echo "::set-env name=TEST::${{ matrix.env.TEST }}"
+          CURRENT_DIR=$PWD
+          cd ..
+          find ./ -type f -exec sed -i -e 's/timeout 90 bash/timeout 120 bash/g' {} \;
+          find ./ -type f -exec sed -i -e 's/\/usr\/local\/bin\/kubectl/$(which kubectl)/g' {} \;
+          find ./ -type f -exec sed -i -e 's/# containers are not running yet./sudo cp -i \/etc\/rancher\/k3s\/k3s.yaml $HOME\/.kube\/config/g' {} \;
+          cd $CURRENT_DIR
+        shell: bash
+      - name: Install
+        run: |
+          mkdir -p $HOME/.kube
+          .github/install.sh
+      - name: Before Script
+        run: |
+          .github/before_script.sh
+          echo "::set-env name=HTTPIE_CONFIG_DIR::$GITHUB_WORKSPACE/.github"
+      - name: Script
+        run: .github/script.sh
+        shell: bash
+      - name: After failure
+        if: failure()
+        run: |
+          http --timeout 30 --check-status --pretty format --print hb http://localhost:24817/pulp/api/v3/status/
+          sudo docker images
+          sudo kubectl logs -l name=pulp-operator -c ansible --tail=10000
+          sudo kubectl logs -l name=pulp-operator -c operator --tail=10000
+          sudo kubectl logs -l app=pulp-api --tail=50000
+          sudo kubectl logs -l app=pulp-content --tail=10000
+          sudo kubectl logs -l app=pulp-resource-manager --tail=10000
+          sudo kubectl logs -l app=pulp-worker --tail=10000

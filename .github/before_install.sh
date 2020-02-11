@@ -2,8 +2,8 @@
 
 set -mveuo pipefail
 
-export PRE_BEFORE_INSTALL=$TRAVIS_BUILD_DIR/.travis/pre_before_install.sh
-export POST_BEFORE_INSTALL=$TRAVIS_BUILD_DIR/.travis/post_before_install.sh
+export PRE_BEFORE_INSTALL=$GITHUB_WORKSPACE/.github/pre_before_install.sh
+export POST_BEFORE_INSTALL=$GITHUB_WORKSPACE/.github/post_before_install.sh
 
 COMMIT_MSG=$(git log --format=%B --no-merges -1)
 export COMMIT_MSG
@@ -17,7 +17,7 @@ if [[ -n $(echo -e $COMMIT_MSG | grep -P "Required PR:.*" | grep -v "https") ]];
   exit 1
 fi
 
-if [ "$TRAVIS_PULL_REQUEST" != "false" ] || [ -z "$TRAVIS_TAG" -a "$TRAVIS_BRANCH" != "master" ]
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ -z "${GITHUB_REF##*/}" -a "${GITHUB_REF##*/}" != "master" ]
 then
   export PULP_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulpcore\/pull\/(\d+)' | awk -F'/' '{print $7}')
   export PULP_SMASH_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/pulp-smash\/pull\/(\d+)' | awk -F'/' '{print $7}')
@@ -35,9 +35,6 @@ fi
 # dev_requirements contains tools needed for flake8, etc.
 # So install them here rather than in install.sh
 pip install -r dev_requirements.txt
-
-# check the commit message
-# ./.travis/check_commit.sh
 
 cd ../pulp_catdog
 # run black separately from flake8 to get a diff
@@ -86,11 +83,11 @@ if [ -n "$PULP_PR_NUMBER" ]; then
 fi
 
 rm ./pulpcore/containers/images/pulp/container-assets/pulp-api
-mv ./plugin_template/.travis/pulp-api ./pulpcore/containers/images/pulp/container-assets/pulp-api
+mv ./plugin_template/.github/pulp-api ./pulpcore/containers/images/pulp/container-assets/pulp-api
 
 # When building a (release) tag, we don't need the development modules for the
 # build (they will be installed as dependencies of the plugin).
-if [ -z "$TRAVIS_TAG" ]; then
+if [ -z "${GITHUB_REF##*/}" ]; then
 
   git clone --depth=1 https://github.com/pulp/pulp-smash.git
 

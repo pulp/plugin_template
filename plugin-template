@@ -81,6 +81,11 @@ def main():
                             Generate or update travis configuration files.
 
                         '''))
+    parser.add_argument('--github', action='store_true',
+                        help=textwrap.dedent('''\
+                            Generate or update github actions configuration files.
+
+                        '''))
     parser.add_argument('--docs', action='store_true',
                         help=textwrap.dedent('''\
                             Generate or update plugin documentation.
@@ -155,7 +160,7 @@ def main():
                 print("If bindings are not excluded, `test_bindings.py` must exist.")
                 return 2
 
-    for section in ['generate_config', 'bootstrap', 'travis', 'docs', 'test']:
+    for section in ['generate_config', 'bootstrap', 'travis', 'github', 'docs', 'test']:
         if getattr(args, section) or args.all:
             write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
