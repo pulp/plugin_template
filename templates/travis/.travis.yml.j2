@@ -24,6 +24,9 @@ services:
   - postgresql
   - redis-server
   - docker
+{%- for item in travis_addtl_services %}
+  - {{ item }}
+{%- endfor %}
 addons:
   apt:
     packages:
