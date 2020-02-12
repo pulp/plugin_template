@@ -62,10 +62,11 @@ images:
   - {{ plugin_name }}-${TAG}:
       image_name: {{ plugin_name }}
       tag: $TAG
+      pulpcore: pulpcore{{ pulpcore_pip_version_specifier if pulpcore_pip_version_specifier is not none }}
       plugins:
         - ./{{ plugin_name }}
         {%- for item in additional_plugins %}
-        - {{ item.name }}
+        - {{ item.name }}{{ item.pip_version_specifier | default(omit) }}
         {%- endfor %}
 VARSYAML
 else
