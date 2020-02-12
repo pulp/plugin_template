@@ -44,6 +44,7 @@ DEFAULT_SETTINGS = {
     'pulpcore_pip_version_specifier': None,
     'pypi_username': None,
     'stable_branch': None,
+    'travis_addtl_services': [],
     'travis_notifications': None,
 }
 

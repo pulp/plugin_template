@@ -146,6 +146,9 @@ The following settings are stored in `template_config.yml`.
 
   coverage              Include collection of coverage and reporting to coveralls.io
 
+  travis_addtl_services A list of additional services to add under .travis.yml . See
+                        https://docs.travis-ci.com/user/database-setup/#starting-services for more info.
+
   travis_notifications  A yaml block that contains configuration for Travis build notifications. See
                         https://docs.travis-ci.com/user/notifications/ for configuration options.
 
