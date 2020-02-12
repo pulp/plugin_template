@@ -41,6 +41,7 @@ DEFAULT_SETTINGS = {
     'plugin_app_label': None,
     'pulp_settings': None,
     'pulpcore_branch': 'master',
+    'pulpcore_pip_version_specifier': None,
     'pypi_username': None,
     'stable_branch': None,
     'travis_notifications': None,

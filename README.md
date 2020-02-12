@@ -52,10 +52,22 @@ The following settings are stored in `template_config.yml`.
   additional_plugins    A list with additional plugins to be installed on Travis.
                         Each item in the list is a dict with the following fields:
                         name: the name of the plugin
-                        branch: the git branch of the plugin
+                        branch: the git branch of the plugin. applies to non-tagged Travis jobs, such as PRs & cron jobs.
+                        pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
+                                               Applies to TAGGED (release) jobs.
+                                               See pulpcore_pip_version_specifier, but defaults to undefined, the latest.
 
   pulpcore_branch       The branch of pulpcore to check out and install on Travis.
+                        This only applies to non-tagged Travis jobs, such as PRs & cron jobs.
                         "Required PR" in a commit message will override this.
+                        Your requirements in "setup.py" may inadvertently override this as well.
+
+  pulpcore_pip_version_specifier
+                        A pip version specifier for when pulpcore gets installed from PyPI.
+                        This is only for Travis, and only applies to TAGGED (release) jobs.
+                        An example is "~=3.0.0", which installs the latest 3.0.z,
+                        and is equivalent to `pip install pulpcore~=3.0.0`.
+                        Defaults to null, which installs the latest release from PyPI.
                         Your requirements in "setup.py" may inadvertently override this as well.
 
   pypi_username         The username that should be used when uploading packages to PyPI. It
