@@ -18,6 +18,9 @@ env:
     {%- if test_bindings %}
     - TEST=bindings
     {%- endif %}
+    {%- if test_s3 %}
+    - TEST=s3
+    {%- endif %}
 {%- if test_bindings or docs_test %}
 {%- endif %}
 services:
