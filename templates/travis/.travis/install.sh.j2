@@ -28,13 +28,13 @@ cd $TRAVIS_BUILD_DIR/../pulpcore/containers/
 # https://stackoverflow.com/a/50687120
 #
 # If we are on a tag
-if [ -n "$TRAVIS_TAG" ]; then
+if [ -n "$TRAVIS_TAG" ] && [ "$TRAVIS_TAG" != "''" ]; then
   TAG=$(echo $TRAVIS_TAG | tr / _)
 # If we are on a PR
-elif [ -n "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
+elif [ -n "$TRAVIS_PULL_REQUEST_BRANCH" ] && [ "$TRAVIS_PULL_REQUEST_BRANCH" != "''" ]; then
   TAG=$(echo $TRAVIS_PULL_REQUEST_BRANCH | tr / _)
 # For push builds and hopefully cron builds
-elif [ -n "$TRAVIS_BRANCH" ]; then
+elif [ -n "$TRAVIS_BRANCH" ] && [ "$TRAVIS_BRANCH" != "''" ]; then
   TAG=$(echo $TRAVIS_BRANCH | tr / _)
   if [ "$TAG" = "master" ]; then
     TAG=latest
