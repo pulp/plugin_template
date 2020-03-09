@@ -29,6 +29,7 @@ DEFAULT_SETTINGS = {
     'docs_test': True,
     'pydocstyle': True,
     'test_bindings': True,
+    'test_s3': False,
     'test_performance': False,
     'plugin_camel': None,
     'plugin_camel_short': None,
@@ -47,6 +48,7 @@ DEFAULT_SETTINGS = {
     'travis_addtl_services': [],
     'travis_notifications': None,
 }
+
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,

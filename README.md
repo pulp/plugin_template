@@ -91,6 +91,9 @@ The following settings are stored in `template_config.yml`.
                         script in the .travis directory of the plugin repository. This script
                         is supposed to exercise the generated client library.
 
+  test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
+                        to emulate S3.
+
   test_performance      Include a Travis stage that runs a script to test performance. If using a
                         list, a separate stage will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
