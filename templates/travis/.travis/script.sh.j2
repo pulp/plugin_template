@@ -56,7 +56,7 @@ if [ "$TEST" = 'bindings' ]; then
 
   rm -rf ./pulpcore-client
 
-  ./generate.sh pulpcore ruby
+  ./generate.sh pulpcore ruby 0
   cd pulpcore-client
   gem build pulpcore_client
   gem install --both ./pulpcore_client-0.gem
@@ -64,14 +64,14 @@ if [ "$TEST" = 'bindings' ]; then
 
 {% if plugin_name == 'pulpcore' %}  rm -rf ./pulp_file-client
 
-  ./generate.sh pulp_file ruby
+  ./generate.sh pulp_file ruby 0
   cd pulp_file-client
   gem build pulp_file_client
   gem install --both ./pulp_file_client-0.gem
   cd ..
 {% else %}  rm -rf ./{{ plugin_snake }}-client
 
-  ./generate.sh {{ plugin_snake }} ruby
+  ./generate.sh {{ plugin_snake }} ruby 0
 
   cd {{ plugin_snake }}-client
   gem build {{ plugin_snake }}_client
