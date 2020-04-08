@@ -210,7 +210,7 @@ class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
         result = enqueue_with_reservation(
             tasks.publish,
             [repository_version.repository],
-            kwargs={"repository_version_pk": str(repository_version.pk),},
+            kwargs={"repository_version_pk": str(repository_version.pk)},
         )
         return core.OperationPostponedResponse(result, request)
 

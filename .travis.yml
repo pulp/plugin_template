@@ -29,10 +29,19 @@ addons:
       - jq
   # postgres versions provided by el7 RHSCL (lowest supportable version)
   postgresql: "9.6"
-before_install: .travis/before_install.sh
-install: .travis/install.sh
-before_script: .travis/before_script.sh
-script: .travis/script.sh
+before_install:
+  - .travis/bootstrap_catdog.sh
+  - cd ../pulp_catdog
+  - "TRAVIS_BUILD_DIR=${TRAVIS_BUILD_DIR%/*}/pulp_catdog .travis/before_install.sh"
+install:
+  - cd ../pulp_catdog
+  - "TRAVIS_BUILD_DIR=${TRAVIS_BUILD_DIR%/*}/pulp_catdog .travis/install.sh"
+before_script:
+  - cd ../pulp_catdog
+  - "TRAVIS_BUILD_DIR=${TRAVIS_BUILD_DIR%/*}/pulp_catdog .travis/before_script.sh"
+script:
+  - cd ../pulp_catdog
+  - "TRAVIS_BUILD_DIR=${TRAVIS_BUILD_DIR%/*}/pulp_catdog .travis/script.sh"
 after_failure:
   - http --timeout 30 --check-status --pretty format --print hb http://localhost:24817/pulp/api/v3/status/
   - sudo docker images
