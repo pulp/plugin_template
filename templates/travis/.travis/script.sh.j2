@@ -13,11 +13,12 @@ export FUNC_TEST_SCRIPT=$TRAVIS_BUILD_DIR/.travis/func_test_script.sh
 # Gets set in .travis/settings.yml, but doesn't seem to inherited by
 # this script.
 export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
+export PULP_SETTINGS=$TRAVIS_BUILD_DIR/settings.py
 
 if [ "$TEST" = 'docs' ]; then
-  {% if plugin_name == 'pulpcore' %}
+  {%- if plugin_name == 'pulpcore' %}
     export PULP_CONTENT_ORIGIN=http://$(hostname):24816
-  {% endif %}
+  {%- endif %}
 
   cd docs
   make html
@@ -40,12 +41,15 @@ fi
 
 ./generate.sh pulpcore python
 pip install ./pulpcore-client
-{% if plugin_name == 'pulpcore' %}  ./generate.sh pulp_file python
+{%- if plugin_name == 'pulpcore' %}
+  ./generate.sh pulp_file python
   pip install ./pulp_file-client
   ./generate.sh pulp_certguard python
-  pip install ./pulp_certguard-client{% else %}  ./generate.sh {{ plugin_snake }} python
+  pip install ./pulp_certguard-client
+{%- else %}
+  ./generate.sh {{ plugin_snake }} python
   pip install ./{{ plugin_snake }}-client
-{% endif %}
+{%- endif %}
 cd $TRAVIS_BUILD_DIR
 
 if [ "$TEST" = 'bindings' ]; then
@@ -64,14 +68,16 @@ if [ "$TEST" = 'bindings' ]; then
   gem install --both ./pulpcore_client-0.gem
   cd ..
 
-{% if plugin_name == 'pulpcore' %}  rm -rf ./pulp_file-client
+{%- if plugin_name == 'pulpcore' %}
+  rm -rf ./pulp_file-client
 
   ./generate.sh pulp_file ruby 0
   cd pulp_file-client
   gem build pulp_file_client
   gem install --both ./pulp_file_client-0.gem
   cd ..
-{% else %}  rm -rf ./{{ plugin_snake }}-client
+{%- else %}
+  rm -rf ./{{ plugin_snake }}-client
 
   ./generate.sh {{ plugin_snake }} ruby 0
 
@@ -79,7 +85,7 @@ if [ "$TEST" = 'bindings' ]; then
   gem build {{ plugin_snake }}_client
   gem install --both ./{{ plugin_snake }}_client-0.gem
   cd ..
-{% endif %}
+{%- endif %}
   ruby $TRAVIS_BUILD_DIR/.travis/test_bindings.rb
   exit
 fi
