@@ -127,13 +127,11 @@ show_logs_and_return_non_zero() {
 export -f show_logs_and_return_non_zero
 
 # Run functional tests
-set +u
-{% if plugin_name == 'pulpcore' %}
-export PYTHONPATH=$TRAVIS_BUILD_DIR:${PYTHONPATH}
-{% else %}
-export PYTHONPATH=$TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR/../pulpcore:${PYTHONPATH}
-{% endif %}
-set -u
+{%- if plugin_name == 'pulpcore' %}
+export PYTHONPATH=$TRAVIS_BUILD_DIR${PYTHONPATH:+:${PYTHONPATH}}
+{%- else %}
+export PYTHONPATH=$TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
+{%- endif %}
 
 if [[ "$TEST" == "performance" ]]; then
   wget -qO- https://github.com/crazy-max/travis-wait-enhanced/releases/download/v1.0.0/travis-wait-enhanced_1.0.0_linux_x86_64.tar.gz | sudo tar -C /usr/local/bin -zxvf - travis-wait-enhanced

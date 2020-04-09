@@ -196,14 +196,14 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             env.filters['to_yaml'] = to_nice_yaml
             template = env.get_template(relative_path)
             destination = destination_relative_path[:-len('.j2')]
-            write_template_to_file(template, plugin_root_dir, destination, config)
+            write_template_to_file(template, plugin_root_dir, destination, {"section": name, **config})
             files_templated += 1
             if verbose:
                 print(f"Templated file: {relative_path}")
         else:
             shutil.copyfile(
                 os.path.join(section_template_dir, relative_path),
-                os.path.join(plugin_root_dir, relative_path)
+                os.path.join(plugin_root_dir, destination_relative_path)
             )
             files_copied += 1
             if verbose:

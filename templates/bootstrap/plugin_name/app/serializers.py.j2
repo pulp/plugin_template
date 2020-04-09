@@ -121,7 +121,8 @@ class {{ plugin_camel_short }}DistributionSerializer(platform.PublicationDistrib
     For example::
 
     class Meta:
-        validators = platform.PublicationDistributionSerializer.Meta.validators + [myValidator1, myValidator2]
+        validators = platform.PublicationDistributionSerializer.Meta.validators + [
+            myValidator1, myValidator2]
     """
 
     class Meta:
