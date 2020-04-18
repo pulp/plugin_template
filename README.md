@@ -168,6 +168,10 @@ The following settings are stored in `template_config.yml`.
   stable_branch         A string that points to the latest stable branch (e.g. "3.0"). This is used
                         for features like the cherry pick automation.
 
+  redmine_project       A string that corresponds to the redmine identifier for the repo's project.
+                        This is used during commit validation to make sure the commit is attached to
+                        an issue in the correct project.
+
 ```
 
 # Bootstrap a new Pulp plugin
