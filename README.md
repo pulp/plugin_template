@@ -24,10 +24,6 @@ It's also recommended that you go through the [planning guide](meta_docs/plannin
 The first step is to create a `template_config.yml` for your new plugin. This file contains
 settings used by the `./plugin-template` command when generating new plugins and for future updates.
 
-The first time this file is generated. bootstrap this template. This will create a functional but useless plugin,
-with minimal code, docs, tests, and default Travis CI configuration. Later on we'll discuss
-exactly what each part of this template does and what to change to create a 'real' plugin.
-
 1. Clone this repository
 
    ``$ git clone https://github.com/pulp/plugin_template.git``
@@ -44,7 +40,9 @@ exactly what each part of this template does and what to change to create a 'rea
 
 The first time this command is run, a new directory by the name of PLUGIN_NAME is created inside
 the parent directory of the `plugin_template' directory. The `template_config.yml` is written to
-the root of this new directory. Subsequent uses of the command simply update that file.
+the root of this new directory.
+It is filled with default values for various aspects of the plugin scaffolding.
+You can edit them according to your needs to control subsequent calls to `plugin-template`.
 
 The following settings are stored in `template_config.yml`.
 
@@ -182,6 +180,8 @@ The following settings are stored in `template_config.yml`.
                         The Travis key id that should be used to decode the `.travis/pulp-infra.enc`
                         file.
 
+  pulp_settings         A dictionary of settings that the plugin tests require to be set.
+
 ```
 
 # Bootstrap a new Pulp plugin
@@ -200,6 +200,13 @@ functional tests using the [pulp_smash](https://pulp-smash.readthedocs.io/en/lat
 
 In order to use these tests, you will need to address the "FIXME" messages left in places where
 plugin-writer intervention is required.
+
+At this point, you have a one-off opportunity to use the --all option, which generates everything
+included in the --bootstrap option, as well as documentation, functional and unit test, and travis
+configuration file templates that you require to support a plugin.
+
+  **Note** : Regenerating the *bootstrap* section at a later time will reset all files to their
+  original state, which is almost always not intended.
 
 # Add Travis CI configuration to a Pulp plugin
 
@@ -256,10 +263,10 @@ entrypoints see [the discoverability documentation](meta_docs/discoverability.md
 
 First, look at the [overview](https://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/first-plugin.html#understanding-models) of Pulp Models to understand how Pulp fits these pieces together.
 
-Bootstrapping created three new endpoints (remote, and content). Additional information should be added to these
-to tell Pulp how to handle your content.
+Bootstrapping created various new endpoints (e.g. remote, repository and content).
+Additional information should be added to these to tell Pulp how to handle your content.
 
-For each of these three endpoints, the bootstrap has created a `model`, a `serializer` and a `viewset`.
+For each of these endpoints, the bootstrap has created a `model`, a `serializer` and a `viewset`.
 The [model](https://docs.djangoproject.com/en/2.1/topics/db/models/) is how the data is stored in the database.
 The [serializer](http://www.django-rest-framework.org/api-guide/serializers/) converts complex data to easily parsable types (XML, JSON).
 The [viewset](http://www.django-rest-framework.org/api-guide/viewsets/) provides the handlers to serve/receive the serialized data.
@@ -408,28 +415,18 @@ needed to display the restapi.html page in the root of the built docs.
 
 # Travis configuration
 
-This repository also provides a script for generating a Travis configuration. The script should be
-run with the following command.
+The script for generating a Travis configuration provided in this repository can be used to change
+and update said configuration.
+It should be run with the following command.
 
-   ``$ ./plugin-template --travis plugin_name plugin_app_label``
+   ``$ ./plugin-template --travis PLUGIN_NAME``
 
 The default behavior enables two build stages that generate client libraries using the OpenAPI
-schema. One publishes to PyPI using ``  pypi-username`` setting and the secret environment
+schema. One publishes to PyPI using ``pypi-username`` setting and the secret environment
 variable called $PYPI_PASSWORD. The other stage publishes the client to rubygems.org and requires
 the $RUBYGEMS_API_KEY environment variable to be set. Both environment variables can be created on
 the travis-ci.com settings page for the plugin[0]. The stage that publishes tagged builds to PyPI
-uses the same configs as the client publishing stage. The default pipeline can be created using the
-following commands:
-
-```
-$ git clone git@github.com/pulp/{{ plugin_app_label }}
-$ cd {{ plugin_app_label }}
-$ # copying the requirements file is only needed if plugin was created before this file was added
-$ # to the plugin template
-$ cp doc_requirements.txt ../pulp_<plugin_name>/
-$ touch ../pulp_<plugin_name>/.travis/test_bindings.rb
-$ ./plugin-template --travis --pypi-username your_pypi_username plugin_name
-```
+uses the same configs as the client publishing stage.
 
 The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
 writers by creating specially named scripts in their .travis directories. The scripts are executed
@@ -445,38 +442,6 @@ in the following order, with optional plugin provided scripts in bold:
 1. script.sh
 1. **post_docs_test.sh**
 1. **post_script.sh**
-
-The pipeline can be modified, see the help text for available options.
-
-```
-$ ./plugin-template --help
-usage: plugin-template [-h] [--generate-config] [--bootstrap] [--test]
-                       [--travis] [--docs] [--all] [--verbose]
-                       plugin_name plugin_app_label
-
-Generate a .travis.yml and .travis directoryfor a specified plugin
-
-positional arguments:
-  plugin_name           Create or update this plugin.
-  plugin_app_label      the Django app label for the plugin - usually the part after pulp_ or
-                     pulp-
-
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --bootstrap           Create a new plugin and template boilerplate code.
-
-  --test                Generate or update functional and unit tests.
-
-  --travis              Generate or update travis configuration files.
-
-  --docs                Generate or update plugin documentation.
-
-  --all                 Create a new plugin and template all non-excluded files.
-
-  --verbose             Include more output.
-
-```
 
 # Additional Topics
 
@@ -494,7 +459,7 @@ optional arguments:
     - [ ] models for plugin content type, repository, remote
     - [ ] serializers for plugin content type, repository, remote
     - [ ] viewset for plugin content type, repository, remote
-
+- [ ] Database migrations are generated and committed
 - [ ] Errors are handled according to Pulp conventions
 - [ ] Docs for plugin are available (any location and format preferred and provided by plugin writer)
 
