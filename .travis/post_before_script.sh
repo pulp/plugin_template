@@ -1,4 +1,4 @@
 #!/bin/sh
 
-$CMD_PREFIX pulpcore-manager makemigrations
-$CMD_PREFIX pulpcore-manager migrate
+cmd_prefix pulpcore-manager makemigrations
+cmd_prefix pulpcore-manager migrate
