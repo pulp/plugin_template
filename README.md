@@ -147,6 +147,8 @@ The following settings are stored in `template_config.yml`.
   check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
+  check_imports         Check to ensure that code imports from pulpcore use pulpcore.plugin
+
   coverage              Include collection of coverage and reporting to coveralls.io
 
   travis_addtl_services A list of additional services to add under .travis.yml . See
