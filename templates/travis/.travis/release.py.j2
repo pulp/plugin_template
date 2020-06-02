@@ -74,7 +74,7 @@ git.checkout("HEAD", b=f"release_{release_version}")
 os.system(f"towncrier --yes --version {release_version}")
 git.add("CHANGES.rst")
 git.add("CHANGES/*")
-git.commit("-m", f"Building changelog for {release_version}\n\n[noissue]")
+git.commit("-m", f"Building changelog for {release_version}\n\n[noissue][nocoverage]")
 
 # Second commit: release version
 with open(f"{plugin_path}/requirements.txt", "rt") as setup_file:
@@ -94,7 +94,7 @@ git.add(f"{plugin_path}/{plugin_name}/__init__.py")
 git.add(f"{plugin_path}/setup.py")
 git.add(f"{plugin_path}/requirements.txt")
 git.add(f"{plugin_path}/.bumpversion.cfg")
-git.commit("-m", f"Releasing {release_version}\n\n[noissue]")
+git.commit("-m", f"Releasing {release_version}\n\n[noissue][nocoverage]")
 
 sha = repo.head.object.hexsha
 short_sha = git.rev_parse(sha, short=7)
@@ -120,7 +120,7 @@ git.add(f"{plugin_path}/{plugin_name}/__init__.py")
 git.add(f"{plugin_path}/setup.py")
 git.add(f"{plugin_path}/requirements.txt")
 git.add(f"{plugin_path}/.bumpversion.cfg")
-git.commit("-m", f"Bump to {new_dev_version}\n\n[noissue]")
+git.commit("-m", f"Bump to {new_dev_version}\n\n[noissue][nocoverage]")
 
 print(f"\n\nRedmine query of issues to close:\n{REDMINE_QUERY_URL}{issues}")
 print(f"Release commit == {short_sha}")
