@@ -156,8 +156,8 @@ def main():
             return 2
 
         if config['test_bindings']:
-            if not os.path.isfile(os.path.join(plugin_root_dir, '.travis', 'test_bindings.py')):
-                print("If bindings are not excluded, `test_bindings.py` must exist.")
+            if not os.path.isfile(os.path.join(plugin_root_dir, '.travis', 'test_bindings.rb')):
+                print("If bindings are not excluded, `test_bindings.rb` must exist.")
                 return 2
 
     for section in ['generate_config', 'bootstrap', 'travis', 'docs', 'test']:

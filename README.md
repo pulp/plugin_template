@@ -87,7 +87,7 @@ The following settings are stored in `template_config.yml`.
   test_bindings         Include a Travis stage that runs a script to test generated client
                         library.
 
-                        This stage requires the plugin author to include a 'test_bindings.py'
+                        This stage requires the plugin author to include a 'test_bindings.rb'
                         script in the .travis directory of the plugin repository. This script
                         is supposed to exercise the generated client library.
 
@@ -417,7 +417,7 @@ $ cd {{ plugin_app_label }}
 $ # copying the requirements file is only needed if plugin was created before this file was added
 $ # to the plugin template
 $ cp doc_requirements.txt ../pulp_<plugin_name>/
-$ touch ../pulp_<plugin_name>/.travis/test_bindings.py
+$ touch ../pulp_<plugin_name>/.travis/test_bindings.rb
 $ ./plugin-template --travis --pypi-username your_pypi_username plugin_name
 ```
 
