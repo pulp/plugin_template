@@ -187,7 +187,7 @@ class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
     """
 
     endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Publication.objects.all()
+    queryset = models.{{ plugin_camel_short }}Publication.objects.exclude(complete=False)
     serializer_class = serializers.{{ plugin_camel_short }}PublicationSerializer
 
     # This decorator is necessary since a publish operation is asyncrounous and returns
