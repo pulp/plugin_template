@@ -13,7 +13,7 @@ if ".travis" in release_path:
     plugin_path = os.path.dirname(release_path)
 
 version = {}
-with open(f"{plugin_path}/{{ plugin_name }}/__init__.py") as fp:
+with open(f"{plugin_path}/{{ plugin_snake }}/__init__.py") as fp:
     version_line = [line for line in fp.readlines() if "__version__" in line][0]
     exec(version_line, version)
 release_version = version["__version__"].replace(".dev", "")
@@ -111,7 +111,7 @@ with open(f"{plugin_path}/requirements.txt", "wt") as setup_file:
 os.system(f"bump2version {release_type} --allow-dirty")
 
 version = {}
-with open(f"{plugin_path}/{{ plugin_name }}/__init__.py") as fp:
+with open(f"{plugin_path}/{{ plugin_snake }}/__init__.py") as fp:
     version_line = [line for line in fp.readlines() if "__version__" in line][0]
     exec(version_line, version)
 new_dev_version = version["__version__"]
