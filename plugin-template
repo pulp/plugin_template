@@ -48,6 +48,7 @@ DEFAULT_SETTINGS = {
     'stable_branch': None,
     'travis_addtl_services': [],
     'travis_notifications': None,
+    'update_redmine': False,
 }
 
 

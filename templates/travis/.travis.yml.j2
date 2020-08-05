@@ -131,6 +131,14 @@ jobs:
       if: type = cron
       {%- endif %}
     {%- endif %}
+    {%- if update_redmine %}
+    - stage: update-redmine
+      before_install: skip
+      install: skip
+      before_script: skip
+      script: bash .travis/update_redmine.sh
+      if: tag IS present
+    {%- endif %}
     {%- if cherry_pick_automation %}
     - stage: cherry-pick
       if: type = cron
