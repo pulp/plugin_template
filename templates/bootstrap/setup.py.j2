@@ -2,11 +2,12 @@
 
 from setuptools import find_packages, setup
 
-requirements = ["pulpcore>=3.2"]
+with open("requirements.txt") as requirements:
+    requirements = requirements.readlines()
 
 setup(
     name="{{ plugin_dash }}",
-    version="0.1.0a1",
+    version="0.1.0a1.dev",
     description="{{ plugin_dash }} plugin for the Pulp Project",
     license="GPLv2+",
     author="AUTHOR",
