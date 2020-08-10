@@ -1,5 +1,3 @@
-{% include 'header.j2' %}
-
 import re
 import requests
 import subprocess
