@@ -487,3 +487,15 @@ optional arguments:
 
 - [ ] Errors are handled according to Pulp conventions
 - [ ] Docs for plugin are available (any location and format preferred and provided by plugin writer)
+
+
+# Contributing
+
+### Pull Request Checklist
+
+1. Unless a change is small or doesn't affect plugin writers, create an issue on
+https://pulp.plan.io/projects/pulp. Add the tag "Plugin Template".
+2. Add [a changelog update.](https://docs.pulpproject.org/contributing/git.html#changelog-update)
+3. Write an excellent [Commit Message.](https://docs.pulpproject.org/contributing/git.html#commit-message)
+Make sure you reference and link to the issue.
+4. Push your branch to your fork and open a [Pull request across forks.](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
