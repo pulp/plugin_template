@@ -14,14 +14,20 @@ jobs:
           python-version: 3.8
       - name: Install python dependencies
         run: |
-          pip install requests
+          pip install requests j2cli
+      - name: Generate the validation script
+        shell: bash
+        run: |
+          cd templates
+          redmine_project=pulpcore j2 --undefined travis/.travis/validate_commit_message.py.j2 > ../validate_commit_message.py
+          cd ..
       - name: Check commit message
         env:
           GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
         run: |
           for sha in $(curl $GITHUB_CONTEXT | jq '.[].sha' | sed 's/"//g')
           do
-            python templates/travis/.travis/validate_commit_message.py $sha
+            python validate_commit_message.py $sha
             VALUE=$?
             if [ "$VALUE" -gt 0 ]; then
               exit $VALUE
