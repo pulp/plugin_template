@@ -166,7 +166,7 @@ short_sha = git.rev_parse(sha, short=7)
 # Third commit: bump to .dev
 with open(f"{plugin_path}/requirements.txt", "wt") as setup_file:
     for line in setup_lines:
-        if "pulpcore" in line and "pulpcore" not in release_path:
+        if "pulpcore" in line and "pulpcore" not in release_path and release_type != "patch":
             line = f"pulpcore>={lower_pulpcore_version}\n"
 
         setup_file.write(line)
