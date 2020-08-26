@@ -171,6 +171,16 @@ The following settings are stored in `template_config.yml`.
   redmine_project       A string that corresponds to the redmine identifier for the repo's project.
                         This is used during commit validation to make sure the commit is attached to
                         an issue in the correct project.
+  publish_docs_to_pulpprojectdotorg
+                        Include a stage for publishing documentation to
+                        docs.pulpproject.org/<plugin_name>/.
+                        This stage requires that an encrypted private key to be present in the
+                        repository at `.travis/pulp-infra.enc`. See [Travis documentation]
+                        (https://docs.travis-ci.com/user/encrypting-files/#automated-encryption)
+                        for instructions on encrypting the file.
+  pulpprojectdotorg_key_id
+                        The Travis key id that should be used to decode the `.travis/pulp-infra.enc`
+                        file.
 
 ```
 
