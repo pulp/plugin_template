@@ -12,3 +12,18 @@ Changelog
     WARNING: Don't drop the next directive!
 
 .. towncrier release notes start
+
+2020.09.01 (2020-09-01)
+=======================
+
+
+Features
+--------
+
+- Configured the use of token_authentication as used py pulp_container in the CI for plugins.
+  `#6782 <https://pulp.plan.io/issues/6782>`_
+- Introducing towncrier
+  `#7273 <https://pulp.plan.io/issues/7273>`_
+
+
+----
