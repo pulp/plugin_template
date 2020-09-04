@@ -1,0 +1,2 @@
+Removed the ``test_file_decriptors`` test which was not actually testing Pulp code and was failing
+intermittently.
