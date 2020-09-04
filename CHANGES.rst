@@ -13,6 +13,20 @@ Changelog
 
 .. towncrier release notes start
 
+2020.09.04 (2020-09-04)
+=======================
+
+
+Features
+--------
+
+- Adding support for deprecation towncrier type.
+  `#7421 <https://pulp.plan.io/issues/7421>`_
+
+
+----
+
+
 2020.09.01 (2020-09-01)
 =======================
 
