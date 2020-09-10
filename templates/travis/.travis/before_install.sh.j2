@@ -35,6 +35,8 @@ else
   export CI_BASE_IMAGE=
 fi
 
+export PIP_USE_FEATURE=2020-resolver
+
 # dev_requirements contains tools needed for flake8, etc.
 # So install them here rather than in install.sh
 pip install -r dev_requirements.txt

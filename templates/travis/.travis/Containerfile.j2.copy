@@ -1,5 +1,7 @@
 FROM {{ ci_base | default("pulp/pulp-ci:latest") }}
 
+ENV PIP_USE_FEATURE=2020-resolver
+
 {% if s3_test | default(false) %}
 # Hacking botocore (https://github.com/boto/botocore/pull/1990)
 RUN pip3 install django-storages[boto3]
