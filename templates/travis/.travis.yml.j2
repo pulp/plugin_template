@@ -24,8 +24,6 @@ env:
 {%- if test_bindings or docs_test %}
 {%- endif %}
 services:
-  - postgresql
-  - redis-server
   - docker
 {%- for item in travis_addtl_services %}
   - {{ item }}
@@ -35,8 +33,6 @@ addons:
     packages:
       - httpie
       - jq
-  # postgres versions provided by el7 RHSCL (lowest supportable version)
-  postgresql: '9.6'
 before_install: .travis/before_install.sh
 install: .travis/install.sh
 before_script: .travis/before_script.sh
