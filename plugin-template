@@ -40,6 +40,8 @@ DEFAULT_SETTINGS = {
     'plugin_name': None,
     'plugin_snake': None,
     'plugin_app_label': None,
+    'publish_docs_to_pulpprojectdotorg': False,
+    'pulpprojectdotorg_key_id': None,
     'pulp_settings': None,
     'pulpcore_branch': 'master',
     'pulpcore_pip_version_specifier': None,

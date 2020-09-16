@@ -99,7 +99,7 @@ jobs:
         - TEST=bindings
       if: tag IS present
     {%- endif %}
-    {%- if plugin_name == 'pulpcore' %}
+    {%- if publish_docs_to_pulpprojectdotorg %}
     - stage: publish-tagged-docs
       script: bash .travis/publish_docs.sh tag
       env:
