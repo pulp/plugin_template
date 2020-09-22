@@ -13,6 +13,30 @@ Changelog
 
 .. towncrier release notes start
 
+2020.09.22 (2020-09-22)
+=======================
+
+
+Features
+--------
+
+- Added ability for plugins to publish docs to pulpproject.org.
+  `#7229 <https://pulp.plan.io/issues/7229>`_
+- Have validate_commit_message.py accept different cases (e.g. "Fixes #1234").
+  `#7404 <https://pulp.plan.io/issues/7404>`_
+- Adding support for deprecation towncrier type.
+  `#7421 <https://pulp.plan.io/issues/7421>`_
+
+
+Misc
+----
+
+- `#7452 <https://pulp.plan.io/issues/7452>`_, `#7500 <https://pulp.plan.io/issues/7500>`_
+
+
+----
+
+
 2020.09.01 (2020-09-01)
 =======================
 
