@@ -201,6 +201,11 @@ The following settings are stored in `template_config.yml`.
                         list, a separate stage will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
 
+  test_released_plugin_with_next_pulpcore_release
+                        Include a cron job that tests the latest released version of the plugin to
+                        see if it is compatible with pulpcore's master branch. This helps ensure
+                        that pulpcore is following the deprecation policy for the plugin API.
+
   test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
                         to emulate S3.
 
