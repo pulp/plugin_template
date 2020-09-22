@@ -30,6 +30,11 @@ fi
 {%- endfor %}
 
 {%- if plugin_name != 'pulpcore' %}
+if [[ "$TEST" == "plugin-from-pypi" ]]; then
+  PLUGIN_NAME={{ plugin_name }}
+else
+  PLUGIN_NAME=./{{ plugin_name }}
+fi
 if [ -n "$TRAVIS_TAG" ]; then
   # Install the plugin only and use published PyPI packages for the rest
   # Quoting ${TAG} ensures Ansible casts the tag as a string.
@@ -41,7 +46,7 @@ plugins:
   - name: pulpcore
     source: pulpcore{{ pulpcore_pip_version_specifier | default(omit, true) }}
   - name: {{ plugin_name }}
-    source: ./{{ plugin_name }}
+    source:  "${PLUGIN_NAME}"
 {%- for item in additional_plugins %}
   - name: {{ item.name }}
     source: {{ item.name }}{{ item.pip_version_specifier | default(omit, true) }}
@@ -58,14 +63,14 @@ image:
   name: pulp
   tag: "${TAG}"
 plugins:
-  - name: pulpcore
-    source: ./pulpcore
   - name: {{ plugin_name }}
-    source: ./{{ plugin_name }}
+    source: "${PLUGIN_NAME}"
 {%- for item in additional_plugins %}
   - name: {{ item.name }}
     source: ${{ item.name|upper| replace("-", "_") }}
 {%- endfor %}
+  - name: pulpcore
+    source: ./pulpcore
 services:
   - name: pulp
     image: "pulp:${TAG}"
@@ -99,7 +104,7 @@ VARSYAML
 
 {%- if docker_fixtures %}
 
-if [[ "$TEST" == "pulp" || "$TEST" == "performance" || "$TEST" == "s3" ]]; then
+if [[ "$TEST" == "pulp" || "$TEST" == "performance" || "$TEST" == "s3" || "$TEST" == "plugin-from-pypi" ]]; then
   sed -i -e '/^services:/a \
   - name: pulp-fixtures\
     image: docker.io/pulp/pulp-fixtures:latest\
