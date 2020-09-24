@@ -24,6 +24,7 @@ def validate_redmine_data(redmine_query_url, redmine_issues):
     project_set = set()
     stats = defaultdict(list)
     milestone_url = "\n[noissue]"
+    milestone_id = None
     for issue in redmine_issues:
         redmine_issue = redmine.issue.get(int(issue))
 
@@ -36,7 +37,7 @@ def validate_redmine_data(redmine_query_url, redmine_issues):
             stats["status_not_modified"].append(issue)
 
         {%- if update_redmine %}
-        milestone_id = None
+
         try:
             milestone = redmine_issue.fixed_version.name
             milestone_id = redmine_issue.fixed_version.id
@@ -45,10 +46,8 @@ def validate_redmine_data(redmine_query_url, redmine_issues):
             stats["without_milestone"].append(issue)
         {%- endif %}
 
-    {%- if update_redmine %}
     if milestone_id is not None:
         milestone_url = f"Redmine Milestone: {REDMINE_URL}/versions/{milestone_id}.json\n[noissue]"
-    {%- endif %}
 
     print(f"\n\nRedmine stats: {json.dumps(stats, indent=2)}")
     error_messages = []
