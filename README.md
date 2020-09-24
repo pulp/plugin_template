@@ -55,6 +55,8 @@ The following settings are stored in `template_config.yml`.
                                                Applies to TAGGED (release) jobs.
                                                See pulpcore_pip_version_specifier, but defaults to undefined, the latest.
 
+  black                 Boolean, whether to use black to format python source files.
+
   check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
@@ -126,6 +128,24 @@ The following settings are stored in `template_config.yml`.
 
   docs_test             Include a Travis build for testing the 'make html' command for sphinx docs.
 
+  plugin_app_label      Suppose our plugin is named 'pulp_test', then this is 'test'
+
+  plugin_camel          Suppose our plugin is named 'pulp_test', then this is 'PulpTest'
+
+  plugin_camel_short    Suppose our plugin is named 'pulp_test', then this is 'Test'
+
+  plugin_caps           Suppose our plugin is named 'pulp_test', then this is 'PULP_TEST'
+
+  plugin_caps_short     Suppose our plugin is named 'pulp_test', then this is 'TEST'
+
+  plugin_dash           Suppose our plugin is named 'pulp_test', then this is 'pulp-test'
+
+  plugin_dash_short     Suppose our plugin is named 'pulp_test', then this is 'test'
+
+  plugin_name           Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
+
+  plugin_snake          Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
+
   publish_docs_to_pulpprojectdotorg
                         Include a stage for publishing documentation to
                         docs.pulpproject.org/<plugin_name>/.
@@ -152,6 +172,9 @@ The following settings are stored in `template_config.yml`.
   pulpprojectdotorg_key_id
                         The Travis key id that should be used to decode the `.travis/pulp-infra.enc`
                         file.
+
+  pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
+                        Python docstring conventions.
 
   pypi_username         The username that should be used when uploading packages to PyPI. It
                         is required unless deploy_client_to_pypi and deploy_daily_client_to_pypi
@@ -183,6 +206,9 @@ The following settings are stored in `template_config.yml`.
 
   travis_notifications  A yaml block that contains configuration for Travis build notifications. See
                         https://docs.travis-ci.com/user/notifications/ for configuration options.
+
+  update_redmine        Travis will automatically change the state of tickets when PRs are opened,
+                        or merged, and when the changes are released.
 ```
 
 # Bootstrap a new Pulp plugin
