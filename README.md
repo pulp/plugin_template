@@ -55,49 +55,20 @@ The following settings are stored in `template_config.yml`.
                                                Applies to TAGGED (release) jobs.
                                                See pulpcore_pip_version_specifier, but defaults to undefined, the latest.
 
-  pulpcore_branch       The branch of pulpcore to check out and install on Travis.
-                        This only applies to non-tagged Travis jobs, such as PRs & cron jobs.
-                        "Required PR" in a commit message will override this.
-                        Your requirements in "setup.py" may inadvertently override this as well.
+  check_commit_message  Include inspection of commit message for a reference to an issue in
+                        pulp.plan.io.
 
-  pulpcore_pip_version_specifier
-                        A pip version specifier for when pulpcore gets installed from PyPI.
-                        This is only for Travis, and only applies to TAGGED (release) jobs.
-                        An example is "~=3.0.0", which installs the latest 3.0.z,
-                        and is equivalent to `pip install pulpcore~=3.0.0`.
-                        Defaults to null, which installs the latest release from PyPI.
-                        Your requirements in "setup.py" may inadvertently override this as well.
+  cherry_pick_automation
+                        A boolean that will enable a cron job to automatically attempt to cherry
+                        pick changes to a stable release branch. This job will cherry pick any
+                        PRs that are merged and have the label "Needs Cherry Pick". Requires the
+                        template config setting `stable_branch` to be set. Also, requires a github
+                        user account (e.g. pulpbot) to open the cherry pick PR. `GITHUB_USER` and
+                        `GITHUB_TOKEN` must be defined as env variables in Travis. New tokens can be
+                        generated at
+                        [https://github.com/settings/tokens](https://github.com/settings/tokens).
 
-  pypi_username         The username that should be used when uploading packages to PyPI. It
-                        is required unless deploy_client_to_pypi and deploy_daily_client_to_pypi
-                        and deploy_to_pypi are specified.
-
-  docs_test             Include a Travis build for testing the 'make html' command for sphinx docs.
-
-  deploy_to_pypi        Include a Travis stage that publishes builds to PyPI
-
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
-                        username is specified using --pypi-username option.
-
-  test_bindings         Include a Travis stage that runs a script to test generated client
-                        library.
-
-                        This stage requires the plugin author to include a 'test_bindings.rb'
-                        script in the .travis directory of the plugin repository. This script
-                        is supposed to exercise the generated client library.
-
-  test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
-                        to emulate S3.
-
-  test_performance      Include a Travis stage that runs a script to test performance. If using a
-                        list, a separate stage will run a specific performance test file for each
-                        entry in the list. Otherwise, all performance tests will be run together.
-
-  docker_fixtures       In Travis, use the pulp-fixtures docker container to serve up fixtures
-                        instead of using fedorapeople.org.
+  coverage              Include collection of coverage and reporting to coveralls.io
 
   deploy_client_to_pypi Include a Travis stage that publishes a client library to PyPI.
 
@@ -142,33 +113,19 @@ The following settings are stored in `template_config.yml`.
                         variable called RUBYGEMS_API_KEY. The variable can be added in the
                         travis-ci.com settings page for the project.
 
-  check_commit_message  Include inspection of commit message for a reference to an issue in
-                        pulp.plan.io.
+  deploy_to_pypi        Include a Travis stage that publishes builds to PyPI
 
-  coverage              Include collection of coverage and reporting to coveralls.io
+                        This stage only executes when a tag is associated with the commit being
+                        built. When enabling this stage, the user is expected to provide a
+                        secure environment variable called PYPI_PASSWORD. The variable can
+                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        username is specified using --pypi-username option.
 
-  travis_addtl_services A list of additional services to add under .travis.yml . See
-                        https://docs.travis-ci.com/user/database-setup/#starting-services for more info.
+  docker_fixtures       In Travis, use the pulp-fixtures docker container to serve up fixtures
+                        instead of using fedorapeople.org.
 
-  travis_notifications  A yaml block that contains configuration for Travis build notifications. See
-                        https://docs.travis-ci.com/user/notifications/ for configuration options.
+  docs_test             Include a Travis build for testing the 'make html' command for sphinx docs.
 
-  cherry_pick_automation
-                        A boolean that will enable a cron job to automatically attempt to cherry
-                        pick changes to a stable release branch. This job will cherry pick any
-                        PRs that are merged and have the label "Needs Cherry Pick". Requires the
-                        template config setting `stable_branch` to be set. Also, requires a github
-                        user account (e.g. pulpbot) to open the cherry pick PR. `GITHUB_USER` and
-                        `GITHUB_TOKEN` must be defined as env variables in Travis. New tokens can be
-                        generated at
-                        [https://github.com/settings/tokens](https://github.com/settings/tokens).
-
-  stable_branch         A string that points to the latest stable branch (e.g. "3.0"). This is used
-                        for features like the cherry pick automation.
-
-  redmine_project       A string that corresponds to the redmine identifier for the repo's project.
-                        This is used during commit validation to make sure the commit is attached to
-                        an issue in the correct project.
   publish_docs_to_pulpprojectdotorg
                         Include a stage for publishing documentation to
                         docs.pulpproject.org/<plugin_name>/.
@@ -176,12 +133,56 @@ The following settings are stored in `template_config.yml`.
                         repository at `.travis/pulp-infra.enc`. See [Travis documentation]
                         (https://docs.travis-ci.com/user/encrypting-files/#automated-encryption)
                         for instructions on encrypting the file.
+
+  pulp_settings         A dictionary of settings that the plugin tests require to be set.
+
+  pulpcore_branch       The branch of pulpcore to check out and install on Travis.
+                        This only applies to non-tagged Travis jobs, such as PRs & cron jobs.
+                        "Required PR" in a commit message will override this.
+                        Your requirements in "setup.py" may inadvertently override this as well.
+
+  pulpcore_pip_version_specifier
+                        A pip version specifier for when pulpcore gets installed from PyPI.
+                        This is only for Travis, and only applies to TAGGED (release) jobs.
+                        An example is "~=3.0.0", which installs the latest 3.0.z,
+                        and is equivalent to `pip install pulpcore~=3.0.0`.
+                        Defaults to null, which installs the latest release from PyPI.
+                        Your requirements in "setup.py" may inadvertently override this as well.
+
   pulpprojectdotorg_key_id
                         The Travis key id that should be used to decode the `.travis/pulp-infra.enc`
                         file.
 
-  pulp_settings         A dictionary of settings that the plugin tests require to be set.
+  pypi_username         The username that should be used when uploading packages to PyPI. It
+                        is required unless deploy_client_to_pypi and deploy_daily_client_to_pypi
+                        and deploy_to_pypi are specified.
 
+  redmine_project       A string that corresponds to the redmine identifier for the repo's project.
+                        This is used during commit validation to make sure the commit is attached to
+                        an issue in the correct project.
+
+  stable_branch         A string that points to the latest stable branch (e.g. "3.0"). This is used
+                        for features like the cherry pick automation.
+
+  test_bindings         Include a Travis stage that runs a script to test generated client
+                        library.
+
+                        This stage requires the plugin author to include a 'test_bindings.rb'
+                        script in the .travis directory of the plugin repository. This script
+                        is supposed to exercise the generated client library.
+
+  test_performance      Include a Travis stage that runs a script to test performance. If using a
+                        list, a separate stage will run a specific performance test file for each
+                        entry in the list. Otherwise, all performance tests will be run together.
+
+  test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
+                        to emulate S3.
+
+  travis_addtl_services A list of additional services to add under .travis.yml . See
+                        https://docs.travis-ci.com/user/database-setup/#starting-services for more info.
+
+  travis_notifications  A yaml block that contains configuration for Travis build notifications. See
+                        https://docs.travis-ci.com/user/notifications/ for configuration options.
 ```
 
 # Bootstrap a new Pulp plugin
