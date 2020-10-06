@@ -43,16 +43,17 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(DIAGRAM_BUILD_DIR)/*
 
 diagrams:
 ifneq ($(wildcard $(DIAGRAM_SOURCE_DIR)), )
 	mkdir -p $(DIAGRAM_BUILD_DIR)
-	python3 -m plantuml diagrams_src/*.dot
+	python3 -m plantuml $(DIAGRAM_SOURCE_DIR)/*.dot
 	# cp + rm = mv  workaround https://pulp.plan.io/issues/4791#note-3
-	cp diagrams_src/*.png $(DIAGRAM_BUILD_DIR)/
-	rm diagrams_src/*.png
+	cp $(DIAGRAM_SOURCE_DIR)/*.png $(DIAGRAM_BUILD_DIR)/
+	rm $(DIAGRAM_SOURCE_DIR)/*.png
 else
-	@echo "Did not find diagrams_src."
+	@echo "Did not find $(DIAGRAM_SOURCE_DIR)."
 endif
 
 html:
