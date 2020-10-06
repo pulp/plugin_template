@@ -53,6 +53,11 @@ black --check --diff .
 # Lint code.
 flake8 --config flake8.cfg
 
+{% if check_manifest -%}
+# check for any files unintentionally left out of MANIFEST.in
+check-manifest
+{%- endif %}
+
 {% if plugin_name != 'pulpcore' -%}
 # check for imports from pulpcore that aren't pulpcore.plugin
 ./.travis/check_pulpcore_imports.sh

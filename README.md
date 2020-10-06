@@ -60,6 +60,9 @@ The following settings are stored in `template_config.yml`.
   check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
+  check_manifest        Runs check-manifest to see if any files that were unintentionally left out
+                        of MANIFEST.in. For more info, see https://pypi.org/project/check-manifest/.
+
   cherry_pick_automation
                         A boolean that will enable a cron job to automatically attempt to cherry
                         pick changes to a stable release branch. This job will cherry pick any
