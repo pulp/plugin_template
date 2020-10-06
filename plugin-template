@@ -18,6 +18,7 @@ DEFAULT_SETTINGS = {
     'additional_plugins': [],
     'black': True,
     'check_commit_message': True,
+    'check_manifest': True,
     'cherry_pick_automation': False,
     'coverage': False,
     'deploy_client_to_pypi': True,
