@@ -15,8 +15,8 @@ elif [ "$TRAVIS_COMMIT" != "" ]; then
   RANGE=$TRAVIS_COMMIT
 fi
 
-# Travis sends the ranges with 3 dots. Git only wants two.
 if [[ "$RANGE" == *...* ]]; then
+  # Switch to using ".." for git log to capture only PR commits
   RANGE=`echo $TRAVIS_COMMIT_RANGE | sed 's/\.\.\./../'`
 else
   RANGE="$RANGE~..$RANGE"
