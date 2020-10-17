@@ -1,0 +1,2 @@
+Adding a ``make test`` command that can be used to run the tests along with all required setup steps
+such as generating bindings.

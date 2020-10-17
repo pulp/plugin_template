@@ -44,24 +44,7 @@ pip install -r dev_requirements.txt
 ./.travis/check_commit.sh
 {%- endif %}
 
-{% if black -%}
-# run black separately from flake8 to get a diff
-black --version
-black --check --diff .
-{%- endif %}
-
-# Lint code.
-flake8 --config flake8.cfg
-
-{% if check_manifest -%}
-# check for any files unintentionally left out of MANIFEST.in
-check-manifest
-{%- endif %}
-
-{% if plugin_name != 'pulpcore' -%}
-# check for imports from pulpcore that aren't pulpcore.plugin
-./.travis/check_pulpcore_imports.sh
-{%- endif %}
+make lint
 
 cd ..
 
