@@ -13,6 +13,22 @@ Changelog
 
 .. towncrier release notes start
 
+2020.10.20 (2020-10-20)
+=======================
+
+
+Features
+--------
+
+- Add diagrams to plugins docs Makefile
+  `#7629 <https://pulp.plan.io/issues/7629>`_
+- Added check_manifest option that runs check-manifest to check for files ommitted from MANIFEST.in.
+  `#7656 <https://pulp.plan.io/issues/7656>`_
+
+
+----
+
+
 2020.09.23 (2020-09-23)
 =======================
 
