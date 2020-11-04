@@ -505,7 +505,8 @@ release on a day, you can append a number to end after a hyphen (eg "2020.08.11-
 1. First, generate the changelog with your version (`towncrier --yes --version 2020.08.11`)
 2. Check in the new changelog, push, and open your PR.
 3. After the PR is merged, create a tag pointing to the changelog commit (`git tag 2020.08.11 9fceb02`)
-4. Finally push your tag (`git push origin 2020.08.11`)
+4. Push your tag (`git push origin 2020.08.11`)
+5. Go into redmine and close out any issues that were released
 
 
 # Contributing
