@@ -5,17 +5,17 @@
 
 set -mveuo pipefail
 
-source .travis/utils.sh
+source .github/workflows/scripts/utils.sh
 
-export POST_SCRIPT=$TRAVIS_BUILD_DIR/.travis/post_script.sh
-export POST_DOCS_TEST=$TRAVIS_BUILD_DIR/.travis/post_docs_test.sh
-export FUNC_TEST_SCRIPT=$TRAVIS_BUILD_DIR/.travis/func_test_script.sh
+export POST_SCRIPT=$GITHUB_WORKSPACE/.github/workflows/scripts/post_script.sh
+export POST_DOCS_TEST=$GITHUB_WORKSPACE/.github/workflows/scripts/post_docs_test.sh
+export FUNC_TEST_SCRIPT=$GITHUB_WORKSPACE/.github/workflows/scripts/func_test_script.sh
 
 # Needed for both starting the service and building the docs.
-# Gets set in .travis/settings.yml, but doesn't seem to inherited by
+# Gets set in .github/settings.yml, but doesn't seem to inherited by
 # this script.
 export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
-export PULP_SETTINGS=$TRAVIS_BUILD_DIR/.travis/settings/settings.py
+export PULP_SETTINGS=$GITHUB_WORKSPACE/.github/workflows/ansible/settings/settings.py
 
 if [ "$TEST" = "docs" ]; then
   cd docs
@@ -45,12 +45,12 @@ pip install ./{{ plugin_snake }}-client
 ./generate.sh {{ item.name | replace("-", "_") }} python
 pip install ./{{ item.name | replace("-", "_") }}-client
 {%- endfor %}
-cd $TRAVIS_BUILD_DIR
+cd $GITHUB_WORKSPACE
 
 if [ "$TEST" = 'bindings' ]; then
-  python $TRAVIS_BUILD_DIR/.travis/test_bindings.py
+  python $GITHUB_WORKSPACE/.github/workflows/scripts/test_bindings.py
   cd ../pulp-openapi-generator
-  if [ ! -f $TRAVIS_BUILD_DIR/.travis/test_bindings.rb ]
+  if [ ! -f $GITHUB_WORKSPACE/.github/workflows/scripts/test_bindings.rb ]
   then
     exit
   fi
@@ -81,7 +81,7 @@ if [ "$TEST" = 'bindings' ]; then
   gem install --both ./{{ plugin_snake }}_client-0.gem
   cd ..
 {%- endif %}
-  ruby $TRAVIS_BUILD_DIR/.travis/test_bindings.rb
+  ruby $GITHUB_WORKSPACE/.github/workflows/test_bindings.rb
   exit
 fi
 
@@ -97,21 +97,10 @@ cmd_prefix bash -c "PULP_DATABASES__default__USER=postgres django-admin test --n
 
 # Run functional tests
 {%- if plugin_name == 'pulpcore' %}
-export PYTHONPATH=$TRAVIS_BUILD_DIR${PYTHONPATH:+:${PYTHONPATH}}
+export PYTHONPATH=$GITHUB_WORKSPACE${PYTHONPATH:+:${PYTHONPATH}}
 {%- else %}
-export PYTHONPATH=$TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
+export PYTHONPATH=$GITHUB_WORKSPACE:$GITHUB_WORKSPACE/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
 {%- endif %}
-
-if [[ "$TEST" == "performance" ]]; then
-  wget -qO- https://github.com/crazy-max/travis-wait-enhanced/releases/download/v1.0.0/travis-wait-enhanced_1.0.0_linux_x86_64.tar.gz | sudo tar -C /usr/local/bin -zxvf - travis-wait-enhanced
-  echo "--- Performance Tests ---"
-  if [[ -z ${PERFORMANCE_TEST+x} ]]; then
-    travis-wait-enhanced --interval=1m --timeout=40m -- pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance
-  else
-    travis-wait-enhanced --interval=1m --timeout=40m -- pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance.test_$PERFORMANCE_TEST
-  fi
-  exit
-fi
 
 if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT

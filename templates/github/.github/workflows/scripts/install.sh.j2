@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+{% include 'header.j2' %}
+
+set -euv
+
+if [ "$TEST" = "docs" ]; then
+{%- if plugin_name == 'pulpcore' %}
+  pip install psycopg2-binary
+{%- else %}
+  pip install -r ../pulpcore/doc_requirements.txt
+{%- endif %}
+  pip install -r doc_requirements.txt
+fi
+
+pip install -r functest_requirements.txt
+
+cd .github/workflows/ansible/
+
+TAG=ci_build
+
+{#- For pulpcore, and any other repo that might check out some plugin PR #}
+{%- for item in additional_plugins %}
+
+if [ -e $GITHUB_WORKSPACE/../{{ item.name }} ]; then
+  {{ item.name | upper | replace("-", "_") }}=./{{ item.name }}
+else
+  {{ item.name | upper | replace("-", "_") }}=git+https://github.com/pulp/{{ item.name }}.git@{{ item.branch }}
+fi
+{%- endfor %}
+
+{%- if plugin_name != 'pulpcore' %}
+if [[ "$TEST" == "plugin-from-pypi" ]]; then
+  PLUGIN_NAME={{ plugin_name }}
+else
+  PLUGIN_NAME=./{{ plugin_name }}
+fi
+if [ -n "${GITHUB_REF##*/}" ]; then
+  # Install the plugin only and use published PyPI packages for the rest
+  # Quoting ${TAG} ensures Ansible casts the tag as a string.
+  cat >> vars/main.yaml << VARSYAML
+image:
+  name: pulp
+  tag: "${TAG}"
+plugins:
+  - name: pulpcore
+    source: pulpcore{{ pulpcore_pip_version_specifier | default(omit, true) }}
+  - name: {{ plugin_name }}
+    source:  "${PLUGIN_NAME}"
+{%- for item in additional_plugins %}
+  - name: {{ item.name }}
+    source: {{ item.name }}{{ item.pip_version_specifier | default(omit, true) }}
+{%- endfor %}
+services:
+  - name: pulp
+    image: "pulp:${TAG}"
+    volumes:
+      - ./settings:/etc/pulp
+VARSYAML
+else
+  cat >> vars/main.yaml << VARSYAML
+image:
+  name: pulp
+  tag: "${TAG}"
+plugins:
+  - name: {{ plugin_name }}
+    source: "${PLUGIN_NAME}"
+{%- for item in additional_plugins %}
+  - name: {{ item.name }}
+    source: ${{ item.name|upper| replace("-", "_") }}
+{%- endfor %}
+  - name: pulpcore
+    source: ./pulpcore
+services:
+  - name: pulp
+    image: "pulp:${TAG}"
+    volumes:
+      - ./settings:/etc/pulp
+VARSYAML
+fi
+{%- else %}
+cat >> vars/main.yaml << VARSYAML
+image:
+  name: pulp
+  tag: "${TAG}"
+plugins:
+  - name: pulpcore
+    source: ./pulpcore
+{%- for item in additional_plugins %}
+  - name: {{ item.name }}
+    source: ${{ item.name|upper| replace("-", "_") }}
+{%- endfor %}
+services:
+  - name: pulp
+    image: "pulp:${TAG}"
+    volumes:
+      - ./settings:/etc/pulp
+VARSYAML
+{%- endif %}
+
+cat >> vars/main.yaml << VARSYAML
+pulp_settings: {{ pulp_settings | tojson }}
+VARSYAML
+
+{%- if docker_fixtures %}
+
+if [[ "$TEST" == "pulp" || "$TEST" == "performance" || "$TEST" == "s3" || "$TEST" == "plugin-from-pypi" ]]; then
+  sed -i -e '/^services:/a \
+  - name: pulp-fixtures\
+    image: docker.io/pulp/pulp-fixtures:latest\
+    env: {BASE_URL: "http://pulp-fixtures"}' vars/main.yaml
+fi
+{%- endif %}
+
+{%- if test_s3 %}
+
+if [ "$TEST" = "s3" ]; then
+  export MINIO_ACCESS_KEY=AKIAIT2Z5TDYPX3ARJBA
+  export MINIO_SECRET_KEY=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
+  sed -i -e '/^services:/a \
+  - name: minio\
+    image: minio/minio\
+    env:\
+      MINIO_ACCESS_KEY: "'$MINIO_ACCESS_KEY'"\
+      MINIO_SECRET_KEY: "'$MINIO_SECRET_KEY'"\
+    command: "server /data"' vars/main.yaml
+  sed -i -e '$a s3_test: true\
+minio_access_key: "'$MINIO_ACCESS_KEY'"\
+minio_secret_key: "'$MINIO_SECRET_KEY'"' vars/main.yaml
+fi
+{%- endif %}
+
+ansible-playbook build_container.yaml
+ansible-playbook start_container.yaml

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+{% include 'header.j2' %}
+
+set -euv
+
+echo ::group::REQUESTS
+pip3 install requests
+echo ::endgroup::
+
+for sha in $(curl $GITHUB_CONTEXT | jq '.[].sha' | sed 's/"//g')
+do
+  python3 .scripts/validate_commit_message.py $sha
+  VALUE=$?
+  if [ "$VALUE" -gt 0 ]; then
+    exit $VALUE
+  fi
+done
