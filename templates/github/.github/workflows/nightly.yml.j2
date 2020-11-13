@@ -1,0 +1,118 @@
+{% include 'header.j2' %}
+---
+name: Pulp Nightly CI/CD
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # runs at 23:00 daily
+    - cron: '00 23 * * *'
+
+jobs:
+  pulp:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:9.6
+      redis:
+        image: redis
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # by default, it uses a depth of 1
+          # this fetches all history so that we can read each commit
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.7"
+
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "2.6"
+
+      - name: Install httpie
+        run: |
+          echo ::group::HTTPIE
+          sudo apt-get update -yq
+          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
+          echo ::endgroup::
+
+      - name: Before Install
+        run: .github/workflows/scripts/before_install.sh
+        shell: bash
+
+      - name: Install
+        run: .github/workflows/scripts/install.sh
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+        shell: bash
+
+      - name: Before Script
+        run: |
+          .github/workflows/scripts/before_script.sh
+          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.github/workflows/" >> $GITHUB_ENV
+
+      - name: Script
+        run: .github/workflows/scripts/script.sh
+        shell: bash
+
+      {% if deploy_daily_client_to_rubygems %}
+      - name: Publish nightly client to rubygems
+        run: .scripts/publish_client_gem.sh
+        shell: bash
+      {% endif %}
+
+      {% if deploy_daily_client_to_pypi %}
+      - name: Publish nightly client to pypi
+        run: .scripts/publish_client_pypi.sh
+        shell: bash
+      {% endif %}
+
+      {% if publish_docs_to_pulpprojectdotorg %}
+      - name: Publish nightly docs
+        run: .scripts/publish_docs.sh nightly
+        shell: bash
+      {% endif %}
+
+      {%- if test_performance %}
+        {%- if test_performance is iterable %}
+          {%- for test in test_performance %}
+      - name: "{{test}} performance test"
+        env:
+          - TEST="performance PERFORMANCE_TEST={{test}}"
+          {%- endfor %}
+        {%- else %}
+      - name: Performance test
+        run: |
+          echo "--- Performance Tests ---"
+          if [[ -z ${PERFORMANCE_TEST+x} ]]; then
+            pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance
+          else
+            pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance.test_$PERFORMANCE_TEST
+          fi
+          exit
+        {%- endif %}
+      {%- endif %}
+
+      {%- if test_released_plugin_with_next_pulpcore_release %}
+      - name: Test released plugin with next pulpcore release
+        env:
+          - TEST=plugin-from-pypi
+    {%- endif %}
+
+      - name: After failure
+        if: failure()
+        run: |
+          http --timeout 30 --check-status --pretty format --print hb http://pulp/pulp/api/v3/status/ || true
+          docker images || true
+          docker ps -a || true
+          docker logs pulp || true
+          docker exec pulp ls -latr /etc/yum.repos.d/ || true
+          docker exec pulp cat /etc/yum.repos.d/* || true
+          {%- if plugin_name == 'pulp_rpm' %}
+          docker exec pulp ls -latr /etc/yum.repos.d/
+          docker exec pulp cat /etc/yum.repos.d/*
+          {%- endif %}
