@@ -51,7 +51,7 @@ jobs:
 
       {% if plugin_name != 'pulpcore' -%}
       - name: Check for pulpcore imports outside of pulpcore.plugin
-        run: sh .scripts/check_pulpcore_imports.sh
+        run: sh .ci/scripts/check_pulpcore_imports.sh
       {%- endif %}
 
   pulp:

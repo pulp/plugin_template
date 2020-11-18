@@ -62,33 +62,33 @@ jobs:
       - name: Deploy plugin to pypi
         env:
           PYPI_PASSWORD: ${{ "{{ secrets.PYPI_PASSWORD }}" }}
-        run: bash .scripts/publish_plugin_pypi.sh
+        run: bash .ci/scripts/publish_plugin_pypi.sh
       {%- endif %}
 
       {%- if deploy_client_to_rubygems %}
       - name: Publish client to rubygems
         env:
           RUBYGEMS_API_KEY: ${{ "{{ secrets.RUBYGEMS_API_KEY }}" }}
-        run: bash .scripts/publish_client_gem.sh
+        run: bash .ci/scripts/publish_client_gem.sh
       {%- endif %}
 
       {%- if deploy_client_to_pypi %}
       - name: Publish client to pypi
         env:
           PYPI_PASSWORD: ${{ "{{ secrets.PYPI_PASSWORD }}" }}
-        run: bash .scripts/publish_client_pypi.sh
+        run: bash .ci/scripts/publish_client_pypi.sh
       {%- endif %}
 
       {%- if publish_docs_to_pulpprojectdotorg %}
       - name: Publish docs to pulpproject.org
-        run: bash .scripts/publish_docs.sh tag $BRANCH
+        run: bash .ci/scripts/publish_docs.sh tag $BRANCH
       env:
           - BRANCH=${GITHUB_REF##*/}
       {%- endif %}
 
       {%- if update_redmine %}
       - name: Update Redmine
-        script: bash .scripts/update_redmine.sh
+        script: bash .ci/scripts/update_redmine.sh
       {%- endif %}
 
       - name: After failure

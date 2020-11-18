@@ -61,13 +61,13 @@ jobs:
 
       {% if deploy_daily_client_to_rubygems %}
       - name: Publish nightly client to rubygems
-        run: .scripts/publish_client_gem.sh
+        run: .ci/scripts/publish_client_gem.sh
         shell: bash
       {% endif %}
 
       {% if deploy_daily_client_to_pypi %}
       - name: Publish nightly client to pypi
-        run: .scripts/publish_client_pypi.sh
+        run: .ci/scripts/publish_client_pypi.sh
         shell: bash
       {% endif %}
 
