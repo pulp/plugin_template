@@ -15,7 +15,7 @@ else
   TAG_BUILD=1
 fi
 
-if [ "$TEST" = "docs" ]; then
+if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
 {%- if plugin_name == 'pulpcore' %}
   pip install psycopg2-binary
 {%- else %}
