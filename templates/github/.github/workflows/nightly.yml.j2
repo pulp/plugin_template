@@ -131,8 +131,8 @@ jobs:
       - name: Publish nightly docs
         env:
           BRANCH: ${GITHUB_REF##*/}
+          PULP_DOCS_KEY: {% raw %}${{ secrets.PULP_DOCS_KEY }}{% endraw %}
         run: .ci/scripts/publish_docs.sh nightly $BRANCH
-        shell: bash
       {% endif %}
 
       {%- if test_performance %}
