@@ -70,12 +70,6 @@ jobs:
           - TEST: docs
           - TEST: s3
 
-    # services:
-    #   postgres:
-    #     image: postgres:9.6
-    #   redis:
-    #     image: redis
-
     defaults:
       run:
         working-directory: pulp_catdog

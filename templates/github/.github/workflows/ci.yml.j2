@@ -72,12 +72,6 @@ jobs:
           - TEST: docs
           - TEST: s3
 
-    services:
-      postgres:
-        image: postgres:9.6
-      redis:
-        image: redis
-
     steps:
       - uses: actions/checkout@v2
         with:
