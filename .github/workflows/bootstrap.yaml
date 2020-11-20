@@ -1,0 +1,129 @@
+---
+name: Test bootstrapping a plugin
+on: pull_request
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pulp_catdog
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: plugin_template
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.7"
+      - name: Bootstrap catdog plugin
+        working-directory: plugin_template
+        run: |
+          .ci/bootstrap_catdog.sh
+
+  # Below this line we include the steps of the ci workflow of the generated plugin
+
+        # dev_requirements contains tools needed for flake8, etc.
+      - name: Install requirements
+        run: pip3 install -r dev_requirements.txt
+
+      # This check tries to lookup nonexisting commits
+      # - name: Check commit message
+      #   if: github.event_name == 'pull_request'
+      #   env:
+      #     GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
+      #   run: sh .github/workflows/scripts/check_commit.sh
+
+      # run black separately from flake8 to get a diff
+      - name: Run black
+        run: |
+          black --version
+          black --check --diff .
+
+      # Lint code.
+      - name: Run flake8
+        run: flake8 --config flake8.cfg
+
+      # check for any files unintentionally left out of MANIFEST.in
+      - name: Check manifest
+        run: check-manifest
+
+      - name: Check for pulpcore imports outside of pulpcore.plugin
+        run: sh .ci/scripts/check_pulpcore_imports.sh
+
+  pulp:
+    runs-on: ubuntu-latest
+    # run only after lint finishes
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - TEST: pulp
+          - TEST: docs
+          - TEST: s3
+
+    # services:
+    #   postgres:
+    #     image: postgres:9.6
+    #   redis:
+    #     image: redis
+
+    defaults:
+      run:
+        working-directory: pulp_catdog
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: plugin_template
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.7"
+      - name: Bootstrap catdog plugin
+        working-directory: plugin_template
+        run: |
+          .ci/bootstrap_catdog.sh
+
+  # Below this line we include the steps of the ci workflow of the generated plugin
+
+      - name: Install httpie
+        run: |
+          echo ::group::HTTPIE
+          sudo apt-get update -yq
+          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
+          echo ::endgroup::
+          echo "TEST=${{ matrix.env.TEST }}" >> $GITHUB_ENV
+
+      - name: Before Install
+        run: GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/before_install.sh
+        shell: bash
+
+      - name: Install
+        run: GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/install.sh
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+        shell: bash
+
+      - name: Before Script
+        run: |
+          GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/before_script.sh
+          GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.github" >> $GITHUB_ENV
+
+      - name: Script
+        run: GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/script.sh
+        shell: bash
+
+      - name: After failure
+        if: failure()
+        run: |
+          echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
+          http --timeout 30 --check-status --pretty format --print hb http://pulp/pulp/api/v3/status/ || true
+          docker images || true
+          docker ps -a || true
+          docker logs pulp || true
+          docker exec pulp ls -latr /etc/yum.repos.d/ || true
+          docker exec pulp cat /etc/yum.repos.d/* || true
