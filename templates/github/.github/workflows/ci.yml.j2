@@ -49,7 +49,7 @@ jobs:
         run: check-manifest
       {%- endif %}
 
-      {% if plugin_name != 'pulpcore' -%}
+      {% if check_stray_pulpcore_imports -%}
       - name: Check for pulpcore imports outside of pulpcore.plugin
         run: sh .ci/scripts/check_pulpcore_imports.sh
       {%- endif %}
