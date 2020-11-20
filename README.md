@@ -73,6 +73,9 @@ The following settings are stored in `template_config.yml`.
                         generated at
                         [https://github.com/settings/tokens](https://github.com/settings/tokens).
 
+  check_stray_pulpcore_imports
+                        Check that plugins are importing from pulpcore.plugin and not pulpcore directly.
+
   coverage              Include collection of coverage and reporting to coveralls.io
 
   deploy_client_to_pypi Include a Travis stage that publishes a client library to PyPI.
