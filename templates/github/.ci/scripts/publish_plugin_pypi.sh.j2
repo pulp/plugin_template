@@ -2,6 +2,9 @@
 
 {% include 'header.j2' %}
 
+# make sure this script runs at the repo root
+cd "$(dirname "$(realpath -e "$0")")"/../..
+
 set -euv
 
 pip install twine

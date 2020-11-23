@@ -1,4 +1,9 @@
+#!/bin/bash
+
 {% include 'header.j2' %}
+
+# make sure this script runs at the repo root
+cd "$(dirname "$(realpath -e "$0")")"/../..
 
 pip install PyGithub GitPython yq
 

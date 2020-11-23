@@ -1,6 +1,11 @@
 #!/bin/bash
 
+{% include 'header.j2' %}
+
 set -euv
+
+# make sure this script runs at the repo root
+cd "$(dirname "$(realpath -e "$0")")"/../..
 
 openssl aes-256-cbc -K $encrypted_{{ pulpprojectdotorg_key_id }}_key -iv $encrypted_{{ pulpprojectdotorg_key_id }}_iv -in .ci/assets/pulp-infra.enc -out ~/.ssh/pulp-infra -d
 sudo chmod 600 ~/.ssh/pulp-infra
@@ -12,7 +17,7 @@ pip3 install -r doc_requirements.txt
 
 export PYTHONUNBUFFERED=1
 export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
-export PULP_SETTINGS=$GITHUB_WORKSPACE/.ci/ansible/settings/settings.py
+export PULP_SETTINGS=$PWD/.ci/ansible/settings/settings.py
 
 eval "$(ssh-agent -s)" #start the ssh agent
 ssh-add ~/.ssh/pulp-infra
