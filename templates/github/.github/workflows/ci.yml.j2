@@ -1,7 +1,13 @@
 {% include 'header.j2' %}
 ---
-name: Pulp PR CI
-on: pull_request
+name: Pulp CI
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - '*'
 
 jobs:
 
