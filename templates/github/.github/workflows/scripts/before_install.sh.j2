@@ -2,6 +2,9 @@
 
 {% include 'header.j2' %}
 
+# make sure this script runs at the repo root
+cd "$(dirname "$(realpath -e "$0")")"/../../..
+
 set -mveuo pipefail
 
 if [[ "$TEST" == "plugin-from-pypi" ]]; then
@@ -14,8 +17,8 @@ echo "---" > .ci/ansible/vars/main.yaml
 echo "component_name: {{ plugin_snake }}" >> .ci/ansible/vars/main.yaml
 echo "component_version: '${COMPONENT_VERSION}'" >> .ci/ansible/vars/main.yaml
 
-export PRE_BEFORE_INSTALL=$GITHUB_WORKSPACE/.github/workflows/scripts/pre_before_install.sh
-export POST_BEFORE_INSTALL=$GITHUB_WORKSPACE/.github/workflows/scripts/post_before_install.sh
+export PRE_BEFORE_INSTALL=$PWD/.github/workflows/scripts/pre_before_install.sh
+export POST_BEFORE_INSTALL=$PWD/.github/workflows/scripts/post_before_install.sh
 
 COMMIT_MSG=$(git log --format=%B --no-merges -1)
 export COMMIT_MSG

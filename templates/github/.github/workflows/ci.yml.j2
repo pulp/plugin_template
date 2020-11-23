@@ -105,7 +105,7 @@ jobs:
       - name: Before Script
         run: |
           .github/workflows/scripts/before_script.sh
-          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.github" >> $GITHUB_ENV
+          echo "HTTPIE_CONFIG_DIR=$PWD/.github" >> $GITHUB_ENV
 
       - name: Script
         run: .github/workflows/scripts/script.sh

@@ -2,6 +2,10 @@
 
 {% include 'header.j2' %}
 
+# make sure this script runs at the repo root
+cd "$(dirname "$(realpath -e "$0")")"/../../..
+REPO_ROOT="$PWD"
+
 set -euv
 
 if [ "$TEST" = "docs" ]; then
@@ -22,7 +26,7 @@ TAG=ci_build
 {#- For pulpcore, and any other repo that might check out some plugin PR #}
 {%- for item in additional_plugins %}
 
-if [ -e $GITHUB_WORKSPACE/../{{ item.name }} ]; then
+if [ -e $REPO_ROOT/../{{ item.name }} ]; then
   {{ item.name | upper | replace("-", "_") }}=./{{ item.name }}
 else
   {{ item.name | upper | replace("-", "_") }}=git+https://github.com/pulp/{{ item.name }}.git@{{ item.branch }}

@@ -98,11 +98,11 @@ jobs:
           echo "TEST=${{ matrix.env.TEST }}" >> $GITHUB_ENV
 
       - name: Before Install
-        run: GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/before_install.sh
+        run: .github/workflows/scripts/before_install.sh
         shell: bash
 
       - name: Install
-        run: GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/install.sh
+        run: .github/workflows/scripts/install.sh
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -110,11 +110,11 @@ jobs:
 
       - name: Before Script
         run: |
-          GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/before_script.sh
-          GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.github" >> $GITHUB_ENV
+          .github/workflows/scripts/before_script.sh
+          echo "HTTPIE_CONFIG_DIR=$PWD/.github" >> $GITHUB_ENV
 
       - name: Script
-        run: GITHUB_WORKSPACE="${GITHUB_WORKSPACE}/pulp_catdog" .github/workflows/scripts/script.sh
+        run: .github/workflows/scripts/script.sh
         shell: bash
 
       - name: After failure
