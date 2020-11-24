@@ -4,6 +4,13 @@
 
 set -euv
 
+if [ "${GITHUB_REF##refs/tags/}" = "${GITHUB_REF}" ]
+then
+  TAG_BUILD=0
+else
+  TAG_BUILD=1
+fi
+
 if [ "$TEST" = "docs" ]; then
 {%- if plugin_name == 'pulpcore' %}
   pip install psycopg2-binary
@@ -35,7 +42,7 @@ if [[ "$TEST" == "plugin-from-pypi" ]]; then
 else
   PLUGIN_NAME=./{{ plugin_name }}
 fi
-if [ -n "${GITHUB_REF##*/}" ]; then
+if [ "${TAG_BUILD}" = "1" ]; then
   # Install the plugin only and use published PyPI packages for the rest
   # Quoting ${TAG} ensures Ansible casts the tag as a string.
   cat >> vars/main.yaml << VARSYAML

@@ -4,6 +4,20 @@
 
 set -mveuo pipefail
 
+if [ "${GITHUB_REF##refs/heads/}" = "${GITHUB_REF}" ]
+then
+  BRANCH_BUILD=0
+else
+  BRANCH_BUILD=1
+  BRANCH="${GITHUB_REF##refs/heads/}"
+fi
+if [ "${GITHUB_REF##refs/tags/}" = "${GITHUB_REF}" ]
+then
+  TAG_BUILD=0
+else
+  TAG_BUILD=1
+fi
+
 if [[ "$TEST" == "plugin-from-pypi" ]]; then
   COMPONENT_VERSION=$(http https://pypi.org/pypi/{{ plugin_dash }}/json | jq -r '.info.version')
 else
@@ -29,7 +43,7 @@ if [[ -n $(echo -e $COMMIT_MSG | grep -P "Required PR:.*" | grep -v "https") ]];
   exit 1
 fi
 
-if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ -z "${GITHUB_REF##*/}" -a "${GITHUB_REF##*/}" != "master" ]
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "master" ]
 then
 {%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator"] + additional_plugins | map(attribute="name") | list %}
   export {{ repository | upper | replace("-", "_") }}_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/{{ repository }}\/pull\/(\d+)' | awk -F'/' '{print $7}')
@@ -71,7 +85,7 @@ cd ..
 {% if plugin_name != 'pulpcore' %}
 # When building a (release) tag, we don't need the development modules for the
 # build (they will be installed as dependencies of the plugin).
-if [ -z "${GITHUB_REF##*/}" ]; then
+if [ "${TAG_BUILD}" = "1" ]; then
 {% endif %}
   git clone --depth=1 https://github.com/pulp/pulp-smash.git
 
