@@ -60,7 +60,7 @@ jobs:
         run: sh .ci/scripts/check_pulpcore_imports.sh
       {%- endif %}
 
-  pulp:
+  test:
     runs-on: ubuntu-latest
     # run only after lint finishes
     needs: lint
