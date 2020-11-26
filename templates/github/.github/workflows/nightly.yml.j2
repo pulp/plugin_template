@@ -18,6 +18,9 @@ jobs:
           - TEST: pulp
           - TEST: docs
           - TEST: s3
+          {%- if test_released_plugin_with_next_pulpcore_release %}
+          - TEST: plugin-from-pypi
+          {%- endif %}
 
     steps:
       - uses: actions/checkout@v2
@@ -137,26 +140,18 @@ jobs:
           {%- for test in test_performance %}
       - name: "{{test}} performance test"
         env:
-          TEST: "performance PERFORMANCE_TEST={{test}}"
+          TEST: performance
+          PERFORMANCE_TEST: {{test}}
+        run: .github/workflows/scripts/script.sh
+
           {%- endfor %}
         {%- else %}
       - name: Performance test
-        run: |
-          echo "--- Performance Tests ---"
-          if [[ -z ${PERFORMANCE_TEST+x} ]]; then
-            pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance
-          else
-            pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance.test_$PERFORMANCE_TEST
-          fi
-          exit
+        env:
+          TEST: performance
+        run: .github/workflows/scripts/script.sh
         {%- endif %}
       {%- endif %}
-
-      {%- if test_released_plugin_with_next_pulpcore_release %}
-      - name: Test released plugin with next pulpcore release
-        env:
-          TEST: plugin-from-pypi
-    {%- endif %}
 
       - name: After failure
         if: failure()
