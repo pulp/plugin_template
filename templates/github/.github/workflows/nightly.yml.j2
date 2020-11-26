@@ -126,7 +126,9 @@ jobs:
 
       {% if publish_docs_to_pulpprojectdotorg %}
       - name: Publish nightly docs
-        run: .scripts/publish_docs.sh nightly
+        env:
+          BRANCH: ${GITHUB_REF##*/}
+        run: .ci/scripts/publish_docs.sh nightly $BRANCH
         shell: bash
       {% endif %}
 
@@ -135,7 +137,7 @@ jobs:
           {%- for test in test_performance %}
       - name: "{{test}} performance test"
         env:
-          - TEST="performance PERFORMANCE_TEST={{test}}"
+          TEST: "performance PERFORMANCE_TEST={{test}}"
           {%- endfor %}
         {%- else %}
       - name: Performance test
@@ -153,8 +155,8 @@ jobs:
       {%- if test_released_plugin_with_next_pulpcore_release %}
       - name: Test released plugin with next pulpcore release
         env:
-          - TEST=plugin-from-pypi
-      {%- endif %}
+          TEST: plugin-from-pypi
+    {%- endif %}
 
       - name: After failure
         if: failure()
