@@ -35,6 +35,7 @@ jobs:
           sudo apt-get update -yq
           sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
           echo ::endgroup::
+          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
           echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
 
       - name: Before Install
@@ -84,6 +85,7 @@ jobs:
           sudo apt-get update -yq
           sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
           echo ::endgroup::
+          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
 
       - name: Install python dependencies
         run: |
