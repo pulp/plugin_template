@@ -9,7 +9,7 @@
   },
   "hosts": [
     {
-      "hostname": "pulp",
+      "hostname": "pulp.example.com",
       "roles": {
         "api": {
           "port": 80,
@@ -25,6 +25,7 @@
         "pulp workers": {},
         "redis": {},
         "shell": {
+          "container": "pulp.example.com",
           "transport": "docker"
         }
       }

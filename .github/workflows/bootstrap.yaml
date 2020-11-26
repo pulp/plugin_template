@@ -120,9 +120,9 @@ jobs:
         if: failure()
         run: |
           echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
-          http --timeout 30 --check-status --pretty format --print hb http://pulp/pulp/api/v3/status/ || true
+          http --timeout 30 --check-status --pretty format --print hb http://pulp.example.com/pulp/api/v3/status/ || true
           docker images || true
           docker ps -a || true
-          docker logs pulp || true
-          docker exec pulp ls -latr /etc/yum.repos.d/ || true
-          docker exec pulp cat /etc/yum.repos.d/* || true
+          docker logs pulp.example.com || true
+          docker exec pulp.example.com ls -latr /etc/yum.repos.d/ || true
+          docker exec pulp.example.com cat /etc/yum.repos.d/* || true

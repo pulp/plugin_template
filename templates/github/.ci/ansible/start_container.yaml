@@ -70,7 +70,7 @@
     - block:
         - name: "Wait for Pulp"
           uri:
-            url: "http://pulp/pulp/api/v3/status/"
+            url: "http://pulp.example.com/pulp/api/v3/status/"
             follow_redirects: none
           register: result
           until: result.status == 200
@@ -78,7 +78,7 @@
           delay: 5
       rescue:
         - name: "Output pulp container log"
-          command: "docker logs pulp"
+          command: "docker logs pulp.example.com"
           failed_when: true
 
     - name: "Check version of component being tested"
@@ -89,15 +89,15 @@
           Component {{ component_name }} was expected to be installed in version {{ component_version }}.
           Instead it is reported as version {{ (result.json.versions | items2dict(key_name="component", value_name="version"))[component_name] }}.
 
-    - name: "Set pulp password in .netrc"
+    - name: "Set pulp.example.com password in .netrc"
       copy:
         dest: "~/.netrc"
         content: |
-          machine pulp
+          machine pulp.example.com
           login admin
           password password
 
-- hosts: pulp
+- hosts: pulp.example.com
   gather_facts: false
   tasks:
     - name: "Set pulp admin password"

@@ -3,7 +3,7 @@ all:
   children:
     containers:
       hosts:
-        pulp:
+        pulp.example.com:
         pulp-fixtures:
         minio:
       vars:

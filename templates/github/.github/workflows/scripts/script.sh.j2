@@ -23,7 +23,7 @@ export PULP_SETTINGS=$PWD/.ci/ansible/settings/settings.py
 
 if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
   cd docs
-  make PULP_URL="http://pulp" html
+  make PULP_URL="http://pulp.example.com" html
   cd ..
 
   if [ -f $POST_DOCS_TEST ]; then
