@@ -141,6 +141,8 @@ jobs:
       {%- if update_redmine %}
       - name: Update Redmine
         run: bash .ci/scripts/update_redmine.sh
+        env:
+          REDMINE_API_KEY: ${{ "{{ secrets.REDMINE_API_KEY }}" }}
       {%- endif %}
 
       - name: After failure
