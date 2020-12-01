@@ -17,6 +17,9 @@ jobs:
           - TEST: pulp
           - TEST: docs
           - TEST: s3
+          {%- if test_bindings %}
+          - TEST: bindings
+          {%- endif %}
 
     steps:
       - uses: actions/checkout@v2
