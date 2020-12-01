@@ -4,9 +4,9 @@ set -euv
 
 pip install -r test_requirements.txt
 ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
-mkdir -p ../pulp_catdog/.github/workflows/scripts
-touch ../pulp_catdog/.github/workflows/scripts/test_bindings.py
-touch ../pulp_catdog/.github/workflows/scripts/test_bindings.rb
+mkdir -p ../pulp_catdog/.ci/assets/bindings
+touch ../pulp_catdog/.ci/assets/bindings/test_bindings.py
+touch ../pulp_catdog/.ci/assets/bindings/test_bindings.rb
 echo 'pypi_username: the_pypi_user' >> ../pulp_catdog/template_config.yml
 sed -i "s/test_s3: false/test_s3: true/g" ../pulp_catdog/template_config.yml
 ./plugin-template --all pulp_catdog
