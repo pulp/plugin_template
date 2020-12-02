@@ -136,9 +136,8 @@ jobs:
       {%- if publish_docs_to_pulpprojectdotorg %}
       - name: Publish docs to pulpproject.org
         env:
-          BRANCH: ${GITHUB_REF#refs/{heads,tags}/}
           PULP_DOCS_KEY: {% raw %}${{ secrets.PULP_DOCS_KEY }}{% endraw %}
-        run: .ci/scripts/publish_docs.sh tag $BRANCH
+        run: .ci/scripts/publish_docs.sh tag ${GITHUB_REF#refs/{heads,tags}/}
       {%- endif %}
 
       {%- if update_redmine %}

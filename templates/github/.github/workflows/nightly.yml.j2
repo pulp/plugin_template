@@ -133,9 +133,8 @@ jobs:
       {% if publish_docs_to_pulpprojectdotorg %}
       - name: Publish nightly docs
         env:
-          BRANCH: ${GITHUB_REF##*/}
           PULP_DOCS_KEY: {% raw %}${{ secrets.PULP_DOCS_KEY }}{% endraw %}
-        run: .ci/scripts/publish_docs.sh nightly $BRANCH
+        run: .ci/scripts/publish_docs.sh nightly ${GITHUB_REF##*/}
       {% endif %}
 
       {%- if test_performance %}
