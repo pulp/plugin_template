@@ -137,7 +137,7 @@ jobs:
       - name: Publish docs to pulpproject.org
         env:
           PULP_DOCS_KEY: {% raw %}${{ secrets.PULP_DOCS_KEY }}{% endraw %}
-        run: .ci/scripts/publish_docs.sh tag ${GITHUB_REF#refs/{heads,tags}/}
+        run: .ci/scripts/publish_docs.sh tag ${GITHUB_REF##*/}
       {%- endif %}
 
       {%- if update_redmine %}
