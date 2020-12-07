@@ -13,6 +13,37 @@ Changelog
 
 .. towncrier release notes start
 
+2020.12.07 (2020-12-07)
+=======================
+
+
+Features
+--------
+
+- Added a stage for testing released plugin with master branch of pulpcore.
+  `#7411 <https://pulp.plan.io/issues/7411>`_
+- Added support for Github Actions.
+  `#7858 <https://pulp.plan.io/issues/7858>`_
+- Added a workflow to test the bootstrapping mechanism for a new plugin
+  `#7860 <https://pulp.plan.io/issues/7860>`_
+
+
+Bugfixes
+--------
+
+- Stopped to derive the docker tag from the branch name.
+  `#7799 <https://pulp.plan.io/issues/7799>`_
+
+
+Misc
+----
+
+- `#7880 <https://pulp.plan.io/issues/7880>`_
+
+
+----
+
+
 2020.10.20 (2020-10-20)
 =======================
 
