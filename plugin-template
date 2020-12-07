@@ -10,6 +10,7 @@ import tempfile
 import textwrap
 import utils
 import yaml
+from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -55,6 +56,13 @@ DEFAULT_SETTINGS = {
     'travis_notifications': None,
     'update_redmine': False,
 }
+
+
+DEPRECATED_FILES = [
+    ".ci/scripts/release_requirements.txt",
+    # ".travis",
+    # ".travis.yml",
+]
 
 
 def main():
@@ -175,6 +183,10 @@ def main():
         file_path = os.path.join(plugin_root_dir, 'template_config.yml')
         print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
 
+    if plugin_root_dir:
+        print("\nDeprecation check:")
+        check_for_deprecated_files(plugin_root_dir)
+
 
 def to_nice_yaml(data):
     """Implement a filter for Jinja 2 templates to render human readable YAML."""
@@ -284,6 +296,19 @@ def generate_config(plugin_name, plugin_app_label):
         if key not in config:
             config[key] = value
     return config
+
+
+def check_for_deprecated_files(plugin_root_dir):
+    """Check for files that have been deprecated (ie moved or removed)."""
+    files_found = False
+    for fp in DEPRECATED_FILES:
+        path = Path(plugin_root_dir).joinpath(fp)
+        if path.exists():
+            print(f"Found deprecated file: '{path}'. It is recommended you delete this file.")
+            files_found = True
+
+    if not files_found:
+        print("No deprecated files found.")
 
 
 if __name__ == '__main__':
