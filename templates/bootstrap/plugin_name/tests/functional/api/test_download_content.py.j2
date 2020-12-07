@@ -7,13 +7,13 @@ from urllib.parse import urljoin
 
 from pulp_smash import config, utils
 from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo
+from pulp_smash.pulp3.bindings import monitor_task
 
 from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_FIXTURE_URL
 from {{ plugin_snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_client,
     get_{{ plugin_app_label }}_content_paths,
     gen_{{ plugin_app_label }}_remote,
-    monitor_task,
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
@@ -82,7 +82,7 @@ class DownloadContentTestCase(unittest.TestCase):
         # Create a publication.
         publish_data = {{ plugin_camel_short }}{{ plugin_camel_short }}Publication(repository=repo.pulp_href)
         publish_response = publications.create(publish_data)
-        created_resources = monitor_task(publish_response.task)
+        created_resources = monitor_task(publish_response.task).created_resources
         publication_href = created_resources[0]
         self.addCleanup(publications.delete, publication_href)
 
@@ -90,7 +90,7 @@ class DownloadContentTestCase(unittest.TestCase):
         body = gen_distribution()
         body["publication"] = publication_href
         distribution_response = distributions.create(body)
-        created_resources = monitor_task(distribution_response.task)
+        created_resources = monitor_task(distribution_response.task).created_resources
         distribution = distributions.read(created_resources[0])
         self.addCleanup(distributions.delete, distribution.pulp_href)
 

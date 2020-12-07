@@ -4,12 +4,12 @@ from random import choice
 import unittest
 
 from pulp_smash import utils
+from pulp_smash.pulp3.bindings import monitor_task
 
 from {{ plugin_snake }}.tests.functional.constants import DOWNLOAD_POLICIES
 from {{ plugin_snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_client,
     gen_{{ plugin_app_label }}_remote,
-    monitor_task,
     skip_if,
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
