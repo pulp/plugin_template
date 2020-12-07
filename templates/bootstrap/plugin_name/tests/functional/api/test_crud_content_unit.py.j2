@@ -4,13 +4,13 @@ import unittest
 
 from pulp_smash import utils
 from pulp_smash.pulp3.utils import delete_orphans
+from pulp_smash.pulp3.bindings import monitor_task
 
 from {{ plugin_snake }}.tests.functional.utils import (
     core_client,
     gen_artifact,
     gen_{{ plugin_app_label }}_client,
     gen_{{ plugin_app_label }}_content_attrs,
-    monitor_task,
     skip_if,
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
@@ -48,7 +48,7 @@ class ContentUnitTestCase(unittest.TestCase):
         """Create content unit."""
         attrs = gen_{{ plugin_app_label }}_content_attrs(self.artifact)
         response = self.{{ plugin_app_label }}_content_api.create(**attrs)
-        created_resources = monitor_task(response.task)
+        created_resources = monitor_task(response.task).created_resources
         content_unit = self.{{ plugin_app_label }}_content_api.read(created_resources[0])
         self.content_unit.update(content_unit.to_dict())
         for key, val in attrs.items():
