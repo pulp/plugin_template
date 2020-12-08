@@ -14,7 +14,7 @@ sed -i "s/test_s3: false/test_s3: true/g" ../pulp_catdog/template_config.yml
 cd ../pulp_catdog
 
 # ignore unused imports
-flake8 --config flake8.cfg .ci || exit 1 # check travis files before ignoring imports
+flake8 --config flake8.cfg .ci || exit 1 # check ci files before ignoring imports
 sed -i -e '/^ignore/s/$/,F401/' flake8.cfg
 
 # include post_before_script to generate migrations

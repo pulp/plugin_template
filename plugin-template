@@ -52,16 +52,14 @@ DEFAULT_SETTINGS = {
     'test_performance': False,
     'test_released_plugin_with_next_pulpcore_release': False,
     'test_s3': False,
-    'travis_addtl_services': [],
-    'travis_notifications': None,
     'update_redmine': False,
 }
 
 
 DEPRECATED_FILES = [
     ".ci/scripts/release_requirements.txt",
-    # ".travis",
-    # ".travis.yml",
+    ".travis",
+    ".travis.yml",
 ]
 
 
@@ -93,11 +91,6 @@ def main():
     parser.add_argument('--test', action='store_true',
                         help=textwrap.dedent('''\
                             Generate or update functional and unit tests.
-
-                        '''))
-    parser.add_argument('--travis', action='store_true',
-                        help=textwrap.dedent('''\
-                            Generate or update travis configuration files.
 
                         '''))
     parser.add_argument('--github', action='store_true',
@@ -168,14 +161,14 @@ def main():
     # the config. (note: uses .copy() to avoid a self reference)
     config['config'] = config.copy()
 
-    if args.travis or args.github or args.all:
+    if args.github or args.all:
         if not config['pypi_username'] and (config['deploy_client_to_pypi'] or \
                 config['deploy_to_pypi']):
             print("If PyPI scripts are included, PyPI username is required.")
             return 2
 
-    for section in ['generate_config', 'bootstrap', 'travis', 'github', 'docs', 'test']:
-        if getattr(args, section) or (args.all and section != 'travis'):
+    for section in ['generate_config', 'bootstrap', 'github', 'docs', 'test']:
+        if getattr(args, section) or args.all:
             write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
     if write_new_config and not (args.generate_config or args.all):
