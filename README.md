@@ -47,10 +47,10 @@ You can edit them according to your needs to control subsequent calls to `plugin
 The following settings are stored in `template_config.yml`.
 
 ```bash
-  additional_plugins    A list with additional plugins to be installed on Travis.
+  additional_plugins    A list with additional plugins to be installed on Github Actions.
                         Each item in the list is a dict with the following fields:
                         name: the name of the plugin
-                        branch: the git branch of the plugin. applies to non-tagged Travis jobs, such as PRs & cron jobs.
+                        branch: the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
                                                Applies to TAGGED (release) jobs.
                                                See pulpcore_pip_version_specifier, but defaults to undefined, the latest.
@@ -78,61 +78,60 @@ The following settings are stored in `template_config.yml`.
 
   coverage              Include collection of coverage and reporting to coveralls.io
 
-  deploy_client_to_pypi Include a Travis stage that publishes a client library to PyPI.
+  deploy_client_to_pypi Include a Github Actions job that publishes a client library to PyPI.
 
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
+                        This job only executes when a tag is associated with the commit being
+                        built. When enabling this job, the user is expected to provide a
                         secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        be added in the Github secrets settings page for the repository[0]. The PYPI
                         username is specified using --pypi-username option.
 
-                        This stage uses the OpenAPI schema for the plugin to generate a Python
+                        This job uses the OpenAPI schema for the plugin to generate a Python
                         client library using openapi-generator-cli.
 
   deploy_client_to_rubygems
-                        Include a Travis stage that publishes a client library to RubyGems.org.
+                        Include a Github Actions job that publishes a client library to RubyGems.org.
 
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
+                        This job only executes when a tag is associated with the commit being
+                        built. When enabling this job, the user is expected to provide a
                         secure environment variable called RUBYGEMS_API_KEY. The variable can
-                        be added in the travis-ci.com settings page for the project.
+                        be added in the Github secrets settings page for the repository.
 
   deploy_daily_client_to_pypi
-                        Include a Travis stage that publishes a client library to PyPI.
+                        Include a Github Actions job that publishes a client library to PyPI.
 
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
+                        This job only executes when a tag is associated with the commit being
+                        built. When enabling this job, the user is expected to provide a
                         secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        be added in the Github secrets settings page for the repository[0]. The PYPI
                         username is specified using --pypi-username option.
 
-                        This stage uses the OpenAPI schema for the plugin to generate a Python
+                        This job uses the OpenAPI schema for the plugin to generate a Python
                         client library using openapi-generator-cli.
 
-                        [0] https://docs.travis-ci.com/user/environment-variables/
-                        #defining-variables-in-repository-settings
+                        [0] https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets
 
   deploy_daily_client_to_rubygems
-                        Include a Travis stage that publishes a client library to RubyGems.org
+                        Include a Github Actions job that publishes a client library to RubyGems.org
                         with each CRON build.
 
-                        This stage only executes on builds trigerred by CRON. When enabling
-                        this stage, the user is expected to provide a secure environment
+                        This job only executes on builds trigerred by CRON. When enabling
+                        this job, the user is expected to provide a secure environment
                         variable called RUBYGEMS_API_KEY. The variable can be added in the
-                        travis-ci.com settings page for the project.
+                        Github secrets settings page for the repository.
 
-  deploy_to_pypi        Include a Travis stage that publishes builds to PyPI
+  deploy_to_pypi        Include a Github Actions job that publishes builds to PyPI
 
-                        This stage only executes when a tag is associated with the commit being
-                        built. When enabling this stage, the user is expected to provide a
+                        This job only executes when a tag is associated with the commit being
+                        built. When enabling this job, the user is expected to provide a
                         secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the travis-ci.com settings page for the project[0]. The PYPI
+                        be added in the Github secrets settings page for the repository[0]. The PYPI
                         username is specified using --pypi-username option.
 
-  docker_fixtures       In Travis, use the pulp-fixtures docker container to serve up fixtures
-                        instead of using fedorapeople.org.
+  docker_fixtures       In Github Actions, use the pulp-fixtures docker container to serve up
+                        fixtures instead of using fedorapeople.org.
 
-  docs_test             Include a Travis build for testing the 'make html' command for sphinx docs.
+  docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
   plugin_app_label      Suppose our plugin is named 'pulp_test', then this is 'test'
 
@@ -153,31 +152,24 @@ The following settings are stored in `template_config.yml`.
   plugin_snake          Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
 
   publish_docs_to_pulpprojectdotorg
-                        Include a stage for publishing documentation to
-                        docs.pulpproject.org/<plugin_name>/.
-                        This stage requires that an encrypted private key to be present in the
-                        repository at `.travis/pulp-infra.enc`. See [Travis documentation]
-                        (https://docs.travis-ci.com/user/encrypting-files/#automated-encryption)
-                        for instructions on encrypting the file.
+                        Include a job for publishing documentation to
+                        docs.pulpproject.org/<plugin_name>/. This job requires the project-specific
+                        authorized ssh key to be set as a secret named `PULP_DOCS_KEY`.
 
   pulp_settings         A dictionary of settings that the plugin tests require to be set.
 
-  pulpcore_branch       The branch of pulpcore to check out and install on Travis.
-                        This only applies to non-tagged Travis jobs, such as PRs & cron jobs.
+  pulpcore_branch       The branch of pulpcore to check out and install in Github Actions.
+                        This only applies to non-tagged jobs, such as PRs & cron jobs.
                         "Required PR" in a commit message will override this.
                         Your requirements in "setup.py" may inadvertently override this as well.
 
   pulpcore_pip_version_specifier
                         A pip version specifier for when pulpcore gets installed from PyPI.
-                        This is only for Travis, and only applies to TAGGED (release) jobs.
+                        This is only for Github Actions, and only applies to TAGGED (release) jobs.
                         An example is "~=3.0.0", which installs the latest 3.0.z,
                         and is equivalent to `pip install pulpcore~=3.0.0`.
                         Defaults to null, which installs the latest release from PyPI.
                         Your requirements in "setup.py" may inadvertently override this as well.
-
-  pulpprojectdotorg_key_id
-                        The Travis key id that should be used to decode the `.travis/pulp-infra.enc`
-                        file.
 
   pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
                         Python docstring conventions.
@@ -193,15 +185,15 @@ The following settings are stored in `template_config.yml`.
   stable_branch         A string that points to the latest stable branch (e.g. "3.0"). This is used
                         for features like the cherry pick automation.
 
-  test_bindings         Include a Travis stage that runs a script to test generated client
+  test_bindings         Include a job that runs a script to test generated client
                         library.
 
-                        This stage requires the plugin author to include a 'test_bindings.rb'
-                        script in the .travis directory of the plugin repository. This script
-                        is supposed to exercise the generated client library.
+                        This job requires the plugin author to include a 'test_bindings.rb'
+                        script in the ./.ci/assets/bindings directory of the plugin repository. This
+                        script is supposed to exercise the generated client library.
 
-  test_performance      Include a Travis stage that runs a script to test performance. If using a
-                        list, a separate stage will run a specific performance test file for each
+  test_performance      Include a nightly job that runs a script to test performance. If using a
+                        list, a separate job will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
 
   test_released_plugin_with_next_pulpcore_release
@@ -212,13 +204,7 @@ The following settings are stored in `template_config.yml`.
   test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
                         to emulate S3.
 
-  travis_addtl_services A list of additional services to add under .travis.yml . See
-                        https://docs.travis-ci.com/user/database-setup/#starting-services for more info.
-
-  travis_notifications  A yaml block that contains configuration for Travis build notifications. See
-                        https://docs.travis-ci.com/user/notifications/ for configuration options.
-
-  update_redmine        Travis will automatically change the state of tickets when PRs are opened,
+  update_redmine        The CI will automatically change the state of tickets when PRs are opened,
                         or merged, and when the changes are released.
 ```
 
@@ -240,25 +226,25 @@ In order to use these tests, you will need to address the "FIXME" messages left 
 plugin-writer intervention is required.
 
 At this point, you have a one-off opportunity to use the --all option, which generates everything
-included in the --bootstrap option, as well as documentation, functional and unit test, and travis
-configuration file templates that you require to support a plugin.
+included in the --bootstrap option, as well as documentation, functional and unit test, and Github
+Actions configuration file templates that you require to support a plugin.
 
   **Note** : Regenerating the *bootstrap* section at a later time will reset all files to their
   original state, which is almost always not intended.
 
-# Add Travis CI configuration to a Pulp plugin
+# Add CI configuration to a Pulp plugin
 
-The next step is to add a Travis configuration file and scripts for continuous integration. These
+The next step is to add Github Actions workflows and scripts for continuous integration. These
 are highly recommended, as they will make continuous verification of your plugin's functionality
 much easier.
 
-1. Run the `./plugin-template --travis` command to generate the Travis CI config based on the
-   settings in `template_config.yml`.
+1. Run the `./plugin-template --github` command to generate the CI config based on the settings in
+   `template_config.yml`.
 
-   ``$ ./plugin-template --travis PLUGIN_NAME``
+   ``$ ./plugin-template --github PLUGIN_NAME``
 
-Running the command again will update the plugin with the latest Travis CI configuration provided
-by the plugin-template.
+Running the command again will update the plugin with the latest Github Actions CI configuration
+provided by the plugin-template.
 
 # Add Documentation to a Pulp plugin
 
@@ -451,24 +437,26 @@ localhost. The 'make html' command first downloads the OpenAPI schema for the pl
 in ``docs/_static/api.json``. You should add this file to git. This file will then provide data
 needed to display the restapi.html page in the root of the built docs.
 
-# Travis configuration
+# Github Actions configuration
 
-The script for generating a Travis configuration provided in this repository can be used to change
+The script for generating a CI/CD configuration provided in this repository can be used to change
 and update said configuration.
 It should be run with the following command.
 
-   ``$ ./plugin-template --travis PLUGIN_NAME``
+```
+$ ./plugin-template --github PLUGIN_NAME
+```
 
-The default behavior enables two build stages that generate client libraries using the OpenAPI
+The default behavior enables two build jobs that generate client libraries using the OpenAPI
 schema. One publishes to PyPI using ``pypi-username`` setting and the secret environment
-variable called $PYPI_PASSWORD. The other stage publishes the client to rubygems.org and requires
-the $RUBYGEMS_API_KEY environment variable to be set. Both environment variables can be created on
-the travis-ci.com settings page for the plugin[0]. The stage that publishes tagged builds to PyPI
-uses the same configs as the client publishing stage.
+variable called $PYPI_PASSWORD. The other job publishes the client to rubygems.org and requires
+the $RUBYGEMS_API_KEY secret to be set. Both environment variables can be set in the Github secrets
+settings page for the plugin repository. The job that publishes tagged builds to PyPI uses the same
+configs as the client publishing job.
 
 The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
-writers by creating specially named scripts in their .travis directories. The scripts are executed
-in the following order, with optional plugin provided scripts in bold:
+writers by creating specially named scripts in their `.github/workflows/scripts/` directory. The
+scripts are executed in the following order, with optional plugin provided scripts in bold:
 
 1. **pre_before_install.sh**
 1. before_install.sh
