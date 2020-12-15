@@ -63,16 +63,6 @@ The following settings are stored in `template_config.yml`.
   check_manifest        Runs check-manifest to see if any files that were unintentionally left out
                         of MANIFEST.in. For more info, see https://pypi.org/project/check-manifest/.
 
-  cherry_pick_automation
-                        A boolean that will enable a cron job to automatically attempt to cherry
-                        pick changes to a stable release branch. This job will cherry pick any
-                        PRs that are merged and have the label "Needs Cherry Pick". Requires the
-                        template config setting `stable_branch` to be set. Also, requires a github
-                        user account (e.g. pulpbot) to open the cherry pick PR. `GITHUB_USER` and
-                        `GITHUB_TOKEN` must be defined as env variables in Travis. New tokens can be
-                        generated at
-                        [https://github.com/settings/tokens](https://github.com/settings/tokens).
-
   check_stray_pulpcore_imports
                         Check that plugins are importing from pulpcore.plugin and not pulpcore directly.
 
@@ -181,9 +171,6 @@ The following settings are stored in `template_config.yml`.
   redmine_project       A string that corresponds to the redmine identifier for the repo's project.
                         This is used during commit validation to make sure the commit is attached to
                         an issue in the correct project.
-
-  stable_branch         A string that points to the latest stable branch (e.g. "3.0"). This is used
-                        for features like the cherry pick automation.
 
   test_bindings         Include a job that runs a script to test generated client
                         library.
