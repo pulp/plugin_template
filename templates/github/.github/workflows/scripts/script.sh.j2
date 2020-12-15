@@ -106,6 +106,15 @@ export PYTHONPATH=$REPO_ROOT${PYTHONPATH:+:${PYTHONPATH}}
 export PYTHONPATH=$REPO_ROOT:$REPO_ROOT/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
 {%- endif %}
 
+if [[ "$TEST" == "performance" ]]; then
+  if [[ -z ${PERFORMANCE_TEST+x} ]]; then
+    pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance
+  else
+    pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance.test_$PERFORMANCE_TEST
+  fi
+  exit
+fi
+
 if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT
 else
