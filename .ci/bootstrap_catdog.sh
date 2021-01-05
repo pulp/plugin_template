@@ -2,7 +2,13 @@
 
 set -euv
 
-COMMIT_MSG=$(git log --format=%B -n 1 HEAD^2)
+GITHUB_EVENT_NAME="${GITHUB_EVENT_NAME:-not_pull_request}"
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ]
+then
+    COMMIT_MSG=$(git log --format=%B -n 1 HEAD^2)
+else
+    COMMIT_MSG="Initial commit\n\n[noissue]"
+fi
 echo $COMMIT_MSG
 
 pip install -r test_requirements.txt
