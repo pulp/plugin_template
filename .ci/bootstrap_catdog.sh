@@ -2,6 +2,9 @@
 
 set -euv
 
+COMMIT_MSG=$(git log --format=%B -n 1 HEAD^2)
+echo $COMMIT_MSG
+
 pip install -r test_requirements.txt
 ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
 mkdir -p ../pulp_catdog/.ci/assets/bindings
@@ -25,4 +28,4 @@ git init
 git config user.name "Cat Dog"
 git config user.email "pulp@cat.dog"
 git add .
-git commit -m $'Initial commit\n\n[noissue]'
+git commit -m "$COMMIT_MSG"
