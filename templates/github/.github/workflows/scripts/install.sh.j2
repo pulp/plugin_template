@@ -36,7 +36,7 @@ TAG=ci_build
 if [ -e $REPO_ROOT/../{{ item.name }} ]; then
   {{ item.name | upper | replace("-", "_") }}=./{{ item.name }}
 else
-  {{ item.name | upper | replace("-", "_") }}=git+https://github.com/pulp/{{ item.name }}.git@{{ item.branch }}
+  {{ item.name | upper | replace("-", "_") }}=git+https://github.com/{{item.org | default("pulp")}}/{{ item.name }}.git@{{ item.branch }}
 fi
 {%- endfor %}
 

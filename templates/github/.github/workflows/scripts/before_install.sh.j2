@@ -101,7 +101,7 @@ pip install --upgrade --force-reinstall ./pulp-smash
 
 {%- for plugin in additional_plugins %}
 
-git clone --depth=1 https://github.com/pulp/{{ plugin.name }}.git --branch {{ plugin.branch }}
+git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git --branch {{ plugin.branch }}
 if [ -n "${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER" ]; then
   cd {{ plugin.name }}
   git fetch --depth=1 origin pull/${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER/head:${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER
