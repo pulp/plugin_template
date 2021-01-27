@@ -123,6 +123,8 @@ The following settings are stored in `template_config.yml`.
 
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
+  isort                 Boolean, whether to use isort to format imports in python files.
+
   plugin_app_label      Suppose our plugin is named 'pulp_test', then this is 'test'
 
   plugin_camel          Suppose our plugin is named 'pulp_test', then this is 'PulpTest'

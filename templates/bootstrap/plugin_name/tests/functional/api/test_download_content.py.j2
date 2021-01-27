@@ -6,25 +6,24 @@ from random import choice
 from urllib.parse import urljoin
 
 from pulp_smash import config, utils
-from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo
 from pulp_smash.pulp3.bindings import monitor_task
+from pulp_smash.pulp3.utils import download_content_unit, gen_distribution, gen_repo
+from pulpcore.client.{{ plugin_snake }} import (
+    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
+    Distributions{{ plugin_camel_short }}Api,
+    Publications{{ plugin_camel_short }}Api,
+    Remotes{{ plugin_camel_short }}Api,
+    Repositories{{ plugin_camel_short }}Api,
+    RepositorySyncURL,
+)
 
 from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_FIXTURE_URL
 from {{ plugin_snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_client,
-    get_{{ plugin_app_label }}_content_paths,
     gen_{{ plugin_app_label }}_remote,
+    get_{{ plugin_app_label }}_content_paths,
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
-
-from pulpcore.client.{{ plugin_snake }} import (
-    Distributions{{ plugin_camel_short }}Api,
-    Publications{{ plugin_camel_short }}Api,
-    Repositories{{ plugin_camel_short }}Api,
-    RepositorySyncURL,
-    Remotes{{ plugin_camel_short }}Api,
-    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
-)
 
 
 # Implement tests.functional.utils.get_{{ plugin_app_label }}_content_unit_paths(),

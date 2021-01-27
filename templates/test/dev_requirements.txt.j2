@@ -3,6 +3,9 @@ flake8
 {% if black %}
 flake8-black
 {% endif %}
+{% if isort %}
+flake8-isort
+{% endif %}
 {% if pydocstyle %}
 flake8-docstrings
 {% endif %}

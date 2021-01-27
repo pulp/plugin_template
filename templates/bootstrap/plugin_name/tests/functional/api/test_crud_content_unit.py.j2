@@ -3,8 +3,10 @@
 import unittest
 
 from pulp_smash import utils
-from pulp_smash.pulp3.utils import delete_orphans
 from pulp_smash.pulp3.bindings import monitor_task
+from pulp_smash.pulp3.utils import delete_orphans
+from pulpcore.client.{{ plugin_snake }} import Content{{ plugin_camel_short }}Api
+from pulpcore.client.pulpcore import ArtifactsApi
 
 from {{ plugin_snake }}.tests.functional.utils import (
     core_client,
@@ -13,10 +15,8 @@ from {{ plugin_snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_content_attrs,
     skip_if,
 )
-from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
-from pulpcore.client.pulpcore import ArtifactsApi
-from pulpcore.client.{{ plugin_snake }} import Content{{ plugin_camel_short }}Api
+from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401 isort:skip
 
 
 # Read the instructions provided below for the steps needed to enable this test (see: FIXME's).

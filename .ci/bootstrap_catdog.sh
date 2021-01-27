@@ -18,6 +18,7 @@ touch ../pulp_catdog/.ci/assets/bindings/test_bindings.py
 touch ../pulp_catdog/.ci/assets/bindings/test_bindings.rb
 echo 'pypi_username: the_pypi_user' >> ../pulp_catdog/template_config.yml
 sed -i "s/test_s3: false/test_s3: true/g" ../pulp_catdog/template_config.yml
+sed -i "s/isort: false/isort: true/g" ../pulp_catdog/template_config.yml
 ./plugin-template --all pulp_catdog
 
 cd ../pulp_catdog

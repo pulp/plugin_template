@@ -29,6 +29,7 @@ DEFAULT_SETTINGS = {
     'deploy_to_pypi': True,
     'docker_fixtures': False,
     'docs_test': True,
+    'isort': False,
     'plugin_app_label': None,
     'plugin_camel': None,
     'plugin_camel_short': None,

@@ -1,5 +1,5 @@
-from gettext import gettext as _
 import logging
+from gettext import gettext as _
 
 from pulpcore.plugin.models import Artifact, ProgressReport, Remote, Repository
 from pulpcore.plugin.stages import (
@@ -10,7 +10,6 @@ from pulpcore.plugin.stages import (
 )
 
 from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Content, {{ plugin_camel_short }}Remote
-
 
 log = logging.getLogger(__name__)
 

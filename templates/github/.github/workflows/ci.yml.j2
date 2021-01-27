@@ -45,6 +45,12 @@ jobs:
           black --check --diff .
       {%- endif %}
 
+      {% if isort -%}
+      - name: Run isort
+        run: |
+          isort -c --diff .
+      {%- endif %}
+
       # Lint code.
       - name: Run flake8
         run: flake8 --config flake8.cfg

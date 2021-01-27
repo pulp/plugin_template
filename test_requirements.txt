@@ -5,6 +5,7 @@ flake8
 flake8-docstrings
 flake8-tuple
 flake8-quotes
+isort
 jinja2
 mock
 git+https://github.com/pulp/pulp-smash.git#egg=pulp-smash

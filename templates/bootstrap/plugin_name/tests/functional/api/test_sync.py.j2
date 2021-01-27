@@ -3,25 +3,18 @@
 import unittest
 
 from pulp_smash import cli, config
-from pulp_smash.pulp3.bindings import monitor_task, PulpTaskError
+from pulp_smash.pulp3.bindings import PulpTaskError, monitor_task
 from pulp_smash.pulp3.constants import MEDIA_PATH
 from pulp_smash.pulp3.utils import gen_repo, get_added_content_summary, get_content_summary
+from pulpcore.client.{{ plugin_snake }} import Remotes{{ plugin_camel_short }}Api, Repositories{{ plugin_camel_short }}Api, RepositorySyncURL
 
 from {{ plugin_snake }}.tests.functional.constants import (
     {{ plugin_caps_short }}_FIXTURE_SUMMARY,
     {{ plugin_caps_short }}_INVALID_FIXTURE_URL,
 )
-from {{ plugin_snake }}.tests.functional.utils import (
-    gen_{{ plugin_app_label }}_client,
-    gen_{{ plugin_app_label }}_remote,
-)
-from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_client, gen_{{ plugin_app_label }}_remote
 
-from pulpcore.client.{{ plugin_snake }} import (
-    Repositories{{ plugin_camel_short }}Api,
-    RepositorySyncURL,
-    Remotes{{ plugin_camel_short }}Api,
-)
+from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401 isort:skip
 
 
 # Implement sync support before enabling this test.

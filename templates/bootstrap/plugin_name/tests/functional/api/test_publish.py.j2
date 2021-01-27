@@ -6,22 +6,19 @@ from random import choice
 from pulp_smash import config
 from pulp_smash.pulp3.bindings import monitor_task
 from pulp_smash.pulp3.utils import gen_repo, get_content, get_versions, modify_repo
-
-from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_CONTENT_NAME
-from {{ plugin_snake }}.tests.functional.utils import (
-    gen_{{ plugin_app_label }}_client,
-    gen_{{ plugin_app_label }}_remote,
-)
-from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
-
 from pulpcore.client.{{ plugin_snake }} import (
+    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
     Publications{{ plugin_camel_short }}Api,
+    Remotes{{ plugin_camel_short }}Api,
     Repositories{{ plugin_camel_short }}Api,
     RepositorySyncURL,
-    Remotes{{ plugin_camel_short }}Api,
-    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
 )
 from pulpcore.client.{{ plugin_snake }}.exceptions import ApiException
+
+from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_CONTENT_NAME
+from {{ plugin_snake }}.tests.functional.utils import gen_{{ plugin_app_label }}_client, gen_{{ plugin_app_label }}_remote
+
+from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401 isort:skip
 
 
 # Implement sync and publish support before enabling this test.

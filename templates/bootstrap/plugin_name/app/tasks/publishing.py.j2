@@ -2,15 +2,14 @@ import logging
 from gettext import gettext as _
 
 from pulpcore.plugin.models import (
-    RepositoryVersion,
     PublishedArtifact,
     PublishedMetadata,
     RemoteArtifact,
+    RepositoryVersion,
 )
 from pulpcore.plugin.tasking import WorkingDirectory
 
 from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Publication
-
 
 log = logging.getLogger(__name__)
 

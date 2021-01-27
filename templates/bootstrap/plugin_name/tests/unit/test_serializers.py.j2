@@ -1,10 +1,11 @@
 import unittest
+
 from django.test import TestCase
 
-from {{ plugin_snake }}.app.serializers import {{ plugin_camel_short }}ContentSerializer
-from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Content
-
 from pulpcore.plugin.models import Artifact
+
+from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Content
+from {{ plugin_snake }}.app.serializers import {{ plugin_camel_short }}ContentSerializer
 
 
 # Fill data with sufficient information to create {{ plugin_camel_short }}Content
