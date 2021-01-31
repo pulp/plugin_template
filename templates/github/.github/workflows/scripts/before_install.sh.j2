@@ -49,12 +49,12 @@ fi
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "master" ]
 then
-{%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator"] + additional_plugins | map(attribute="name") | list %}
+{%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] + additional_plugins | map(attribute="name") | list %}
   export {{ repository | upper | replace("-", "_") }}_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/{{ repository }}\/pull\/(\d+)' | awk -F'/' '{print $7}')
 {%- endfor %}
   echo $COMMIT_MSG | sed -n -e 's/.*CI Base Image:\s*\([-_/[:alnum:]]*:[-_[:alnum:]]*\).*/ci_base: "\1"/p' >> .ci/ansible/vars/main.yaml
 else
-  {%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator"] + additional_plugins | map(attribute="name") | list %}
+  {%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] + additional_plugins | map(attribute="name") | list %}
   export {{ repository | upper | replace("-", "_") }}_PR_NUMBER=
 {%- endfor %}
   export CI_BASE_IMAGE=
@@ -74,6 +74,21 @@ cd pulp-openapi-generator
 sed -i -e 's/localhost:24817/pulp/g' generate.sh
 sed -i -e 's/:24817/pulp/g' generate.sh
 cd ..
+
+{% if test_cli %}
+git clone --depth=1 https://github.com/pulp/pulp-cli.git
+if [ -n "$PULP_CLI_PR_NUMBER" ]; then
+  cd pulp-cli
+  git fetch origin pull/$PULP_CLI_PR_NUMBER/head:$PULP_CLI_PR_NUMBER
+  git checkout $PULP_CLI_PR_NUMBER
+  cd ..
+fi
+
+cd pulp-cli
+pip install -e .
+pulp config create --base-url http://pulp --location tests/settings.toml
+cd ..
+{% endif %}
 
 {% if plugin_name != 'pulpcore' -%}
 git clone --depth=1 https://github.com/pulp/pulpcore.git --branch {{ pulpcore_branch }}

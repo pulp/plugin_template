@@ -126,6 +126,12 @@ else
     pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional
 fi
 
+{%- if test_cli %}
+pushd ../pulp-cli
+pytest -v -m {{ plugin_name }}
+popd
+{%- endif %}
+
 if [ -f $POST_SCRIPT ]; then
   source $POST_SCRIPT
 fi
