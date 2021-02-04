@@ -1,4 +1,0 @@
-Cherrypick processor is no longer available. 
-
-Configuration options `cherry_pick_automation` and `stable_branch` are no longer in use.
-Feel free to remove them from your template_config.yml.

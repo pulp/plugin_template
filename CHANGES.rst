@@ -13,6 +13,57 @@ Changelog
 
 .. towncrier release notes start
 
+2021.02.04 (2021-02-04)
+=======================
+
+
+Features
+--------
+
+- Added a check for deprecated files (ie files that have been moved or removed).
+  `#7933 <https://pulp.plan.io/issues/7933>`_
+- Moved the version definition to the ``version`` attribute of ``PulpPluginAppConfig``, and have
+  ``bump2version`` maintain it. Also update the ``docs/conf.py`` to be bump2version maintained. The
+  release script now parses its versions from ``setup.py`` which is needed for the removal of
+  ``{plugin_name}.__init__.__version__``.
+  `#7943 <https://pulp.plan.io/issues/7943>`_
+- GHA workflows have been switched to run on a CentOS 8 based container.
+  `#8148 <https://pulp.plan.io/issues/8148>`_
+
+
+Bugfixes
+--------
+
+- Fixed bug where older version of docs would overwrite the latest docs when an older Y stream was released.
+  `#7766 <https://pulp.plan.io/issues/7766>`_
+- Get performance tests working on Github Actions.
+  `#7896 <https://pulp.plan.io/issues/7896>`_
+- Updated the port for pulp-fixtures in smash-config.json.
+  `#8183 <https://pulp.plan.io/issues/8183>`_
+
+
+Improved Documentation
+----------------------
+
+- Updated instructions in the README to use Github Actions instead of Travis.
+  `#7861 <https://pulp.plan.io/issues/7861>`_
+
+
+Deprecations and Removals
+-------------------------
+
+- Removed Travis files and references to Travis.
+  `#7861 <https://pulp.plan.io/issues/7861>`_
+- Cherrypick processor is no longer available. 
+
+  Configuration options `cherry_pick_automation` and `stable_branch` are no longer in use.
+  Feel free to remove them from your template_config.yml.
+  `#7869 <https://pulp.plan.io/issues/7869>`_
+
+
+----
+
+
 2020.12.07 (2020-12-07)
 =======================
 
