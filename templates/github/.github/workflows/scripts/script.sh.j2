@@ -128,7 +128,7 @@ fi
 
 {%- if test_cli %}
 pushd ../pulp-cli
-pytest -v -m {{ plugin_name }}
+pytest -v -m {{ plugin_snake }}
 popd
 {%- endif %}
 
