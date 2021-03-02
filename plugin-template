@@ -48,6 +48,7 @@ DEFAULT_SETTINGS = {
     'redmine_project': None,
     'test_bindings': True,
     'test_cli': False,
+    'test_fips_nightly': False,
     'test_performance': False,
     'test_released_plugin_with_next_pulpcore_release': False,
     'test_s3': False,
