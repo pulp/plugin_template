@@ -181,6 +181,8 @@ The following settings are stored in `template_config.yml`.
 
   test_cli              Run the pulp-cli tests as part of the CI tests
 
+  test_fips_nightly             Run nightly FIPS tests
+
   test_performance      Include a nightly job that runs a script to test performance. If using a
                         list, a separate job will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
