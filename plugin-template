@@ -19,6 +19,7 @@ DEFAULT_SETTINGS = {
     'additional_plugins': [],
     'black': True,
     'check_commit_message': True,
+    'check_gettext': True,
     'check_manifest': True,
     'check_stray_pulpcore_imports': True,
     'coverage': False,

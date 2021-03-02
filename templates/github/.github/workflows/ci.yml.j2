@@ -60,6 +60,11 @@ jobs:
         run: sh .ci/scripts/check_pulpcore_imports.sh
       {%- endif %}
 
+      {% if check_gettext -%}
+      - name: Check for gettext problems
+        run: sh .ci/scripts/check_gettext.sh
+      {%- endif %}
+
   test:
     runs-on: ubuntu-latest
     # run only after lint finishes

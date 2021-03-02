@@ -60,6 +60,8 @@ The following settings are stored in `template_config.yml`.
   check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
+  check_gettext         Check for problems with gettext such as mixing f-strings with gettext.
+
   check_manifest        Runs check-manifest to see if any files that were unintentionally left out
                         of MANIFEST.in. For more info, see https://pypi.org/project/check-manifest/.
 
