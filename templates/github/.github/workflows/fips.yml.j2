@@ -43,6 +43,7 @@ jobs:
           cd ../pulp_installer/
           git submodule update --init
           .github/workflows/scripts/install.sh {{ "${{ matrix.test_type }}" }}
+          cd ..
           {% if plugin_name != 'pulpcore' -%}
           git clone https://github.com/pulp/pulpcore
           {%- else -%}
