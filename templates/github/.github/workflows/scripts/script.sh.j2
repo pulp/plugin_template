@@ -127,6 +127,9 @@ else
 fi
 
 {%- if test_cli %}
+{%- if docker_fixtures %}
+export PULP_FIXTURES_URL="http://pulp-fixtures:8080"
+{%- endif %}
 pushd ../pulp-cli
 pytest -v -m {{ plugin_snake }}
 popd
