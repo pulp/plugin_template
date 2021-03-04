@@ -39,7 +39,7 @@ configuration = cfg.get_bindings_config()
 def set_up_module():
     """Skip tests Pulp 3 isn't under test or if {{ plugin_snake }} isn't installed."""
     require_pulp_3(SkipTest)
-    require_pulp_plugins({"{{ plugin_snake }}"}, SkipTest)
+    require_pulp_plugins({"{{ plugin_app_label }}"}, SkipTest)
 
 
 def gen_{{ plugin_app_label }}_client():
