@@ -1,16 +1,17 @@
 {% include 'header.j2' %}
 
 import argparse
-import json
 import re
 import os
 import textwrap
-from collections import defaultdict
-from pathlib import Path
 
 from git import Repo
+{% if issue_tracker=='redmine' %}
+from collections import defaultdict
+from pathlib import Path
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError
+import json
 
 
 REDMINE_URL = "https://pulp.plan.io"
@@ -60,7 +61,7 @@ def validate_redmine_data(redmine_query_url, redmine_issues):
         raise RuntimeError("\n".join(error_messages))
 
     return milestone_url
-
+{% endif %}
 
 release_path = os.path.dirname(os.path.abspath(__file__))
 plugin_path = release_path.split("/.ci")[0]
@@ -75,7 +76,7 @@ with open(f"{plugin_path}/setup.py") as fp:
         raise RuntimeError("Could not detect existing version ... aborting.")
 release_version = version.replace(".dev", "")
 
-
+{% if issue_tracker=='redmine' %}
 issues_to_close = set()
 for filename in Path(f"{plugin_path}/CHANGES").rglob("*"):
     if filename.stem.isdigit():
@@ -85,7 +86,7 @@ for filename in Path(f"{plugin_path}/CHANGES").rglob("*"):
 issues = ",".join(issues_to_close)
 redmine_final_query = f"{REDMINE_QUERY_URL}{issues}"
 milestone_url = validate_redmine_data(redmine_final_query, issues_to_close)
-
+{% endif %}
 helper = textwrap.dedent(
     """\
         Start the release process.
@@ -159,10 +160,14 @@ git.add(f"{plugin_path}/docs/conf.py")
 git.add(f"{plugin_path}/setup.py")
 git.add(f"{plugin_path}/requirements.txt")
 git.add(f"{plugin_path}/.bumpversion.cfg")
+{% if issue_tracker=='redmine' %}
 git.commit(
     "-m",
     f"Release {release_version}\n\nRedmine Query: {redmine_final_query}\n{milestone_url}",
 )
+{% else %}
+git.commit("-m", f"Release {release_version}")
+{% endif %}
 
 sha = repo.head.object.hexsha
 short_sha = git.rev_parse(sha, short=7)
@@ -193,6 +198,8 @@ git.add(f"{plugin_path}/requirements.txt")
 git.add(f"{plugin_path}/.bumpversion.cfg")
 git.commit("-m", f"Bump to {new_dev_version}\n\n[noissue]")
 
+{% if issue_tracker=='redmine' %}
 print(f"\n\nRedmine query of issues to close:\n{redmine_final_query}")
+{% endif %}
 print(f"Release commit == {short_sha}")
 print(f"All changes were committed on branch: release_{release_version}")

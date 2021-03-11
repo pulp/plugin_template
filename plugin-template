@@ -30,6 +30,7 @@ DEFAULT_SETTINGS = {
     'deploy_to_pypi': True,
     'docker_fixtures': False,
     'docs_test': True,
+    'issue_tracker': 'redmine',
     'plugin_app_label': None,
     'plugin_camel': None,
     'plugin_camel_short': None,
@@ -117,6 +118,10 @@ def main():
                             Include more output.
 
                         '''))
+    parser.add_argument('--migrate-github-issues', action='store_true',
+                        help=textwrap.dedent('''\
+                            Migrate plugin's issue checker CI/CD from Redmine to GitHub
+                        '''))
     args = parser.parse_args()
 
 
@@ -164,6 +169,13 @@ def main():
     # Config key is used by the template_config.yml.j2 template to dump
     # the config. (note: uses .copy() to avoid a self reference)
     config['config'] = config.copy()
+
+    if args.migrate_github_issues:
+        if config['issue_tracker'] == 'github':
+            print(f"{args.plugin_name} is already using GitHub as the issue tracker")
+            return 2
+        migrate_github_issues(config, plugin_root_dir, verbose=args.verbose)
+        return 0
 
     if args.github or args.all:
         if not config['pypi_username'] and (config['deploy_client_to_pypi'] or \
@@ -307,6 +319,31 @@ def check_for_deprecated_files(plugin_root_dir):
     if not files_found:
         print("No deprecated files found.")
 
+
+def migrate_github_issues(config, plugin_root_dir, verbose=False):
+    """Moves the plugin's issue checker CI/CD off of Redmine and onto GitHub"""
+    print("Updating template_config.yml and templating ci section")
+    name = config['plugin_name']
+    redmine = config['redmine_project']
+    if not redmine:
+        print("Redmine project name not set. Please set 'redmine_project' in template_config.yml"
+              " and rerun this command")
+        return 2
+    config['issue_tracker'] = 'github'
+    config['redmine_project'] = None
+    config['update_redmine'] = False
+    config.pop('config')
+    config['config'] = config.copy()
+    write_template_section(config, "generate_config", plugin_root_dir, verbose=verbose)
+    write_template_section(config, "github", plugin_root_dir, verbose=verbose)
+    print("Updating pyproject.toml to point to GitHub issues\n")
+    search_string = "pulp.plan.io"
+    replace_string = f"github.com\/pulp\/{name}"
+    os.system(f"sed -i 's/{search_string}/{replace_string}/' {plugin_root_dir}/pyproject.toml")
+    print(f"Please check the Pulp-CI PR processor (https://git.io/Jtsz5) and remove {name}"
+          f" if present\n")
+    print(f"Don't forget to migrate current issues from https://pulp.plan.io/projects/{redmine}"
+          f" and remove the repo from the project settings\n")
 
 if __name__ == '__main__':
     sys.exit(main())

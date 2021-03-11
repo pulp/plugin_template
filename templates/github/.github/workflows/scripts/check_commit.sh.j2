@@ -9,6 +9,9 @@ set -euv
 
 echo ::group::REQUESTS
 pip3 install requests
+{% if issue_tracker=='github' %}
+pip3 install pygithub
+{% endif %}
 echo ::endgroup::
 
 for sha in $(curl $GITHUB_CONTEXT | jq '.[].sha' | sed 's/"//g')

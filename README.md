@@ -123,6 +123,9 @@ The following settings are stored in `template_config.yml`.
   docker_fixtures       In Github Actions, use the pulp-fixtures docker container to serve up
                         fixtures instead of using fedorapeople.org.
 
+  issue_tracker         Which issue tracker the project will use. Valid values are 'redmine' and 'github'.
+                        To switch from Redmine to GitHub use the --migrate-github-issues option.
+
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
   plugin_app_label      Suppose our plugin is named 'pulp_test', then this is 'test'

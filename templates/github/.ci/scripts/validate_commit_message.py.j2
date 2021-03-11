@@ -1,11 +1,33 @@
 {% include 'header.j2' %}
 
 import re
+{% if issue_tracker=='redmine' %}
 import requests
+{% endif %}
 import subprocess
 import sys
 from pathlib import Path
+{% if issue_tracker=='github' %}
+from github import Github
 
+KEYWORDS = ["fixes", "closes"]
+NO_ISSUE = "[noissue]"
+CHANGELOG_EXTS = [".feature", ".bugfix", ".doc", ".removal", ".misc", ".deprecation"]
+
+sha = sys.argv[1]
+message = subprocess.check_output(["git", "log", "--format=%B", "-n 1", sha]).decode("utf-8")
+
+g = Github()
+repo = g.get_repo("pulp/{{ plugin_name }}")
+
+
+def __check_status(issue):
+    gi = repo.get_issue(int(issue))
+    if gi.pull_request:
+        sys.exit(f"Error: issue #{issue} is a pull request.")
+    if gi.closed_at:
+        sys.exit(f"Error: issue #{issue} is closed.")
+{% else %}
 KEYWORDS = ["fixes", "closes", "re", "ref"]
 NO_ISSUE = "[noissue]"
 STATUSES = ["NEW", "ASSIGNED", "POST", "MODIFIED"]
@@ -33,7 +55,7 @@ def __check_status(issue):
         project_json = requests.get(f"{REDMINE_URL}/projects/{project_id}.json").json()
         if project_json["project"]["identifier"] != project:
             sys.exit(f"Error: issue {issue} is not in the {project} project.")
-
+{% endif %}
 
 def __check_changelog(issue):
     matches = list(Path("CHANGES").rglob(f"{issue}.*"))
