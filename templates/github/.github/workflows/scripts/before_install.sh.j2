@@ -48,7 +48,7 @@ if [[ -n $(echo -e $COMMIT_MSG | grep -P "Required PR:.*" | grep -v "https") ]];
   exit 1
 fi
 
-if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "master" ]
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "{{ plugin_default_branch }}" ]
 then
 {%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] + additional_plugins | map(attribute="name") | list %}
   export {{ repository | upper | replace("-", "_") }}_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/{{ repository }}\/pull\/(\d+)' | awk -F'/' '{print $7}')
