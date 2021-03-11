@@ -37,6 +37,7 @@ DEFAULT_SETTINGS = {
     'plugin_caps_short': None,
     'plugin_dash': None,
     'plugin_dash_short': None,
+    'plugin_default_branch': 'master',
     'plugin_name': None,
     'plugin_snake': None,
     'publish_docs_to_pulpprojectdotorg': False,
