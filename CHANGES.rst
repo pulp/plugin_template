@@ -13,6 +13,31 @@ Changelog
 
 .. towncrier release notes start
 
+2021.03.15 (2021-03-15)
+=======================
+
+
+Features
+--------
+
+- Adding nightly FIPS tests
+  `#3800 <https://pulp.plan.io/issues/3800>`_
+- Add a ``test_cli`` option to test against pulp-cli.
+  `#8184 <https://pulp.plan.io/issues/8184>`_
+- Added a gettext check for use of f-strings with gettext.
+  `#8316 <https://pulp.plan.io/issues/8316>`_
+
+
+Bugfixes
+--------
+
+- Fix publish job by using app label.
+  `#8311 <https://pulp.plan.io/issues/8311>`_
+
+
+----
+
+
 2021.02.04 (2021-02-04)
 =======================
 
