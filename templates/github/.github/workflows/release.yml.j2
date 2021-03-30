@@ -183,7 +183,7 @@ jobs:
 
       {%- if publish_docs_to_pulpprojectdotorg %}
       - name: Publish docs to pulpproject.org
-        run: .ci/scripts/publish_docs.sh tag ${GITHUB_REF##*/}
+        run: .ci/scripts/publish_docs.sh tag {{ "${{ github.event.inputs.release }}" }}
       {%- endif %}
 
       {%- if update_redmine %}
