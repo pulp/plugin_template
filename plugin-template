@@ -68,6 +68,10 @@ DEPRECATED_FILES = {
         ".travis",
         ".travis.yml",
     ],
+    "docs": [
+        "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
+        "docs/_static/api.json"
+    ],
 }
 
 
