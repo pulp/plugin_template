@@ -1,4 +1,5 @@
 import logging
+import tempfile
 from gettext import gettext as _
 
 from pulpcore.plugin.models import (
@@ -7,7 +8,6 @@ from pulpcore.plugin.models import (
     PublishedMetadata,
     RemoteArtifact,
 )
-from pulpcore.plugin.tasking import WorkingDirectory
 
 from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Publication
 
@@ -30,7 +30,7 @@ def publish(repository_version_pk):
             ver=repository_version.number,
         )
     )
-    with WorkingDirectory():
+    with tempfile.TemporaryDirectory("."):
         with {{ plugin_camel_short }}Publication.create(repository_version) as publication:
             # Write any Artifacts (files) to the file system, and the database.
             #
