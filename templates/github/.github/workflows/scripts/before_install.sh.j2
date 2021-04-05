@@ -50,12 +50,15 @@ fi
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "{{ plugin_default_branch }}" ]
 then
-{%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] + additional_plugins | map(attribute="name") | list %}
+{%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] %}
   export {{ repository | upper | replace("-", "_") }}_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/pulp\/{{ repository }}\/pull\/(\d+)' | awk -F'/' '{print $7}')
+{%- endfor %}
+{%- for item in additional_repos %}
+  export {{ item.name | upper | replace("-", "_") }}_PR_NUMBER=$(echo $COMMIT_MSG | grep -oP 'Required\ PR:\ https\:\/\/github\.com\/{{item.org | default("pulp")}}\/{{ item.name }}\/pull\/(\d+)' | awk -F'/' '{print $7}')
 {%- endfor %}
   echo $COMMIT_MSG | sed -n -e 's/.*CI Base Image:\s*\([-_/[:alnum:]]*:[-_[:alnum:]]*\).*/ci_base: "\1"/p' >> .ci/ansible/vars/main.yaml
 else
-  {%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] + additional_plugins | map(attribute="name") | list %}
+  {%- for repository in ["pulpcore", "pulp-smash", "pulp-openapi-generator", "pulp-cli"] + additional_repos | map(attribute="name") | list %}
   export {{ repository | upper | replace("-", "_") }}_PR_NUMBER=
 {%- endfor %}
   export CI_BASE_IMAGE=
@@ -115,7 +118,7 @@ fi
 pip install --upgrade --force-reinstall ./pulp-smash
 {% endif %}
 
-{%- for plugin in additional_plugins %}
+{%- for plugin in additional_repos %}
 
 git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git --branch {{ plugin.branch }}
 if [ -n "${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER" ]; then

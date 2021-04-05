@@ -16,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader
 
 
 DEFAULT_SETTINGS = {
-    'additional_plugins': [],
+    'additional_repos': [],
     'black': True,
     'check_commit_message': True,
     'check_gettext': True,

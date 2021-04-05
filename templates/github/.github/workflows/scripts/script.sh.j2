@@ -50,7 +50,7 @@ pip install ./pulpcore-client
 ./generate.sh {{ plugin_snake }} python
 pip install ./{{ plugin_snake }}-client
 {%- endif %}
-{%- for item in additional_plugins %}
+{%- for item in additional_repos if item.bindings | default(true) %}
 ./generate.sh {{ item.name | replace("-", "_") }} python
 pip install ./{{ item.name | replace("-", "_") }}-client
 {%- endfor %}

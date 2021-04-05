@@ -47,9 +47,11 @@ You can edit them according to your needs to control subsequent calls to `plugin
 The following settings are stored in `template_config.yml`.
 
 ```bash
-  additional_plugins    A list with additional plugins to be installed on Github Actions.
+  additional_repos    A list with additional repos to be installed on Github Actions.
                         Each item in the list is a dict with the following fields:
                         name: the name of the plugin
+                        bindings (optional): boolean whether or not generate bindings
+                        org (optional): github organization
                         branch: the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
                                                Applies to TAGGED (release) jobs.
