@@ -13,6 +13,29 @@ Changelog
 
 .. towncrier release notes start
 
+2021.04.08 (2021-04-08)
+=======================
+
+
+Features
+--------
+
+- Created a manual trigger for our release process so the process could be rerun in case of failures.
+  `#8404 <https://pulp.plan.io/issues/8404>`_
+- Enable PR checkout from repos outside pulp org
+  `#8510 <https://pulp.plan.io/issues/8510>`_
+
+
+Deprecations and Removals
+-------------------------
+
+- Removed FIPS tests
+  `#8455 <https://pulp.plan.io/issues/8455>`_
+
+
+----
+
+
 2021.03.15 (2021-03-15)
 =======================
 
