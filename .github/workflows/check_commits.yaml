@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           cd templates
-          redmine_project=pulp j2 --undefined github/.ci/scripts/validate_commit_message.py.j2 > ../validate_commit_message.py
+          redmine_project=pulp issue_tracker=redmine j2 --undefined github/.ci/scripts/validate_commit_message.py.j2 > ../validate_commit_message.py
           cd ..
       - name: Check commit message
         env:
