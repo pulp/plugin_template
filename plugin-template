@@ -58,14 +58,16 @@ DEFAULT_SETTINGS = {
 }
 
 
-DEPRECATED_FILES = [
-    ".ci/scripts/cherrypick.sh",
-    ".ci/scripts/cherrypick.py",
-    ".ci/scripts/release_requirements.txt",
-    ".github/workflows/fips.yml",
-    ".travis",
-    ".travis.yml",
-]
+DEPRECATED_FILES = {
+    "github": [
+        ".ci/scripts/cherrypick.sh",
+        ".ci/scripts/cherrypick.py",
+        ".ci/scripts/release_requirements.txt",
+        ".github/workflows/fips.yml",
+        ".travis",
+        ".travis.yml",
+    ],
+}
 
 
 def main():
@@ -183,9 +185,12 @@ def main():
             print("If PyPI scripts are included, PyPI username is required.")
             return 2
 
-    for section in ['generate_config', 'bootstrap', 'github', 'docs', 'test']:
-        if getattr(args, section) or args.all:
-            write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
+    sections = [
+        section for section in ['generate_config', 'bootstrap', 'github', 'docs', 'test']
+        if getattr(args, section) or args.all
+    ]
+    for section in sections:
+        write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
     if write_new_config and not (args.generate_config or args.all):
         write_template_section(config, 'generate_config', plugin_root_dir, verbose=args.verbose)
@@ -194,7 +199,7 @@ def main():
 
     if plugin_root_dir:
         print("\nDeprecation check:")
-        check_for_deprecated_files(plugin_root_dir)
+        check_for_deprecated_files(plugin_root_dir, sections)
 
 
 def to_nice_yaml(data):
@@ -307,14 +312,15 @@ def generate_config(plugin_name, plugin_app_label):
     return config
 
 
-def check_for_deprecated_files(plugin_root_dir):
+def check_for_deprecated_files(plugin_root_dir, sections):
     """Check for files that have been deprecated (ie moved or removed)."""
     files_found = False
-    for fp in DEPRECATED_FILES:
-        path = Path(plugin_root_dir).joinpath(fp)
-        if path.exists():
-            print(f"Found deprecated file: '{path}'. It is recommended you delete this file.")
-            files_found = True
+    for section in sections:
+        for fp in DEPRECATED_FILES.get(section, []):
+            path = Path(plugin_root_dir).joinpath(fp)
+            if path.exists():
+                print(f"Found deprecated file: '{path}'. It is recommended you delete this file.")
+                files_found = True
 
     if not files_found:
         print("No deprecated files found.")
