@@ -21,6 +21,7 @@ DEFAULT_SETTINGS = {
     'check_commit_message': True,
     'check_gettext': True,
     'check_manifest': True,
+    'check_openapi_schema': True,
     'check_stray_pulpcore_imports': True,
     'coverage': False,
     'deploy_client_to_pypi': True,
