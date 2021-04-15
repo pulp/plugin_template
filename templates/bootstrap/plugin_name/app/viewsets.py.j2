@@ -215,7 +215,7 @@ class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
         return core.OperationPostponedResponse(result, request)
 
 
-class {{ plugin_camel_short }}DistributionViewSet(core.BaseDistributionViewSet):
+class {{ plugin_camel_short }}DistributionViewSet(core.DistributionViewSet):
     """
     A ViewSet for {{ plugin_camel_short }}Distribution.
 
