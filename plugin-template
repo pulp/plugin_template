@@ -61,7 +61,6 @@ DEFAULT_SETTINGS = {
 
 DEPRECATED_FILES = {
     "github": [
-        ".ci/scripts/cherrypick.sh",
         ".ci/scripts/cherrypick.py",
         ".ci/scripts/release_requirements.txt",
         ".github/workflows/fips.yml",
