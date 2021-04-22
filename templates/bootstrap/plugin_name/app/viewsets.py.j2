@@ -18,7 +18,7 @@ from pulpcore.plugin.serializers import (
     AsyncOperationResponseSerializer,
     RepositorySyncURLSerializer,
 )
-from pulpcore.plugin.tasking import enqueue_with_reservation
+from pulpcore.plugin.tasking import dispatch
 from pulpcore.plugin.models import ContentArtifact
 
 from . import models, serializers, tasks
@@ -161,10 +161,10 @@ class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet, ModifyRe
         serializer.is_valid(raise_exception=True)
         remote = serializer.validated_data.get("remote")
 
-        result = enqueue_with_reservation(
+        result = dispatch(
             tasks.synchronize,
             [repository, remote],
-            kwargs={"remote_pk": remote.pk, "repository_pk": repository.pk},
+            kwargs={"remote_pk": str(remote.pk), "repository_pk": str(repository.pk)},
         )
         return core.OperationPostponedResponse(result, request)
 
@@ -207,7 +207,7 @@ class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
         serializer.is_valid(raise_exception=True)
         repository_version = serializer.validated_data.get("repository_version")
 
-        result = enqueue_with_reservation(
+        result = dispatch(
             tasks.publish,
             [repository_version.repository],
             kwargs={"repository_version_pk": str(repository_version.pk)},
