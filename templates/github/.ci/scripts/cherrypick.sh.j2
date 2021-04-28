@@ -18,8 +18,13 @@ issue="$2"
 backport="$3"
 commit_message=$(git log --format=%B -n 1 $commit)
 
-echo $commit_message | grep -q -E "(fixes|closes).*#$issue" || \
-  (echo "Error: issue $issue not detected in commit message." && exit 1)
+if ! echo $commit_message | grep -q "\[noissue\]"
+then
+  if ! echo $commit_message | grep -q -E "(fixes|closes).*#$issue"
+  then
+    echo "Error: issue $issue not detected in commit message." && exit 1
+  fi
+fi
 
 git cherry-pick --no-commit "$commit"
 
