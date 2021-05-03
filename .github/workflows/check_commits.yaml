@@ -14,12 +14,12 @@ jobs:
           python-version: 3.8
       - name: Install python dependencies
         run: |
-          pip install requests j2cli
+          pip install requests j2cli PyGithub
       - name: Generate the validation script
         shell: bash
         run: |
           cd templates
-          redmine_project=pulp issue_tracker=redmine j2 --undefined github/.ci/scripts/validate_commit_message.py.j2 > ../validate_commit_message.py
+          issue_tracker=github plugin_name=plugin_template j2 --undefined github/.ci/scripts/validate_commit_message.py.j2 > ../validate_commit_message.py
           cd ..
       - name: Check commit message
         env:
