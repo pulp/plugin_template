@@ -3,7 +3,7 @@ Documenting your API
 --------------------
 
 Each instance of Pulp optionally hosts dynamically generated API documentation located at
-`http://pulpserver/pulp/api/v3/docs/`.
+`https://pulpserver/pulp/api/v3/docs/`.
 
 The API endpoint description is generated from the docstring on the CRUD methods on a ViewSet.
 
