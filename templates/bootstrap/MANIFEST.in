@@ -1,5 +1,6 @@
 include CHANGES.rst
 include COMMITMENT
+include COPYRIGHT
 include functest_requirements.txt
 include LICENSE
 include pyproject.toml
