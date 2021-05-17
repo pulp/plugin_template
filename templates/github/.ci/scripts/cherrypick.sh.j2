@@ -48,7 +48,7 @@ do
   git add "$newfile"
 done
 
-commit_message="$(printf "$commit_message" | sed -E 's/(fixes|closes)/backports/')"
+commit_message="$(printf "$commit_message" | sed -E 's/(fixes|closes)/backports/i')"
 commit_message="$commit_message
 
 fixes #$backport
