@@ -13,6 +13,30 @@ Changelog
 
 .. towncrier release notes start
 
+2021.05.18 (2021-05-18)
+=======================
+
+
+Features
+--------
+
+- Added retry when installing amazon.aws collection in CI.
+  `#8529 <https://pulp.plan.io/issues/8529>`_
+- Updated the bootstrap code to use the new ``Distribution`` model.
+  `#8569 <https://pulp.plan.io/issues/8569>`_
+- Added cherrypick.sh script to perform cherry-picks.
+  `#8601 <https://pulp.plan.io/issues/8601>`_
+
+
+Misc
+----
+
+- `#8532 <https://pulp.plan.io/issues/8532>`_
+
+
+----
+
+
 2021.04.08 (2021-04-08)
 =======================
 
