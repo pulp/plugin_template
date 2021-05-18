@@ -115,6 +115,63 @@ export PYTHONPATH=$REPO_ROOT${PYTHONPATH:+:${PYTHONPATH}}
 export PYTHONPATH=$REPO_ROOT:$REPO_ROOT/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
 {%- endif %}
 
+{% if upgrade_range %}
+if [[ "$TEST" == "upgrade" ]]; then
+  git checkout ci_upgrade_test -- {{ plugin_snake }}/tests/
+
+  # Handle app label change:
+  sed -i "/require_pulp_plugins/s/{{ plugin_snake }}/{{ plugin_app_label }}/" {{ plugin_snake }}/tests/functional/utils.py
+
+  # Running pre upgrade tests:
+  pytest -v -r sx --color=yes --pyargs -capture=no {{ plugin_snake }}.tests.upgrade.pre
+
+  # Checking out ci_upgrade_test branch and upgrading plugins
+  {%- for plugin_branch in upgrade_range[0].keys() if plugin_branch != "pulpcore_branch" %}
+  cmd_prefix bash -c "cd {{ plugin_branch| replace("_branch", "") }}; git checkout -f ci_upgrade_test; pip install ."
+  {%- endfor %}
+  cmd_prefix bash -c "cd pulpcore; git checkout -f ci_upgrade_test; pip install ."
+
+  # Migrating
+  cmd_prefix bash -c "django-admin migrate --no-input"
+
+  # Restarting single container services
+  cmd_prefix bash -c "s6-svc -r /var/run/s6/services/pulpcore-api"
+  cmd_prefix bash -c "s6-svc -r /var/run/s6/services/pulpcore-content"
+  cmd_prefix bash -c "s6-svc -r /var/run/s6/services/pulpcore-resource-manager"
+  cmd_prefix bash -c "s6-svc -r /var/run/s6/services/pulpcore-worker@1"
+  cmd_prefix bash -c "s6-svc -r /var/run/s6/services/pulpcore-worker@2"
+
+  echo "Restarting in 60 seconds"
+  sleep 60
+
+  # CLI commands to display plugin versions and content data
+  pulp status
+  {%- if plugin_name != 'pulpcore' %}
+  pulp {{ plugin_app_label }} content list
+  {%- else %}
+  pulp file content list
+  {%- endif %}
+
+  # Rebuilding bindings
+  cd ../pulp-openapi-generator
+  ./generate.sh pulpcore python
+  pip install ./pulpcore-client
+  {%- if plugin_name != 'pulpcore' %}
+  ./generate.sh {{ plugin_snake }} python
+  pip install ./{{ plugin_snake }}-client
+  {%- endif %}
+  {%- for item in additional_repos if item.bindings | default(true) %}
+  ./generate.sh {{ item.name | replace("-", "_") }} python
+  pip install ./{{ item.name | replace("-", "_") }}-client
+  {%- endfor %}
+  cd $REPO_ROOT
+
+  # Running post upgrade tests
+  pytest -v -r sx --color=yes --pyargs -capture=no {{ plugin_snake }}.tests.upgrade.post
+  exit
+fi
+{% endif %}
+
 if [[ "$TEST" == "performance" ]]; then
   if [[ -z ${PERFORMANCE_TEST+x} ]]; then
     pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance
