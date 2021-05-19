@@ -161,7 +161,7 @@ jobs:
         {%- for test in upgrade_range %}
           - FROM_PULPCORE_BRANCH: "{{ test.pulpcore_branch }}"
           {%- for plugin_branch, version in test.items() if plugin_branch != "pulpcore_branch" %}
-            FROM_{{ plugin_branch| upper }}: "{{version}}"
+            FROM_{{ plugin_branch| upper| replace("-", "_") }}: "{{version}}"
           {%- endfor %}
         {%- endfor %}
     {%- endif %}
@@ -186,7 +186,7 @@ jobs:
           echo "TEST=upgrade" >> $GITHUB_ENV
           echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
           {%- for plugin_branch, version in upgrade_range[0].items() %}
-          echo "FROM_{{ plugin_branch| upper }}={{ "${{ matrix.FROM_" + plugin_branch| upper +" }}" }}" >> $GITHUB_ENV
+          echo "FROM_{{ plugin_branch| upper| replace("-", "_") }}={{ "${{ matrix.FROM_" + plugin_branch| upper| replace("-", "_") +" }}" }}" >> $GITHUB_ENV
           {%- endfor %}
 
       - name: Install python dependencies
