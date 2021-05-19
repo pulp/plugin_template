@@ -120,7 +120,7 @@ if [[ "$TEST" == "upgrade" ]]; then
   git checkout ci_upgrade_test -- {{ plugin_snake }}/tests/
 
   # Handle app label change:
-  sed -i "/require_pulp_plugins/s/{{ plugin_snake }}/{{ plugin_app_label }}/" {{ plugin_snake }}/tests/functional/utils.py
+  sed -i "/require_pulp_plugins(/d" {{ plugin_snake }}/tests/functional/utils.py
 
   # Running pre upgrade tests:
   pytest -v -r sx --color=yes --pyargs -capture=no {{ plugin_snake }}.tests.upgrade.pre
