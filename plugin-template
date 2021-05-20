@@ -280,7 +280,7 @@ def write_template_to_file(template, plugin_root_dir, relative_path, config):
         destination_path = os.path.normpath(os.path.join(plugin_root_dir, relative_path))
         os.rename(tempfile_path, destination_path)
 
-        if destination_path.endswith('.sh'):
+        if destination_path.endswith('.sh') or destination_path.endswith('.py'):
             mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | \
                 stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
         else:

@@ -25,7 +25,8 @@ export PULP_URL="http://pulp"
 
 if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
   cd docs
-  make PULP_URL="$PULP_URL" html
+  make PULP_URL="$PULP_URL" diagrams html
+  tar -cvf docs.tar ./_build
   cd ..
 {%- if check_openapi_schema %}
 
