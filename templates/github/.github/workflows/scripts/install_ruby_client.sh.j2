@@ -1,0 +1,37 @@
+#!/bin/bash
+
+{% include 'header.j2' %}
+
+set -euv
+
+# make sure this script runs at the repo root
+cd "$(dirname "$(realpath -e "$0")")"/../../..
+
+export PULP_URL="${PULP_URL:-http://pulp}"
+
+export REPORTED_VERSION=$(http pulp/pulp/api/v3/status/ | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')
+export DESCRIPTION="$(git describe --all --exact-match `git rev-parse HEAD`)"
+if [[ $DESCRIPTION == 'tags/'$REPORTED_VERSION ]]; then
+  export VERSION=${REPORTED_VERSION}
+else
+  export EPOCH="$(date +%s)"
+  export VERSION=${REPORTED_VERSION}${EPOCH}
+fi
+
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_snake }}_client/versions/$VERSION)
+
+if [ "$response" == "200" ];
+then
+  echo "{{ plugin_name }} client $VERSION has already been released. Installing from RubyGems.org."
+  gem install {{ plugin_name }}_client -v $VERSION
+  touch ../{{ plugin_name }}/{{ plugin_snake }}_client-$VERSION.gem
+  exit
+fi
+
+cd ../pulp-openapi-generator
+
+./generate.sh {{ plugin_snake }} ruby $VERSION
+cd {{ plugin_snake }}-client
+gem build {{ plugin_snake }}_client
+gem install --both ./{{ plugin_snake }}_client-$VERSION.gem
+cp ./{{ plugin_snake }}_client-$VERSION.gem ../../{{ plugin_name }}/{{ plugin_snake }}_client-$VERSION.gem

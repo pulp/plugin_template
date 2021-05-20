@@ -10,13 +10,6 @@ set -euv
 
 source .github/workflows/scripts/utils.sh
 
-if [ "${GITHUB_REF##refs/tags/}" = "${GITHUB_REF}" ]
-then
-  TAG_BUILD=0
-else
-  TAG_BUILD=1
-fi
-
 if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
 {%- if plugin_name == 'pulpcore' %}
   pip install psycopg2-binary
@@ -45,10 +38,12 @@ fi
 {%- if plugin_name != 'pulpcore' %}
 if [[ "$TEST" == "plugin-from-pypi" ]]; then
   PLUGIN_NAME={{ plugin_name }}
+elif [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
+  PLUGIN_NAME=./{{ plugin_name }}/dist/{{ plugin_name }}-$PLUGIN_VERSION-py3-none-any.whl
 else
   PLUGIN_NAME=./{{ plugin_name }}
 fi
-if [ "${TAG_BUILD}" = "1" ]; then
+if [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
   # Install the plugin only and use published PyPI packages for the rest
   # Quoting ${TAG} ensures Ansible casts the tag as a string.
   cat >> vars/main.yaml << VARSYAML
@@ -92,13 +87,18 @@ services:
 VARSYAML
 fi
 {%- else %}
+if [[ "$RELEASE_WORKFLOW" == "true" ]]; then
+  PLUGIN_NAME=./dist/{{ plugin_dash }}-*
+else
+  PLUGIN_NAME=./{{ plugin_name }}
+fi
 cat >> vars/main.yaml << VARSYAML
 image:
   name: pulp
   tag: "${TAG}"
 plugins:
   - name: pulpcore
-    source: ./pulpcore
+    source: "${PLUGIN_NAME}"
 {%- for item in additional_repos %}
   - name: {{ item.name }}
     source: ${{ item.name|upper| replace("-", "_") }}
