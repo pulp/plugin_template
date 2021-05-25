@@ -13,6 +13,20 @@ Changelog
 
 .. towncrier release notes start
 
+2021.05.25 (2021-05-25)
+=======================
+
+
+Features
+--------
+
+- Adding upgrade tests
+  `#8776 <https://pulp.plan.io/issues/8776>`_
+
+
+----
+
+
 2021.05.18 (2021-05-18)
 =======================
 
