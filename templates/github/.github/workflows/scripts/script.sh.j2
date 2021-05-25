@@ -146,11 +146,12 @@ if [[ "$TEST" == "upgrade" ]]; then
 
   # CLI commands to display plugin versions and content data
   pulp status
-  {%- if plugin_name != 'pulpcore' %}
-  pulp {{ plugin_app_label }} content list
-  {%- else %}
-  pulp file content list
-  {%- endif %}
+  pulp content list
+  CONTENT_LENGTH=$(pulp content list | jq length)
+  if [[ "$CONTENT_LENGTH" == "0" ]]; then
+    echo "Empty content list"
+    exit 1
+  fi
 
   # Rebuilding bindings
   cd ../pulp-openapi-generator
