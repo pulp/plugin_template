@@ -87,7 +87,7 @@ services:
 VARSYAML
 fi
 {%- else %}
-if [[ "$RELEASE_WORKFLOW" == "true" ]]; then
+if [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
   PLUGIN_NAME=./dist/{{ plugin_dash }}-*
 else
   PLUGIN_NAME=./{{ plugin_name }}
