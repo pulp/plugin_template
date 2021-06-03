@@ -9,11 +9,13 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 pip install twine
 
-export response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_dash }}-client/$1/)
+export VERSION=$(ls dist | sed -rn 's/{{ plugin_name }}-client-(.*)\.tar.gz/\1/p')
+
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_dash }}-client/$VERSION/)
 
 if [ "$response" == "200" ];
 then
-  echo "{{ plugin_name }} client $1 has already been released. Skipping."
+  echo "{{ plugin_name }} client $VERSION has already been released. Skipping."
   exit
 fi
 

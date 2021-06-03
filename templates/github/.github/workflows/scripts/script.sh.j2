@@ -59,7 +59,7 @@ if [[ "$TEST" = 'bindings' ]]; then
   gem install --both ./pulpcore_client-0.gem
 fi
 {%- endif %}
-{%- for item in additional_repos %}
+{%- for item in additional_repos if item.bindings | default(true) %}
 ./generate.sh {{ item.name | replace("-", "_") }} python
 pip install ./{{ item.name | replace("-", "_") }}-client
 rm -rf ./{{ item.name | replace("-", "_") }}-client

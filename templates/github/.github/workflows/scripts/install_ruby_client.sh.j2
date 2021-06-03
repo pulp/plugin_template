@@ -24,7 +24,8 @@ if [ "$response" == "200" ];
 then
   echo "{{ plugin_name }} client $VERSION has already been released. Installing from RubyGems.org."
   gem install {{ plugin_name }}_client -v $VERSION
-  touch ../{{ plugin_name }}/{{ plugin_snake }}_client-$VERSION.gem
+  touch {{ plugin_snake }}_client-$VERSION.gem
+  tar cvf ../../{{ plugin_name }}/ruby-client.tar ./{{ plugin_snake }}_client-$VERSION.gem
   exit
 fi
 
@@ -34,4 +35,4 @@ cd ../pulp-openapi-generator
 cd {{ plugin_snake }}-client
 gem build {{ plugin_snake }}_client
 gem install --both ./{{ plugin_snake }}_client-$VERSION.gem
-cp ./{{ plugin_snake }}_client-$VERSION.gem ../../{{ plugin_name }}/{{ plugin_snake }}_client-$VERSION.gem
+tar cvf ../../{{ plugin_name }}/ruby-client.tar ./{{ plugin_snake }}_client-$VERSION.gem

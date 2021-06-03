@@ -210,6 +210,9 @@ jobs:
           ANSIBLE_FORCE_COLOR: '1'
         shell: bash
 
+      - name: Install Python client
+        run: .github/workflows/scripts/install_python_client.sh
+
       - name: Before Script
         run: .github/workflows/scripts/before_script.sh
 
