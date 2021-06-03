@@ -26,7 +26,7 @@ if [ "$response" == "200" ];
 then
   echo "{{ plugin_name }} client $VERSION has already been released. Installing from PyPI."
   pip install {{ plugin_dash }}-client==$VERSION
-  mkdir dist
+  mkdir -p dist
   tar cvf ../../{{ plugin_name }}/python-client.tar ./dist
   exit
 fi

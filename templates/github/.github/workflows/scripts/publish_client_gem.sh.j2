@@ -14,11 +14,12 @@ echo "---
 :rubygems_api_key: $RUBYGEMS_API_KEY" > ~/.gem/credentials
 sudo chmod 600 ~/.gem/credentials
 
-export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_snake }}_client/versions/$1)
+export VERSION=$(ls {{ plugin_snake }}_client* | sed -rn 's/{{ plugin_snake }}_client-(.*)\.gem/\1/p')
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_snake }}_client/versions/$VERSION)
 
 if [ "$response" == "200" ];
 then
-  echo "{{ plugin_name }} $VERSION has already been released. Skipping."
+  echo "{{ plugin_name }} client $VERSION has already been released. Skipping."
   exit
 fi
 

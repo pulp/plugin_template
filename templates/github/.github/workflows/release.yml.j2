@@ -128,11 +128,10 @@ jobs:
           SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
 
       - name: Install Python client
-        if: {{ "${{ env.TEST == 'bindings' or env.TEST == 'generate-bindings' }}" }}
         run: .github/workflows/scripts/install_python_client.sh
 
       - name: Install Ruby client
-        if: {{ "${{ env.TEST == 'bindings' or env.TEST == 'generate-bindings' }}" }}
+        if: {{ "${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}" }}
         run: .github/workflows/scripts/install_ruby_client.sh
 
       - name: Script
@@ -140,18 +139,18 @@ jobs:
         shell: bash
 
       - name: Upload python client packages
-        if: {{ "${{ env.TEST == 'bindings' }}" }}
+        if: {{ "${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}" }}
         uses: actions/upload-artifact@v2
         with:
           name: python-client.tar
           path: python-client.tar
 
       - name: Upload ruby client packages
-        if: {{ "${{ env.TEST == 'bindings' }}" }}
+        if: {{ "${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}" }}
         uses: actions/upload-artifact@v2
         with:
-          name: {{ plugin_snake }}_client-{{ "${{ github.event.inputs.release }}" }}.gem
-          path: {{ plugin_snake }}_client-{{ "${{ github.event.inputs.release }}" }}.gem
+          name: ruby-client.tar
+          path: ruby-client.tar
 
       - name: Upload built docs
         if: {{ "${{ env.TEST == 'docs' }}" }}
@@ -246,17 +245,20 @@ jobs:
         run: tar -xvf python-client.tar
 
       - name: Publish client to pypi
-        run: bash .github/workflows/scripts/publish_client_pypi.sh {{ "${{ github.event.inputs.release }}" }}
+        run: bash .github/workflows/scripts/publish_client_pypi.sh
       {%- endif %}
 
       {%- if deploy_client_to_rubygems %}
       - name: Download Ruby client
         uses: actions/download-artifact@v2
         with:
-          name: {{ plugin_snake }}_client-{{ "${{ github.event.inputs.release }}" }}.gem
+          name: python-client.tar
+
+      - name: Untar Ruby client packages
+        run: tar -xvf ruby-client.tar
 
       - name: Publish client to rubygems
-        run: bash .github/workflows/scripts/publish_client_gem.sh {{ "${{ github.event.inputs.release }}" }}
+        run: bash .github/workflows/scripts/publish_client_gem.sh
       {%- endif %}
 
       {%- if update_redmine %}
