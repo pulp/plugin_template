@@ -27,7 +27,7 @@ then
   echo "{{ plugin_name }} client $VERSION has already been released. Installing from PyPI."
   pip install {{ plugin_dash }}-client==$VERSION
   mkdir -p dist
-  tar cvf ../../{{ plugin_name }}/python-client.tar ./dist
+  tar cvf python-client.tar ./dist
   exit
 fi
 
