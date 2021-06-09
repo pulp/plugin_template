@@ -191,6 +191,10 @@ The following settings are stored in `template_config.yml`.
                         This is used during commit validation to make sure the commit is attached to
                         an issue in the correct project.
 
+  release_user          The GitHub user that is associated with the RELEASE_TOKEN secret on GitHub.
+                        The username and token are used to push the Changelog and version bump commits
+                        created by the release workflow. The default is 'pulpbot'.
+
   test_bindings         Include a job that runs a script to test generated client
                         library.
 

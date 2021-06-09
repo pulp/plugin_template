@@ -7,9 +7,6 @@ on:
       release:
         description: "Release tag (e.g. 3.2.1)"
         required: true
-      commit_sha:
-        description: "Full commit hash that should be used for the release."
-        required: true
 
 env:
   RELEASE_WORKFLOW: true
@@ -35,11 +32,21 @@ jobs:
       - name: Install python dependencies
         run: |
           echo ::group::PYDEPS
-          pip install bandersnatch wheel gitpython
+          pip install bandersnatch bump2version gitpython python-redmine towncrier wheel
           echo ::endgroup::
 
-      - name: Create a tag and build plugin package
-        run: python .github/workflows/scripts/create_tag_and_build_package.py {{ "${{ github.event.inputs.release }}" }} {{ "${{ github.event.inputs.commit_sha }}" }}
+      - name: Configure Git with pulpbot name and email
+        run: |
+          git config --global user.name 'pulpbot'
+          git config --global user.email 'pulp-infra@redhat.com'
+
+      - name: Setting secrets
+        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
+        env:
+          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+
+      - name: Create the release commit, tag it, create a post-release commit, and build plugin package
+        run: python .github/workflows/scripts/release.py {{ "${{ github.event.inputs.release }}" }}
 
       - name: 'Tar files'
         run: tar -cvf {{  plugin_name }}.tar $GITHUB_WORKSPACE
@@ -135,6 +142,7 @@ jobs:
         run: .github/workflows/scripts/install_ruby_client.sh
 
       - name: Script
+        if: {{ "${{ env.TEST != 'generate-bindings' }}" }}
         run: .github/workflows/scripts/script.sh
         shell: bash
 
@@ -215,8 +223,8 @@ jobs:
         env:
           SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
 
-      - name: Push tag to GitHub
-        run: bash .github/workflows/scripts/push_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }} {{ "${{ github.event.inputs.commit_sha }}" }}
+      - name: Push branch and tag to GitHub
+        run: bash .github/workflows/scripts/push_branch_and_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }}
 
       {%- if publish_docs_to_pulpprojectdotorg %}
       - name: Download built docs
@@ -252,7 +260,7 @@ jobs:
       - name: Download Ruby client
         uses: actions/download-artifact@v2
         with:
-          name: python-client.tar
+          name: ruby-client.tar
 
       - name: Untar Ruby client packages
         run: tar -xvf ruby-client.tar
@@ -265,3 +273,6 @@ jobs:
       - name: Update Redmine
         run: bash .ci/scripts/update_redmine.sh
       {%- endif %}
+
+      - name: Create release on GitHub
+        run: bash .github/workflows/scripts/create_release_from_tag.sh {{ "${{ github.event.inputs.release }}" }}
