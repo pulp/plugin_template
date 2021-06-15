@@ -39,7 +39,7 @@ fi
 if [[ "$TEST" == "plugin-from-pypi" ]]; then
   PLUGIN_NAME={{ plugin_name }}
 elif [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
-  PLUGIN_NAME=./{{ plugin_name }}/dist/{{ plugin_name }}-$PLUGIN_VERSION-py3-none-any.whl
+  PLUGIN_NAME=./{{ plugin_name }}/dist/{{ plugin_snake }}-$PLUGIN_VERSION-py3-none-any.whl
 else
   PLUGIN_NAME=./{{ plugin_name }}
 fi
