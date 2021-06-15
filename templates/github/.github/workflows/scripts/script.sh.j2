@@ -79,7 +79,6 @@ if [[ "$TEST" = 'bindings' ]]; then
   gem build {{ item.name }}_client.gemspec
   gem install --bot ./{{ item.name }}_client-0.gem
 fi
-cd ..
 {%- endfor %}
 cd $REPO_ROOT
 
