@@ -38,11 +38,10 @@ jobs:
         with:
           python-version: "3.7"
 
-      {%- if test_bindings %}
       - uses: actions/setup-ruby@v1
+        if: {{ "${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}" }}
         with:
           ruby-version: "2.6"
-      {%- endif %}
 
       - name: Install httpie
         run: |
