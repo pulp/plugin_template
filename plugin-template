@@ -5,6 +5,7 @@ import os
 import pprint
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -66,7 +67,6 @@ DEFAULT_SETTINGS = {
 
 DEPRECATED_FILES = {
     "github": [
-        ".ci/scripts/cherrypick.py",
         ".ci/scripts/docs-builder.py",
         ".ci/scripts/publish_docs.sh",
         ".ci/scripts/publish_client_gem.sh",
@@ -233,6 +233,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
 
     files_templated = 0
     files_copied = 0
+    gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
     for relative_path in generate_relative_path_set(section_template_dir):
         destination_relative_path = relative_path.replace('plugin_name', config['plugin_snake'])
         necessary_dir_structure = os.path.dirname(os.path.join(plugin_root_dir, destination_relative_path))
@@ -244,7 +245,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             env.filters['to_yaml'] = to_nice_yaml
             template = env.get_template(relative_path)
             destination = destination_relative_path[:-len('.j2')]
-            write_template_to_file(template, plugin_root_dir, destination, {"section": name, **config})
+            write_template_to_file(template, plugin_root_dir, destination, {"section": name, "gitref": gitref, **config})
             files_templated += 1
             if verbose:
                 print(f"Templated file: {relative_path}")
