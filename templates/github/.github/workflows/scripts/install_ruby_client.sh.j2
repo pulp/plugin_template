@@ -23,7 +23,7 @@ export response=$(curl --write-out %{http_code} --silent --output /dev/null http
 if [ "$response" == "200" ];
 then
   echo "{{ plugin_name }} client $VERSION has already been released. Installing from RubyGems.org."
-  gem install {{ plugin_name }}_client -v $VERSION
+  gem install {{ plugin_snake }}_client -v $VERSION
   touch {{ plugin_snake }}_client-$VERSION.gem
   tar cvf ruby-client.tar ./{{ plugin_snake }}_client-$VERSION.gem
   exit
