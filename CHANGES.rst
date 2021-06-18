@@ -13,6 +13,33 @@ Changelog
 
 .. towncrier release notes start
 
+2021.06.18 (2021-06-18)
+=======================
+
+
+Features
+--------
+
+- Made the release workflow idempotent.
+  `#7868 <https://pulp.plan.io/issues/7868>`_
+- Automated the pre-release steps for the release workflow
+
+  The release workflow for plugins now expects a release branch to exist with the correct 
+  .dev version and correct pulpcore requirements. The release workflow needs to be run
+  against the release branch being released. It takes one parameter: release tag (a.k.a
+  version string).
+  `#8119 <https://pulp.plan.io/issues/8119>`_
+
+
+Misc
+----
+
+- `#8226 <https://pulp.plan.io/issues/8226>`_
+
+
+----
+
+
 2021.05.25 (2021-05-25)
 =======================
 
