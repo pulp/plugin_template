@@ -54,6 +54,7 @@ DEFAULT_SETTINGS = {
     'pypi_username': None,
     'redmine_project': None,
     'release_user': 'pulpbot',
+    'sync_ci': True,
     'test_bindings': True,
     'test_cli': False,
     'test_performance': False,
