@@ -195,6 +195,8 @@ The following settings are stored in `template_config.yml`.
                         The username and token are used to push the Changelog and version bump commits
                         created by the release workflow. The default is 'pulpbot'.
 
+  sync_ci               Enables a nightly workflow to update the CI files.
+
   test_bindings         Include a job that runs a script to test generated client
                         library.
 
