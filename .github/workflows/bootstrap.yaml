@@ -50,7 +50,9 @@ jobs:
 
       # Lint code.
       - name: Run flake8
-        run: flake8 --config flake8.cfg
+        run: |
+          flake8 --version
+          flake8 --config flake8.cfg
 
       # check for any files unintentionally left out of MANIFEST.in
       - name: Check manifest
