@@ -54,8 +54,8 @@ jobs:
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: {{  plugin_name }}.tar
-          path: {{  plugin_name }}.tar
+          name: {{ plugin_name }}.tar
+          path: {{ plugin_name }}.tar
   test:
     needs: build-artifacts
 
@@ -300,7 +300,7 @@ jobs:
           committer: {{  'pulpbot <pulp-infra@redhat.com>' }}
           author: {{  'pulpbot <pulp-infra@redhat.com>' }}
           branch: {{ "${{ github.event.inputs.release }}" }}-changelog
-          base: master
+          base: {{ plugin_default_branch }}
           title: 'Building changelog for {{ "${{ github.event.inputs.release }}" }}'
           body: '[noissue]'
           commit-message: |
