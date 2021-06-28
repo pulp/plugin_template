@@ -77,7 +77,8 @@ if [[ "$TEST" = 'bindings' ]]; then
   ./generate.sh {{ item.name }} ruby 0
   cd {{ item.name }}-client
   gem build {{ item.name }}_client.gemspec
-  gem install --bot ./{{ item.name }}_client-0.gem
+  gem install --both ./{{ item.name }}_client-0.gem
+  cd ..
 fi
 {%- endfor %}
 cd $REPO_ROOT
