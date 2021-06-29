@@ -204,6 +204,11 @@ jobs:
         with:
           ruby-version: "2.6"
 
+      - name: Configure Git with pulpbot name and email
+        run: |
+          git config --global user.name 'pulpbot'
+          git config --global user.email 'pulp-infra@redhat.com'
+
       - name: Untar repository
         run: |
           shopt -s dotglob
