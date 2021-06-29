@@ -194,7 +194,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: {{  plugin_name }}.tar
+          name: {{ plugin_name }}.tar
 
       - uses: actions/setup-python@v2
         with:
@@ -287,6 +287,9 @@ jobs:
 
       - name: Create release on GitHub
         run: bash .github/workflows/scripts/create_release_from_tag.sh {{ "${{ github.event.inputs.release }}" }}
+
+      - name: Cleanup repository before making changelog PR
+        run: rm -rf .lock generation {{ plugin_snake }}_client* *-client.tar {{ plugin_name }}.tar todo web
 
       - name: Stage changelog for master branch
         run: python .github/workflows/scripts/stage-changelog-for-master.py {{ "${{ github.event.inputs.release }}" }}
