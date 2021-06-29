@@ -30,7 +30,7 @@ then
 fi
 
 cd ../pulp-openapi-generator
-
+rm -rf {{ plugin_snake }}-client
 ./generate.sh {{ plugin_snake }} ruby $VERSION
 cd {{ plugin_snake }}-client
 gem build {{ plugin_snake }}_client

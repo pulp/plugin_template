@@ -32,7 +32,7 @@ then
 fi
 
 cd ../pulp-openapi-generator
-
+rm -rf {{ plugin_snake }}-client
 ./generate.sh {{ plugin_snake }} python $VERSION
 cd {{ plugin_snake }}-client
 python setup.py sdist bdist_wheel --python-tag py3
