@@ -88,7 +88,7 @@ VARSYAML
 fi
 {%- else %}
 if [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
-  PLUGIN_NAME=./dist/{{ plugin_dash }}-*
+  PLUGIN_NAME=./{{ plugin_name }}/dist/{{ plugin_snake }}-$PLUGIN_VERSION-py3-none-any.whl
 else
   PLUGIN_NAME=./{{ plugin_name }}
 fi
