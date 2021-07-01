@@ -13,6 +13,27 @@ Changelog
 
 .. towncrier release notes start
 
+2021.07.01 (2021-07-01)
+
+Features
+--------
+
+- Release workflow opens PR against master with the latest changelog.
+  `#416 <https://github.com/pulp/plugin_template/issues/416>`_
+- Added a new workflow for creating release branches.
+  `#417 <https://github.com/pulp/plugin_template/issues/417>`_
+
+
+Bugfixes
+--------
+
+- Fixed hardcoded reference to plugin default branch.
+  `#421 <https://github.com/pulp/plugin_template/issues/421>`_
+
+
+----
+
+
 2021.06.18 (2021-06-18)
 =======================
 
