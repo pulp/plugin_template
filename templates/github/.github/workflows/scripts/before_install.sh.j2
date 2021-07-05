@@ -111,7 +111,7 @@ fi
 
 cd pulp-cli
 pip install -e .
-pulp config create --base-url http://pulp --location tests/settings.toml --no-verify-ssl
+pulp config create --base-url {{ pulp_scheme }}://pulp --location tests/settings.toml {% if pulp_scheme != 'https' %}--no-verify-ssl{% endif %}
 mkdir ~/.config/pulp
 cp tests/settings.toml ~/.config/pulp/settings.toml
 cd ..
