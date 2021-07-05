@@ -33,6 +33,7 @@ DEFAULT_SETTINGS = {
     'docker_fixtures': False,
     'docs_test': True,
     'issue_tracker': 'redmine',
+    'pulp_scheme': 'http',
     'plugin_app_label': None,
     'plugin_camel': None,
     'plugin_camel_short': None,
