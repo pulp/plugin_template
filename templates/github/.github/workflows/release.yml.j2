@@ -71,8 +71,12 @@ jobs:
       matrix:
         env:
           - TEST: pulp
+          {%- if docs_test %}
           - TEST: docs
+          {%- endif %}
+          {%- if test_s3 %}
           - TEST: s3
+          {%- endif %}
           {%- if (deploy_client_to_pypi or deploy_client_to_rubygems) and not test_bindings %}
           - TEST: generate-bindings
           {%- elif test_bindings  %}
