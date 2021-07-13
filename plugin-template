@@ -19,6 +19,7 @@ DEFAULT_SETTINGS = {
     'additional_repos': [],
     'upgrade_range': [],
     'black': True,
+    'flake8': True,
     'check_commit_message': True,
     'check_gettext': True,
     'check_manifest': True,

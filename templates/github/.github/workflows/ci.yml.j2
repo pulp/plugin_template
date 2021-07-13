@@ -42,9 +42,11 @@ jobs:
           black --check --diff .
       {%- endif %}
 
+      {% if flake8 -%}
       # Lint code.
       - name: Run flake8
         run: flake8 --config flake8.cfg
+      {%- endif %}
 
       {% if check_manifest -%}
       # check for any files unintentionally left out of MANIFEST.in
@@ -71,8 +73,12 @@ jobs:
       matrix:
         env:
           - TEST: pulp
+          {%- if docs_test %}
           - TEST: docs
+          {%- endif %}
+          {%- if test_s3 %}
           - TEST: s3
+          {%- endif %}
           {%- if test_bindings %}
           - TEST: bindings
           {%- endif %}

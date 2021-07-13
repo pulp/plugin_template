@@ -69,6 +69,8 @@ The following settings are stored in `template_config.yml`.
 
   black                 Boolean, whether to use black to format python source files.
 
+  flake8                Boolean, whether to use flake8 to lint python source files.
+
   check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
