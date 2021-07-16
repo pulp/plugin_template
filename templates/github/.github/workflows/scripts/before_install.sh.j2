@@ -143,9 +143,9 @@ fi
 if [[ "$TEST" == "upgrade" ]]; then
   {%- for plugin_branch in upgrade_range[0].keys() if plugin_snake not in plugin_branch %}
   cd {{ plugin_branch| replace("_branch", "") }}
+  git checkout -b ci_upgrade_test
   git fetch --depth=1 origin heads/$FROM_{{ plugin_branch| upper| replace("-", "_")}}:$FROM_{{ plugin_branch| upper| replace("-", "_")}}
   git checkout $FROM_{{ plugin_branch| upper| replace("-", "_")}}
-  git checkout -b ci_upgrade_test
   # Pin deps
   sed -i "s/~/=/g" requirements.txt
   cd ..
