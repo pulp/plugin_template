@@ -1,12 +1,10 @@
 """Tests that perform actions over content unit."""
 import unittest
 
-from pulp_smash import utils
 from pulp_smash.pulp3.utils import delete_orphans
 from pulp_smash.pulp3.bindings import monitor_task
 
 from {{ plugin_snake }}.tests.functional.utils import (
-    core_client,
     gen_artifact,
     gen_{{ plugin_app_label }}_client,
     gen_{{ plugin_app_label }}_content_attrs,
@@ -14,7 +12,6 @@ from {{ plugin_snake }}.tests.functional.utils import (
 )
 from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
-from pulpcore.client.pulpcore import ArtifactsApi
 from pulpcore.client.{{ plugin_snake }} import Content{{ plugin_camel_short }}Api
 
 
