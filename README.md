@@ -9,12 +9,12 @@ The purpose of this guide is to walk you through, step by step, the Pulp plugin 
 
 This guide specifically details *how* you write a new content plugin.
 
-[*Why* would you want to write a plugin?](https://docs.pulpproject.org/en/3.0/nightly/plugins/index.html)
+[*Why* would you want to write a plugin?](https://docs.pulpproject.org/pulpcore/plugins/index.html)
 
-[*What* exactly is this Pulp thing?](https://docs.pulpproject.org/en/3.0/nightly/overview/concepts.html)
+[*What* exactly is this Pulp thing?](https://docs.pulpproject.org/pulpcore/components.html)
 
 It's recommend that you develop on a system that already has
-[Pulp installed](https://docs.pulpproject.org/en/3.0/nightly/installation/instructions.html).
+[Pulp installed](https://docs.pulpproject.org/pulpcore/installation/instructions.html).
 This allows you to test your plugin at every step.
 
 It's also recommended that you go through the [planning guide](meta_docs/planning-guide.md) before starting to develop your plugin.
@@ -301,7 +301,7 @@ entrypoints see [the discoverability documentation](meta_docs/discoverability.md
 
 # Customizing Plugin Behavior
 
-First, look at the [overview](https://docs.pulpproject.org/en/3.0/nightly/plugins/plugin-writer/first-plugin.html#understanding-models) of Pulp Models to understand how Pulp fits these pieces together.
+First, look at the [overview](https://docs.pulpproject.org/pulpcore/plugins/plugin-writer/concepts/index.html) of Pulp Models to understand how Pulp fits these pieces together.
 
 Bootstrapping created various new endpoints (e.g. remote, repository and content).
 Additional information should be added to these to tell Pulp how to handle your content.
