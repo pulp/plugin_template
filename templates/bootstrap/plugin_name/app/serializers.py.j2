@@ -130,7 +130,7 @@ class {{ plugin_camel_short }}DistributionSerializer(platform.DistributionSerial
     publication = platform.DetailRelatedField(
         required=False,
         help_text=_("Publication to be served"),
-        view_name="publications-{{ plugin_snake_short }}/{{ plugin_snake_short }}-detail",
+        view_name_pattern=r"publications(-.*/.*)?-detail",
         queryset=models.Publication.objects.exclude(complete=False),
         allow_null=True,
     )
