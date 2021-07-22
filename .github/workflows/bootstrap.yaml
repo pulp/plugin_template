@@ -24,6 +24,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "3.8"
+      - name: Lint plugin_template
+        working-directory: plugin_template
+        run: |
+          pip3 install black flake8
+          black --version
+          black --check --diff plugin-template utils.py
+          flake8 --config flake8.cfg plugin-template utils.py
       - name: Bootstrap catdog plugin
         working-directory: plugin_template
         run: |
@@ -43,13 +50,13 @@ jobs:
       #   run: sh .github/workflows/scripts/check_commit.sh
 
       # run black separately from flake8 to get a diff
-      - name: Run black
+      - name: Run black on pulp_catdog
         run: |
           black --version
           black --check --diff .
 
       # Lint code.
-      - name: Run flake8
+      - name: Run flake8 on pulp_catdog
         run: |
           flake8 --version
           flake8 --config flake8.cfg

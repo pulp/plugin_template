@@ -17,52 +17,52 @@ from jinja2 import Environment, FileSystemLoader
 
 
 DEFAULT_SETTINGS = {
-    'additional_repos': [],
-    'upgrade_range': [],
-    'black': True,
-    'flake8': True,
-    'check_commit_message': True,
-    'check_gettext': True,
-    'check_manifest': True,
-    'check_openapi_schema': True,
-    'check_stray_pulpcore_imports': True,
-    'coverage': False,
-    'deploy_client_to_pypi': True,
-    'deploy_client_to_rubygems': True,
-    'deploy_daily_client_to_pypi': True,
-    'deploy_daily_client_to_rubygems': True,
-    'deploy_to_pypi': True,
-    'docker_fixtures': False,
-    'docs_test': True,
-    'issue_tracker': 'redmine',
-    'pulp_scheme': 'http',
-    'plugin_app_label': None,
-    'plugin_camel': None,
-    'plugin_camel_short': None,
-    'plugin_caps': None,
-    'plugin_caps_short': None,
-    'plugin_dash': None,
-    'plugin_dash_short': None,
-    'plugin_default_branch': 'main',
-    'plugin_name': None,
-    'plugin_snake': None,
-    'publish_docs_to_pulpprojectdotorg': False,
-    'pulp_settings': None,
-    'pulpcore_branch': 'master',
-    'pulpcore_pip_version_specifier': None,
-    'pulpprojectdotorg_key_id': None,
-    'pydocstyle': True,
-    'pypi_username': None,
-    'python_version': "3.8",
-    'redmine_project': None,
-    'release_user': 'pulpbot',
-    'sync_ci': True,
-    'test_bindings': True,
-    'test_cli': False,
-    'test_performance': False,
-    'test_released_plugin_with_next_pulpcore_release': False,
-    'test_s3': False,
-    'update_redmine': False,
+    "additional_repos": [],
+    "upgrade_range": [],
+    "black": True,
+    "flake8": True,
+    "check_commit_message": True,
+    "check_gettext": True,
+    "check_manifest": True,
+    "check_openapi_schema": True,
+    "check_stray_pulpcore_imports": True,
+    "coverage": False,
+    "deploy_client_to_pypi": True,
+    "deploy_client_to_rubygems": True,
+    "deploy_daily_client_to_pypi": True,
+    "deploy_daily_client_to_rubygems": True,
+    "deploy_to_pypi": True,
+    "docker_fixtures": False,
+    "docs_test": True,
+    "issue_tracker": "redmine",
+    "pulp_scheme": "http",
+    "plugin_app_label": None,
+    "plugin_camel": None,
+    "plugin_camel_short": None,
+    "plugin_caps": None,
+    "plugin_caps_short": None,
+    "plugin_dash": None,
+    "plugin_dash_short": None,
+    "plugin_default_branch": "main",
+    "plugin_name": None,
+    "plugin_snake": None,
+    "publish_docs_to_pulpprojectdotorg": False,
+    "pulp_settings": None,
+    "pulpcore_branch": "master",
+    "pulpcore_pip_version_specifier": None,
+    "pulpprojectdotorg_key_id": None,
+    "pydocstyle": True,
+    "pypi_username": None,
+    "python_version": "3.8",
+    "redmine_project": None,
+    "release_user": "pulpbot",
+    "sync_ci": True,
+    "test_bindings": True,
+    "test_cli": False,
+    "test_performance": False,
+    "test_released_plugin_with_next_pulpcore_release": False,
+    "test_s3": False,
+    "update_redmine": False,
 }
 
 
@@ -81,72 +81,121 @@ DEPRECATED_FILES = {
     ],
     "docs": [
         "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
-        "docs/_static/api.json"
+        "docs/_static/api.json",
     ],
 }
 
 
 def main():
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description='Create or update a plugin using the current '
-                                                 'template.')
-    parser.add_argument('plugin_name', type=str,
-                        help=textwrap.dedent('''\
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter,
+        description="Create or update a plugin using the current " "template.",
+    )
+    parser.add_argument(
+        "plugin_name",
+        type=str,
+        help=textwrap.dedent(
+            """\
                             Create or update this plugin. The name should start with pulp- or pulp_.
 
-                        '''))
-    parser.add_argument('--plugin-app-label', type=str,
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--plugin-app-label",
+        type=str,
+        help=textwrap.dedent(
+            """\
                             the Django app label for the plugin - usually the part after pulp_ or
                             pulp-.
 
-                        '''))
-    parser.add_argument('--generate-config', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--generate-config",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Create or update a plugin template config for a plugin and exit.
 
-                        '''))
-    parser.add_argument('--bootstrap', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--bootstrap",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Create a new plugin and template boilerplate code.
 
-                        '''))
-    parser.add_argument('--test', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Generate or update functional and unit tests.
 
-                        '''))
-    parser.add_argument('--github', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--github",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Generate or update github CI/CD configuration files.
 
-                        '''))
-    parser.add_argument('--docs', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--docs",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Generate or update plugin documentation.
 
-                        '''))
-    parser.add_argument('--all', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Create a new plugin and template all non-excluded files.
 
-                        '''))
-    parser.add_argument('--verbose', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Include more output.
 
-                        '''))
-    parser.add_argument('--migrate-github-issues', action='store_true',
-                        help=textwrap.dedent('''\
+                        """
+        ),
+    )
+    parser.add_argument(
+        "--migrate-github-issues",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
                             Migrate plugin's issue checker CI/CD from Redmine to GitHub
-                        '''))
+                        """
+        ),
+    )
     args = parser.parse_args()
-
-
 
     here = os.path.dirname(os.path.abspath(__file__))
     plugin_root_dir = os.path.join(os.path.dirname(here), args.plugin_name)
-    plugin_config_path = os.path.join(plugin_root_dir, 'template_config.yml')
+    plugin_config_path = os.path.join(plugin_root_dir, "template_config.yml")
     write_new_config = False
 
     try:
@@ -161,8 +210,10 @@ def main():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
-                    print("\nLoaded plugin template config from "
-                          "{path}/template_config.yml.\n".format(path=plugin_root_dir))
+                    print(
+                        "\nLoaded plugin template config from "
+                        "{path}/template_config.yml.\n".format(path=plugin_root_dir)
+                    )
                     if args.verbose:
                         print("\nUsing the following config:\n")
                         pp = pprint.PrettyPrinter(indent=4)
@@ -172,12 +223,17 @@ def main():
                 print(exc)
                 exit()
     except FileNotFoundError:
-        print("\nCould not find a plugin template config at {path}/template_config.yml.\n".format(
-            path=plugin_root_dir))
+        print(
+            "\nCould not find a plugin template config at {path}/template_config.yml.\n".format(
+                path=plugin_root_dir
+            )
+        )
         if args.all or args.generate_config:
             if not args.plugin_app_label:
-                print("\n--plugin-app-label needs to be specified when generating a template "
-                      "config. See ./plugin-template -h for usage.\n")
+                print(
+                    "\n--plugin-app-label needs to be specified when generating a template "
+                    "config. See ./plugin-template -h for usage.\n"
+                )
                 return 2
             else:
                 config = generate_config(args.plugin_name, args.plugin_app_label)
@@ -186,31 +242,33 @@ def main():
 
     # Config key is used by the template_config.yml.j2 template to dump
     # the config. (note: uses .copy() to avoid a self reference)
-    config['config'] = config.copy()
+    config["config"] = config.copy()
 
     if args.migrate_github_issues:
-        if config['issue_tracker'] == 'github':
+        if config["issue_tracker"] == "github":
             print(f"{args.plugin_name} is already using GitHub as the issue tracker")
             return 2
         migrate_github_issues(config, plugin_root_dir, verbose=args.verbose)
         return 0
 
     if args.github or args.all:
-        if not config['pypi_username'] and (config['deploy_client_to_pypi'] or \
-                config['deploy_to_pypi']):
+        if not config["pypi_username"] and (
+            config["deploy_client_to_pypi"] or config["deploy_to_pypi"]
+        ):
             print("If PyPI scripts are included, PyPI username is required.")
             return 2
 
     sections = [
-        section for section in ['generate_config', 'bootstrap', 'github', 'docs', 'test']
+        section
+        for section in ["generate_config", "bootstrap", "github", "docs", "test"]
         if getattr(args, section) or args.all
     ]
     for section in sections:
         write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
     if write_new_config and not (args.generate_config or args.all):
-        write_template_section(config, 'generate_config', plugin_root_dir, verbose=args.verbose)
-        file_path = os.path.join(plugin_root_dir, 'template_config.yml')
+        write_template_section(config, "generate_config", plugin_root_dir, verbose=args.verbose)
+        file_path = os.path.join(plugin_root_dir, "template_config.yml")
         print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
 
     if plugin_root_dir:
@@ -228,34 +286,39 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     Template or copy all files for the section.
     """
     section_template_dir = "templates/{name}".format(name=name)
-    env = Environment(
-        loader=FileSystemLoader([section_template_dir, 'templates'])
-    )
+    env = Environment(loader=FileSystemLoader([section_template_dir, "templates"]))
 
     files_templated = 0
     files_copied = 0
     gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
     for relative_path in generate_relative_path_set(section_template_dir):
-        destination_relative_path = relative_path.replace('plugin_name', config['plugin_snake'])
-        necessary_dir_structure = os.path.dirname(os.path.join(plugin_root_dir, destination_relative_path))
+        destination_relative_path = relative_path.replace("plugin_name", config["plugin_snake"])
+        necessary_dir_structure = os.path.dirname(
+            os.path.join(plugin_root_dir, destination_relative_path)
+        )
 
         if not os.path.exists(necessary_dir_structure):
             os.makedirs(necessary_dir_structure)
 
-        if relative_path.endswith('.j2'):
-            env.filters['to_yaml'] = to_nice_yaml
+        if relative_path.endswith(".j2"):
+            env.filters["to_yaml"] = to_nice_yaml
             template = env.get_template(relative_path)
-            destination = destination_relative_path[:-len('.j2')]
-            write_template_to_file(template, plugin_root_dir, destination, {"section": name, "gitref": gitref, **config})
+            destination = destination_relative_path[: -len(".j2")]
+            write_template_to_file(
+                template,
+                plugin_root_dir,
+                destination,
+                {"section": name, "gitref": gitref, **config},
+            )
             files_templated += 1
             if verbose:
                 print(f"Templated file: {relative_path}")
         else:
-            if destination_relative_path.endswith('.copy'):
-                destination_relative_path = destination_relative_path[:-len(".copy")]
+            if destination_relative_path.endswith(".copy"):
+                destination_relative_path = destination_relative_path[: -len(".copy")]
             shutil.copyfile(
                 os.path.join(section_template_dir, relative_path),
-                os.path.join(plugin_root_dir, destination_relative_path)
+                os.path.join(plugin_root_dir, destination_relative_path),
             )
             files_copied += 1
             if verbose:
@@ -273,8 +336,7 @@ def generate_relative_path_set(root_dir):
     for root, dirs, files in os.walk(root_dir, topdown=False):
         for file_name in files:
             template_abs_path = os.path.join(root, file_name)
-            template_relative_path = os.path.relpath(template_abs_path,
-                                                     root_dir)
+            template_relative_path = os.path.relpath(template_abs_path, root_dir)
             applicable_paths.add(template_relative_path)
     return applicable_paths
 
@@ -284,17 +346,25 @@ def write_template_to_file(template, plugin_root_dir, relative_path, config):
     Render template with values from the config and write it to the target plugin directory.
     """
 
-    with tempfile.NamedTemporaryFile(mode='w', dir=plugin_root_dir, delete=False) as fd_out:
+    with tempfile.NamedTemporaryFile(mode="w", dir=plugin_root_dir, delete=False) as fd_out:
         tempfile_path = fd_out.name
         fd_out.write(template.render(**config))
-        fd_out.write('\n')
+        fd_out.write("\n")
 
         destination_path = os.path.normpath(os.path.join(plugin_root_dir, relative_path))
         os.rename(tempfile_path, destination_path)
 
-        if destination_path.endswith('.sh') or destination_path.endswith('.py'):
-            mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | \
-                stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
+        if destination_path.endswith(".sh") or destination_path.endswith(".py"):
+            mode = (
+                stat.S_IRUSR
+                | stat.S_IWUSR
+                | stat.S_IXUSR
+                | stat.S_IRGRP
+                | stat.S_IWGRP
+                | stat.S_IXGRP
+                | stat.S_IROTH
+                | stat.S_IXOTH
+            )
         else:
             mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH
         os.chmod(destination_path, mode)
@@ -313,15 +383,15 @@ def generate_config(plugin_name, plugin_app_label):
         config (dict): a dictionary containing a default template configuration for the plugin
     """
     config = {}
-    config['plugin_name'] = plugin_name
-    config['plugin_app_label'] = plugin_app_label
-    config['plugin_snake'] = utils.to_snake(plugin_name)
-    config['plugin_caps'] = utils.to_caps(plugin_name)
-    config['plugin_caps_short'] = utils.to_caps(plugin_app_label)
-    config['plugin_camel'] = utils.to_camel(plugin_name)
-    config['plugin_camel_short'] = utils.to_camel(plugin_app_label)
-    config['plugin_dash'] = utils.to_dash(plugin_name)
-    config['plugin_dash_short'] = utils.to_dash(plugin_app_label)
+    config["plugin_name"] = plugin_name
+    config["plugin_app_label"] = plugin_app_label
+    config["plugin_snake"] = utils.to_snake(plugin_name)
+    config["plugin_caps"] = utils.to_caps(plugin_name)
+    config["plugin_caps_short"] = utils.to_caps(plugin_app_label)
+    config["plugin_camel"] = utils.to_camel(plugin_name)
+    config["plugin_camel_short"] = utils.to_camel(plugin_app_label)
+    config["plugin_dash"] = utils.to_dash(plugin_name)
+    config["plugin_dash_short"] = utils.to_dash(plugin_app_label)
     # Add any missing value from the list of defaults
     for key, value in DEFAULT_SETTINGS.items():
         if key not in config:
@@ -346,27 +416,34 @@ def check_for_deprecated_files(plugin_root_dir, sections):
 def migrate_github_issues(config, plugin_root_dir, verbose=False):
     """Moves the plugin's issue checker CI/CD off of Redmine and onto GitHub"""
     print("Updating template_config.yml and templating ci section")
-    name = config['plugin_name']
-    redmine = config['redmine_project']
+    name = config["plugin_name"]
+    redmine = config["redmine_project"]
     if not redmine:
-        print("Redmine project name not set. Please set 'redmine_project' in template_config.yml"
-              " and rerun this command")
+        print(
+            "Redmine project name not set. Please set 'redmine_project' in template_config.yml"
+            " and rerun this command"
+        )
         return 2
-    config['issue_tracker'] = 'github'
-    config['redmine_project'] = None
-    config['update_redmine'] = False
-    config.pop('config')
-    config['config'] = config.copy()
+    config["issue_tracker"] = "github"
+    config["redmine_project"] = None
+    config["update_redmine"] = False
+    config.pop("config")
+    config["config"] = config.copy()
     write_template_section(config, "generate_config", plugin_root_dir, verbose=verbose)
     write_template_section(config, "github", plugin_root_dir, verbose=verbose)
     print("Updating pyproject.toml to point to GitHub issues\n")
     search_string = "pulp.plan.io"
-    replace_string = f"github.com\/pulp\/{name}"
+    replace_string = "github.com\\/pulp\\/{name}".format(name=name)
     os.system(f"sed -i 's/{search_string}/{replace_string}/' {plugin_root_dir}/pyproject.toml")
-    print(f"Please check the Pulp-CI PR processor (https://git.io/Jtsz5) and remove {name}"
-          f" if present\n")
-    print(f"Don't forget to migrate current issues from https://pulp.plan.io/projects/{redmine}"
-          f" and remove the repo from the project settings\n")
+    print(
+        f"Please check the Pulp-CI PR processor (https://git.io/Jtsz5) and remove {name}"
+        f" if present\n"
+    )
+    print(
+        f"Don't forget to migrate current issues from https://pulp.plan.io/projects/{redmine}"
+        f" and remove the repo from the project settings\n"
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())
