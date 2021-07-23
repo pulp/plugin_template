@@ -90,7 +90,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
       {%- if test_bindings or deploy_client_to_rubygems %}
       - uses: actions/setup-ruby@v1

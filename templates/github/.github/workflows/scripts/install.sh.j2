@@ -114,7 +114,11 @@ VARSYAML
 cat >> vars/main.yaml << VARSYAML
 pulp_settings: {{ pulp_settings | tojson }}
 pulp_scheme: {{ pulp_scheme }}
+{% if python_version == "3.6" %}
+pulp_container_tag: python36
+{% else %}
 pulp_container_tag: {{ 'https' if pulp_scheme == 'https' else 'latest' }}
+{% endif %}
 VARSYAML
 
 {%- if docker_fixtures %}
