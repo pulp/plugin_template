@@ -189,6 +189,8 @@ The following settings are stored in `template_config.yml`.
                         is required unless deploy_client_to_pypi and deploy_daily_client_to_pypi
                         and deploy_to_pypi are specified.
 
+  python_version        Python version to use in the CI. Currently only 3.6 and 3.8 are supported.
+
   redmine_project       A string that corresponds to the redmine identifier for the repo's project.
                         This is used during commit validation to make sure the commit is attached to
                         an issue in the correct project.

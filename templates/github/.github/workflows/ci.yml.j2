@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
         # dev_requirements contains tools needed for flake8, etc.
       - name: Install requirements
@@ -92,7 +92,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
       {%- if test_bindings %}
       - uses: actions/setup-ruby@v1
@@ -185,7 +185,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
       - name: Install httpie
         run: |

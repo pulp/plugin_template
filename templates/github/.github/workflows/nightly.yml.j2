@@ -40,7 +40,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
       - name: Install httpie
         run: |
@@ -139,7 +139,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
       - uses: actions/setup-ruby@v1
         with:
@@ -263,7 +263,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.8"
+          python-version: "{{ python_version }}"
 
       - name: Install httpie
         run: |
