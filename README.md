@@ -81,6 +81,8 @@ The following settings are stored in `template_config.yml`.
 
   check_stray_pulpcore_imports
                         Check that plugins are importing from pulpcore.plugin and not pulpcore directly.
+  
+  core_import_allowed   A list of string patterns to be allowed to import from pulpcore explicitly.
 
   coverage              Include collection of coverage and reporting to coveralls.io
 
@@ -224,6 +226,11 @@ The following settings are stored in `template_config.yml`.
 
   update_redmine        The CI will automatically change the state of tickets when PRs are opened,
                         or merged, and when the changes are released.
+
+  ci_trigger            Value for the `on` clause on workflow/ci.yml (push, pull_request, etc...)
+
+  pre_job_template      holds name and a path for a template to be included to run before jobs.
+  post_job_template     holds name and a path for a template to be included to run after jobs.
 ```
 
 # Bootstrap a new Pulp plugin

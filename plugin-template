@@ -26,6 +26,7 @@ DEFAULT_SETTINGS = {
     "check_manifest": True,
     "check_openapi_schema": True,
     "check_stray_pulpcore_imports": True,
+    "core_import_allowed": [],
     "coverage": False,
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
@@ -63,6 +64,9 @@ DEFAULT_SETTINGS = {
     "test_released_plugin_with_next_pulpcore_release": False,
     "test_s3": False,
     "update_redmine": False,
+    "ci_trigger": "{pull_request: {branches: ['*']}}",
+    "pre_job_template": None,
+    "post_job_template": None,
 }
 
 
@@ -286,7 +290,15 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     Template or copy all files for the section.
     """
     section_template_dir = "templates/{name}".format(name=name)
-    env = Environment(loader=FileSystemLoader([section_template_dir, "templates"]))
+    env = Environment(
+        loader=FileSystemLoader(
+            [
+                section_template_dir,  # The scpecified section folder
+                "templates",  # The default templates folder
+                "../",  # The parent dir to allow including pre/post templates from
+            ]
+        )
+    )
 
     files_templated = 0
     files_copied = 0

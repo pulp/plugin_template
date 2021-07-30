@@ -1,15 +1,14 @@
 {% include 'header.j2' %}
 ---
 name: Pulp CI
-on:
-  pull_request:
-    branches:
-      - '*'
-
+on: {{ ci_trigger | default("{pull_request: {branches: ['*']}}") }}
 jobs:
+
+{% if pre_job_template -%}{{ "  " | indent }}{% include pre_job_template.path %}{%- endif %}
 
   lint:
     runs-on: ubuntu-latest
+    {% if pre_job_template %}needs: {{ pre_job_template.name }}{% endif %}
 
     steps:
       - uses: actions/checkout@v2
@@ -140,6 +139,11 @@ jobs:
       - name: Script
         run: .github/workflows/scripts/script.sh
         shell: bash
+        # env vars useful for post_script.sh when present
+        env:
+          GITHUB_PULL_REQUEST: {{ "${{ github.event.number }}" }}
+          GITHUB_BRANCH: {{ "${{ github.head_ref }}" }}
+          GITHUB_REPO_SLUG: {{ "${{ github.repository }}" }}
 
       - name: After failure
         if: failure()
@@ -245,3 +249,6 @@ jobs:
           docker exec pulp cat /etc/yum.repos.d/*
           {%- endif %}
 {%- endif %}
+
+
+{% if post_job_template -%}{{ "  " | indent }}{% include post_job_template.path %}{%- endif %}
