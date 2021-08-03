@@ -1,6 +1,6 @@
 {% include 'header.j2' %}
 ---
-name: Pulp CI
+name: {{ plugin_camel_short | default("Pulp") }} CI
 on: {{ ci_trigger | default("{pull_request: {branches: ['*']}}") }}
 jobs:
 
