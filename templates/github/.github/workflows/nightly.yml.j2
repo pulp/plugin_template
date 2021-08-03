@@ -1,6 +1,6 @@
 {% include 'header.j2' %}
 ---
-name: Pulp Nightly CI/CD
+name: {{ plugin_camel_short | default("Pulp") }} Nightly CI/CD
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
