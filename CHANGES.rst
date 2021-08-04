@@ -13,6 +13,39 @@ Changelog
 
 .. towncrier release notes start
 
+2021.08.04 (2021-08-04)
+=======================
+
+
+Features
+--------
+
+- Enable https functional tests
+  `#403 <https://github.com/pulp/plugin_template/issues/403>`_
+- Added a new nightly workflow to update CI files.
+  `#420 <https://github.com/pulp/plugin_template/issues/420>`_
+- Added an optional 'before_script' parameter to the release workflow.
+  `#433 <https://github.com/pulp/plugin_template/issues/433>`_
+- Added check to ensure the cherrypick script runs from project root.
+  `#438 <https://github.com/pulp/plugin_template/issues/438>`_
+- Added python_version option.
+  `#457 <https://github.com/pulp/plugin_template/issues/457>`_
+
+
+Bugfixes
+--------
+
+- Handle conflicts when cherry-picking changelog to the main branch.
+  `#439 <https://github.com/pulp/plugin_template/issues/439>`_
+- Updated CLI test code to use cli.toml instead of settings.toml.
+  `#448 <https://github.com/pulp/plugin_template/issues/448>`_
+- Update the Python version to 3.8 in CI files.
+  `#453 <https://github.com/pulp/plugin_template/issues/453>`_
+
+
+----
+
+
 2021.07.01 (2021-07-01)
 
 Features
