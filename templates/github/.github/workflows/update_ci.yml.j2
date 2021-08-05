@@ -20,10 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Configure Git with pulpbot name and email
+      - name: Configure Git with {{ release_user }} name and email
         run: |
-          git config --global user.name 'pulpbot'
-          git config --global user.email 'pulp-infra@redhat.com'
+          git config --global user.name '{{ release_user }}'
+          git config --global user.email '{{ release_email }}'
 
       - name: Run update
         run: |
@@ -33,12 +33,12 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
-          committer: {{  'pulpbot <pulp-infra@redhat.com>' }}
-          author: {{  'pulpbot <pulp-infra@redhat.com>' }}
+          committer: {{release_user}} <{{ release_email }}>
+          author: {{release_user}} <{{ release_email }}>
           title: 'Update CI files'
-          body: '[noissue]'
+          body: '{{ noissue_marker | default("[noissue]") }}'
           commit-message: |
             Update CI files
 
-            [noissue]
+            {{ noissue_marker | default("[noissue]") }}
           delete-branch: true

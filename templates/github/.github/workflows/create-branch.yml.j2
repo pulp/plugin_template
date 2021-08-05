@@ -62,8 +62,8 @@ jobs:
       - name: Make a PR with version bump
         uses: peter-evans/create-pull-request@v3
         with:
-          committer: {{  'pulpbot <pulp-infra@redhat.com>' }}
-          author: {{  'pulpbot <pulp-infra@redhat.com>' }}
+          committer: {{release_user}} <{{ release_email }}>
+          author: {{release_user}} <{{ release_email }}>
           branch: minor-version-bump
           base: {{ plugin_default_branch }}
           title: Bump minor version

@@ -57,6 +57,8 @@ DEFAULT_SETTINGS = {
     "python_version": "3.8",
     "redmine_project": None,
     "release_user": "pulpbot",
+    "release_email": "pulp-infra@redhat.com",
+    "noissue_marker": "[noissue]",
     "sync_ci": True,
     "test_bindings": True,
     "test_cli": False,
