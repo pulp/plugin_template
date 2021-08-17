@@ -8,6 +8,7 @@ from pathlib import Path
 {% if issue_tracker == 'redmine' %}
 import requests
 {% elif issue_tracker == 'github' %}
+import os
 from github import Github
 {% endif %}
 
@@ -19,7 +20,7 @@ KEYWORDS = ["fixes", "closes"]
 
 sha = sys.argv[1]
 message = subprocess.check_output(["git", "log", "--format=%B", "-n 1", sha]).decode("utf-8")
-g = Github()
+g = Github(os.environ.get("GITHUB_TOKEN"))
 repo = g.get_repo("pulp/{{ plugin_name }}")
 
 
