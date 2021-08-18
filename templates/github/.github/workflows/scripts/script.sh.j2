@@ -122,10 +122,10 @@ if [[ "$TEST" == "upgrade" ]]; then
   pytest -v -r sx --color=yes --pyargs -capture=no {{ plugin_snake }}.tests.upgrade.pre
 
   # Checking out ci_upgrade_test branch and upgrading plugins
+  cmd_prefix bash -c "cd pulpcore; git checkout -f ci_upgrade_test; pip install --upgrade --force-reinstall ."
   {%- for plugin_branch in upgrade_range[0].keys() if plugin_branch != "pulpcore_branch" %}
   cmd_prefix bash -c "cd {{ plugin_branch| replace("_branch", "") }}; git checkout -f ci_upgrade_test; pip install ."
   {%- endfor %}
-  cmd_prefix bash -c "cd pulpcore; git checkout -f ci_upgrade_test; pip install ."
 
   # Migrating
   cmd_prefix bash -c "django-admin migrate --no-input"
