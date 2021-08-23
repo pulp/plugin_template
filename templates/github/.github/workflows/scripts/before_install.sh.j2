@@ -119,6 +119,7 @@ cd ..
 git clone --depth=1 https://github.com/pulp/pulpcore.git --branch {{ pulpcore_branch }}
 
 cd pulpcore
+{% if pulpcore_revision %}git checkout {{ pulpcore_revision }}{% endif %}
 if [ -n "$PULPCORE_PR_NUMBER" ]; then
   git fetch --depth=1 origin pull/$PULPCORE_PR_NUMBER/head:$PULPCORE_PR_NUMBER
   git checkout $PULPCORE_PR_NUMBER
@@ -129,12 +130,14 @@ cd ..
 {%- for plugin in additional_repos %}
 
 git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git --branch {{ plugin.branch }}
+cd {{ plugin.name }}
+{% if plugin.revision %}git checkout {{ plugin.revision }}{% endif %}
 if [ -n "${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER" ]; then
-  cd {{ plugin.name }}
   git fetch --depth=1 origin pull/${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER/head:${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER
   git checkout ${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER
-  cd ..
 fi
+
+cd ..
 {%- endfor %}
 
 {% if upgrade_range %}

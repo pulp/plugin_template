@@ -52,6 +52,8 @@ The following settings are stored in `template_config.yml`.
                         name: the name of the plugin
                         bindings (optional): boolean whether or not generate bindings
                         org (optional): github organization
+                        revision (optional): the git commit hash to install.
+                                             "Required PR" in a commit message will override this. 
                         branch: the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
                                                Applies to TAGGED (release) jobs.
@@ -171,6 +173,8 @@ The following settings are stored in `template_config.yml`.
 
   pulp_settings         A dictionary of settings that the plugin tests require to be set.
 
+  pulpcore_revision     The git commit hash to check out and install in Github Actions.
+                        "Required PR" in a commit message will override this.
   pulpcore_branch       The branch of pulpcore to check out and install in Github Actions.
                         This only applies to non-tagged jobs, such as PRs & cron jobs.
                         "Required PR" in a commit message will override this.
@@ -232,7 +236,7 @@ The following settings are stored in `template_config.yml`.
                         or merged, and when the changes are released.
 
   ci_trigger            Value for the `on` clause on workflow/ci.yml (push, pull_request, etc...)
-
+  ci_env                Environment variables to set for the CI build.
   pre_job_template      holds name and a path for a template to be included to run before jobs.
   post_job_template     holds name and a path for a template to be included to run after jobs.
 ```
