@@ -306,6 +306,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     files_copied = 0
     gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
     for relative_path in generate_relative_path_set(section_template_dir):
+        if config["issue_tracker"] != "redmine" and "redmine" in relative_path:
+            continue
         destination_relative_path = relative_path.replace("plugin_name", config["plugin_snake"])
         necessary_dir_structure = os.path.dirname(
             os.path.join(plugin_root_dir, destination_relative_path)
