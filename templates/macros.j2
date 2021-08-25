@@ -1,0 +1,117 @@
+{%- macro set_env_vars() -%} 
+PY_COLORS: '1'
+ANSIBLE_FORCE_COLOR: '1'
+GITHUB_PULL_REQUEST: {{ "${{ github.event.number }}" }}
+GITHUB_PULL_REQUEST_BODY: {{ "${{ github.event.pull_request.body }}" }}
+GITHUB_BRANCH: {{ "${{ github.head_ref }}" }}
+GITHUB_REPO_SLUG: {{ "${{ github.repository }}" }}
+GITHUB_TOKEN: {{ "${{ secrets.GITHUB_TOKEN }}" }}
+GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
+{%- for key, value in ci_env.items() %} 
+{{ key }}: {{ value }}
+{%- endfor %}
+{%- endmacro -%}
+
+
+{%- macro checkout() -%}
+- uses: actions/checkout@v2
+  with:
+    # by default, it uses a depth of 1
+    # this fetches all history so that we can read each commit
+    fetch-depth: 0
+{%- endmacro -%}
+
+
+{%- macro setup_python(pyversion=python_version) -%}
+- uses: actions/setup-python@v2
+  with:
+    python-version: "{{ pyversion }}"
+{%- endmacro -%}
+
+
+{%- macro setup_ruby(condition=None) -%}
+- uses: actions/setup-ruby@v1
+  {%if condition %}if: {{ condition }}{% endif %}
+  with:
+    ruby-version: "2.6"
+{%- endmacro -%}
+
+
+{%- macro install_httpie() -%}
+- name: Install httpie
+  run: |
+    echo ::group::HTTPIE
+    sudo apt-get update -yq
+    sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
+    echo ::endgroup::
+    echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
+    echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
+
+    {%- if upgrade_range %}
+    {%- for plugin_branch, version in upgrade_range[0].items() %}
+    echo "FROM_{{ plugin_branch| upper| replace("-", "_") }}={{ "${{ matrix.FROM_" + plugin_branch| upper| replace("-", "_") +" }}" }}" >> $GITHUB_ENV
+    {%- endfor %}
+    {%- endif %}
+
+    {%- if test_performance %}
+    {%- if test_performance is iterable and test_performance|length > 1 %}
+    echo "PERFORMANCE_TEST={{ "${{ matrix.env.PERFORMANCE_TEST }}" }}" >> $GITHUB_ENV
+    {%- endif %}
+    {%- endif %}
+{%- endmacro -%}
+
+
+{%- macro after_failure() -%}
+- name: After failure
+  if: failure()
+  run: |
+    echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
+    http --timeout 30 --check-status --pretty format --print hb {{ pulp_scheme }}://pulp/pulp/api/v3/status/ || true
+    docker images || true
+    docker ps -a || true
+    docker logs pulp || true
+    docker exec pulp ls -latr /etc/yum.repos.d/ || true
+    docker exec pulp cat /etc/yum.repos.d/* || true
+    docker exec pulp pip3 list
+    {%- if plugin_name == 'pulp_rpm' %}
+    docker exec pulp ls -latr /etc/yum.repos.d/
+    docker exec pulp cat /etc/yum.repos.d/*
+    {%- endif %}
+{%- endmacro -%}
+
+
+{%- macro run_script(name, file, withenv=True, condition=None) -%}
+- name: {{ name }}
+  {%if condition %}if: {{ condition }}{% endif %}
+  run: .github/workflows/scripts/{{ file }}
+  shell: bash
+  {%- if withenv %}
+  env:
+    {{ set_env_vars() | indent(4) }}
+  {%- endif %}
+{%- endmacro -%}
+
+
+{%- macro set_secrets(condition=None) -%}
+- name: Setting secrets
+  {%if condition %}if: {{ condition }}{% endif %}
+  run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
+  env:
+    SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+{%- endmacro -%}
+
+
+{%- macro install_python_deps(deps="") -%}
+- name: Install python dependencies
+  run: |
+    echo ::group::PYDEPS
+    pip install {{ deps }}
+    echo ::endgroup::
+{%- endmacro -%}
+
+{%- macro configure_git() -%}
+- name: Configure Git with {{ release_user }} name and email
+  run: |
+    git config --global user.name '{{ release_user }}'
+    git config --global user.email '{{ release_email }}'
+{%- endmacro -%}    

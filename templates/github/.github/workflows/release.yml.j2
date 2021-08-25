@@ -1,4 +1,16 @@
 {% include 'header.j2' %}
+{% from 'macros.j2' import 
+  set_env_vars, 
+  checkout, 
+  setup_python, 
+  setup_ruby,
+  install_httpie, 
+  after_failure, 
+  run_script, 
+  set_secrets,
+  install_python_deps, 
+  configure_git,
+with context %}
 ---
 name: Release Pipeline
 on:
@@ -24,31 +36,15 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
-          fetch-depth: 0
+      {{ checkout() | indent(6) }}
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
+      {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      - name: Install python dependencies
-        run: |
-          echo ::group::PYDEPS
-          pip install bandersnatch bump2version gitpython python-redmine towncrier==19.9.0 wheel
-          echo ::endgroup::
+      {{ install_python_deps("bandersnatch bump2version gitpython python-redmine towncrier==19.9.0 wheel") | indent(6) }}
 
-      - name: Configure Git with {{ release_user }} name and email
-        run: |
-          git config --global user.name '{{ release_user }}'
-          git config --global user.email '{{ release_email }}'
+      {{ configure_git() | indent(6) }}
 
-      - name: Setting secrets
-        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-        env:
-          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+      {{ set_secrets() | indent(6) }}
 
       - name: Create the release commit, tag it, create a post-release commit, and build plugin package
         run: python .github/workflows/scripts/release.py {{ "${{ github.event.inputs.release }}" }}
@@ -88,14 +84,10 @@ jobs:
         with:
           name: {{  plugin_name }}.tar
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "{{ python_version }}"
+      {{ setup_python() | indent(6) }}
 
       {%- if test_bindings or deploy_client_to_rubygems %}
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: "2.6"
+      {{ setup_ruby() | indent(6) }}
       {%- endif %}
 
       - name: Untar repository
@@ -112,52 +104,31 @@ jobs:
           git checkout "origin/${GITHUB_REF##*/}" -- .ci
           git checkout "origin/${GITHUB_REF##*/}" -- .github
 
-      - name: Install httpie
-        run: |
-          echo ::group::HTTPIE
-          sudo apt-get update -yq
-          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
-          echo ::endgroup::
-          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
-          echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
+      {{ install_httpie() | indent(6) }}
 
-      - name: Before Install
-        run: .github/workflows/scripts/before_install.sh
-        shell: bash
+      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
       - name: Install
         run: |
           export PLUGIN_VERSION={{ "${{ github.event.inputs.release }}" }}
           .github/workflows/scripts/install.sh
         env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
+          {{ set_env_vars() | indent(10) }}
         shell: bash
 
-      - name: Before Script
-        run: |
-          .github/workflows/scripts/before_script.sh
+      {{ run_script(name="Before Script", file="before_script.sh") | indent(6) }}
 
-      - name: Setting secrets
-        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-        env:
-          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+      {{ set_secrets() | indent(6) }}
 
-      - name: Install Python client
-        run: .github/workflows/scripts/install_python_client.sh
+      {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
 
-      - name: Install Ruby client
-        if: {{ "${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}" }}
-        run: .github/workflows/scripts/install_ruby_client.sh
+      {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False, condition="${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}") | indent(6) }}
 
       - name: Additional before_script
         run: {{ "${{ github.event.inputs.before_script }}" }}
         shell: bash
 
-      - name: Script
-        if: {{ "${{ env.TEST != 'generate-bindings' }}" }}
-        run: .github/workflows/scripts/script.sh
-        shell: bash
+      {{ run_script(name="Script", file="script.sh", condition="${{ env.TEST != 'generate-bindings' }}") | indent(6) }}
 
       - name: Upload python client packages
         if: {{ "${{ env.TEST == 'bindings' || env.TEST == 'generate-bindings' }}" }}
@@ -180,20 +151,7 @@ jobs:
           name: docs.tar
           path: docs/docs.tar
 
-      - name: After failure
-        if: failure()
-        run: |
-          http --timeout 30 --check-status --pretty format --print hb {{ pulp_scheme }}://pulp/pulp/api/v3/status/ || true
-          docker images || true
-          docker ps -a || true
-          docker logs pulp || true
-          docker exec pulp ls -latr /etc/yum.repos.d/ || true
-          docker exec pulp cat /etc/yum.repos.d/* || true
-          docker exec pulp pip3 list
-          {%- if plugin_name == 'pulp_rpm' %}
-          docker exec pulp ls -latr /etc/yum.repos.d/
-          docker exec pulp cat /etc/yum.repos.d/*
-          {%- endif %}
+      {{ after_failure() | indent(6) }}
 
 
   publish:
@@ -209,18 +167,11 @@ jobs:
         with:
           name: {{ plugin_name }}.tar
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
+      {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: "2.6"
+      {{ setup_ruby() | indent(6) }}
 
-      - name: Configure Git with {{ release_user }} name and email
-        run: |
-          git config --global user.name '{{ release_user }}'
-          git config --global user.email '{{ release_email }}'
+      {{ configure_git() | indent(6) }}
 
       - name: Untar repository
         run: |
@@ -236,16 +187,9 @@ jobs:
           git checkout "origin/${GITHUB_REF##*/}" -- .ci
           git checkout "origin/${GITHUB_REF##*/}" -- .github
 
-      - name: Setting secrets
-        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-        env:
-          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+      {{ set_secrets() | indent(6) }}
 
-      - name: Install python dependencies
-        run: |
-          echo ::group::PYDEPS
-          pip install gitpython python-redmine
-          echo ::endgroup::
+      {{ install_python_deps("gitpython python-redmine") | indent(6) }}
 
       - name: Push branch and tag to GitHub
         run: bash .github/workflows/scripts/push_branch_and_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }}

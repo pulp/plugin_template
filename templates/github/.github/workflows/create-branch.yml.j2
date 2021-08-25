@@ -1,4 +1,10 @@
 {% include 'header.j2' %}
+{% from 'macros.j2' import 
+  checkout, 
+  setup_python, 
+  set_secrets, 
+  install_python_deps 
+with context %}
 ---
 name: Create New Release Branch
 on:
@@ -19,26 +25,13 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
-          fetch-depth: 0
+      {{ checkout() | indent(6) }}
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
+      {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      - name: Install python dependencies
-        run: |
-          echo ::group::PYDEPS
-          pip install bump2version
-          echo ::endgroup::
+      {{ install_python_deps("bump2version") | indent(6) }}
 
-      - name: Setting secrets
-        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-        env:
-          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+      {{ set_secrets() | indent(6) }}
 
       - name: Verify that branch name matches current version string on {{ plugin_default_branch }} branch
         run: |
