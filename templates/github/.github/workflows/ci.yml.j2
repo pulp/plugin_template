@@ -1,4 +1,15 @@
 {% include 'header.j2' %}
+{% from 'macros.j2' import 
+  set_env_vars, 
+  checkout, 
+  setup_python, 
+  setup_ruby,
+  install_httpie, 
+  after_failure, 
+  run_script, 
+  set_secrets,
+  install_python_deps, 
+with context %}
 ---
 name: {{ plugin_camel_short | default("Pulp") }} CI
 on: {{ ci_trigger | default("{pull_request: {branches: ['*']}}") }}
@@ -11,15 +22,9 @@ jobs:
     {% if pre_job_template %}needs: {{ pre_job_template.name }}{% endif %}
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
-          fetch-depth: 0
+      {{ checkout() | indent(6) }}
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "{{ python_version }}"
+      {{ setup_python() | indent(6) }}
 
         # dev_requirements contains tools needed for flake8, etc.
       - name: Install requirements
@@ -29,11 +34,7 @@ jobs:
       - name: Check commit message
         if: github.event_name == 'pull_request'
         env:
-          GITHUB_TOKEN: {{ "${{ secrets.GITHUB_TOKEN }}" }}
-          GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
-          {%- for key, value in ci_env.items() %} 
-          {{ key }}: {{ value }}
-          {%- endfor %}
+          {{ set_env_vars() | indent(10) }}
         run: sh .github/workflows/scripts/check_commit.sh
       {%- endif %}
 
@@ -87,89 +88,31 @@ jobs:
           {%- endif %}
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
-          fetch-depth: 0
+      {{ checkout() | indent(6) }}
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "{{ python_version }}"
+      {{ setup_python() | indent(6) }}
 
       {%- if test_bindings %}
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: "2.6"
+      {{ setup_ruby() | indent(6) }}
       {%- endif %}
 
-      - name: Install httpie
-        run: |
-          echo ::group::HTTPIE
-          sudo apt-get update -yq
-          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
-          echo ::endgroup::
-          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
-          echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
+      {{ install_httpie() | indent(6) }}
 
-      - name: Before Install
-        run: .github/workflows/scripts/before_install.sh
-        shell: bash
+      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
-      - name: Install
-        run: .github/workflows/scripts/install.sh
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          {%- for key, value in ci_env.items() %} 
-          {{ key }}: {{ value }}
-          {%- endfor %}
-        shell: bash
+      {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
-      - name: Install Python client
-        run: .github/workflows/scripts/install_python_client.sh
+      {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
 
-      - name: Install Ruby client
-        if: {{ "${{ env.TEST == 'bindings' }}" }}
-        run: .github/workflows/scripts/install_ruby_client.sh
+      {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False, condition="${{ env.TEST == 'bindings' }}") | indent(6) }}
 
-      - name: Before Script
-        run: |
-          .github/workflows/scripts/before_script.sh
+      {{ run_script(name="Before Script", file="before_script.sh") | indent(6) }}
 
-      - name: Setting secrets
-        if: github.event_name != 'pull_request'
-        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-        env:
-          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+      {{ set_secrets(condition="github.event_name != 'pull_request'") | indent(6) }}
 
-      - name: Script
-        run: .github/workflows/scripts/script.sh
-        shell: bash
-        # env vars useful for post_script.sh when present
-        env:
-          GITHUB_PULL_REQUEST: {{ "${{ github.event.number }}" }}
-          GITHUB_BRANCH: {{ "${{ github.head_ref }}" }}
-          GITHUB_REPO_SLUG: {{ "${{ github.repository }}" }}
-          {%- for key, value in ci_env.items() %} 
-          {{ key }}: {{ value }}
-          {%- endfor %}
+      {{ run_script(name="Script", file="script.sh") | indent(6) }}
 
-      - name: After failure
-        if: failure()
-        run: |
-          echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
-          http --timeout 30 --check-status --pretty format --print hb {{ pulp_scheme }}://pulp/pulp/api/v3/status/ || true
-          docker images || true
-          docker ps -a || true
-          docker logs pulp || true
-          docker exec pulp ls -latr /etc/yum.repos.d/ || true
-          docker exec pulp cat /etc/yum.repos.d/* || true
-          docker exec pulp pip3 list
-          {%- if plugin_name == 'pulp_rpm' %}
-          docker exec pulp ls -latr /etc/yum.repos.d/
-          docker exec pulp cat /etc/yum.repos.d/*
-          {%- endif %}
+      {{ after_failure() | indent(6) }}
 
 {%- if upgrade_range %}
 
@@ -191,76 +134,27 @@ jobs:
     {%- endif %}
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
-          fetch-depth: 0
+      {{ checkout() | indent(6) }}
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "{{ python_version }}"
+      {{ setup_python() | indent(6) }}
 
-      - name: Install httpie
-        run: |
-          echo ::group::HTTPIE
-          sudo apt-get update -yq
-          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
-          echo ::endgroup::
-          echo "TEST=upgrade" >> $GITHUB_ENV
-          echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
-          {%- for plugin_branch, version in upgrade_range[0].items() %}
-          echo "FROM_{{ plugin_branch| upper| replace("-", "_") }}={{ "${{ matrix.FROM_" + plugin_branch| upper| replace("-", "_") +" }}" }}" >> $GITHUB_ENV
-          {%- endfor %}
+      {{ install_httpie() | indent(6) }}
 
-      - name: Install python dependencies
-        run: |
-          echo ::group::PYDEPS
-          pip install wheel
-          echo ::endgroup::
+      {{ install_python_deps("wheel") | indent(6) }}
 
-      - name: Before Install
-        run: .github/workflows/scripts/before_install.sh
-        shell: bash
+      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
-      - name: Install
-        run: .github/workflows/scripts/install.sh
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          {%- for key, value in ci_env.items() %} 
-          {{ key }}: {{ value }}
-          {%- endfor %}
-        shell: bash
+      {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
-      - name: Install Python client
-        run: .github/workflows/scripts/install_python_client.sh
+      {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
 
-      - name: Before Script
-        run: .github/workflows/scripts/before_script.sh
+      {{ run_script(name="Before Script", file="before_script.sh") | indent(6) }}
 
-      - name: Setting secrets
-        run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-        env:
-          SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
+      {{ set_secrets() | indent(6) }}
 
-      - name: Upgrade test
-        run: .github/workflows/scripts/script.sh
+      {{ run_script(name="Upgrade Test", file="script.sh") | indent(6) }}
 
-      - name: After failure
-        if: failure()
-        run: |
-          http --timeout 30 --check-status --pretty format --print hb {{ pulp_scheme }}://pulp/pulp/api/v3/status/ || true
-          docker images || true
-          docker ps -a || true
-          docker logs pulp || true
-          docker exec pulp ls -latr /etc/yum.repos.d/ || true
-          docker exec pulp cat /etc/yum.repos.d/* || true
-          docker exec pulp pip3 list
-          {%- if plugin_name == 'pulp_rpm' %}
-          docker exec pulp ls -latr /etc/yum.repos.d/
-          docker exec pulp cat /etc/yum.repos.d/*
-          {%- endif %}
+      {{ after_failure() | indent(6) }}
 {%- endif %}
 
 
