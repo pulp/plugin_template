@@ -34,6 +34,8 @@ if [[ "$TEST" = "docs" ]]; then
   cat $PWD/.ci/scripts/schema.py | cmd_stdin_prefix bash -c "cat > /tmp/schema.py"
   cmd_prefix bash -c "python3 /tmp/schema.py"
   cmd_prefix bash -c "pulpcore-manager spectacular --file pulp_schema.yml --validate"
+  echo "Testing OpenAPI schema view..."
+  http $PULP_URL/pulp/api/v3/
 {%- endif %}
 
   if [ -f $POST_DOCS_TEST ]; then
