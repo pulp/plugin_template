@@ -55,6 +55,7 @@ jobs:
       - name: Make a PR with version bump
         uses: peter-evans/create-pull-request@v3
         with:
+          token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
           committer: {{release_user}} <{{ release_email }}>
           author: {{release_user}} <{{ release_email }}>
           branch: minor-version-bump
