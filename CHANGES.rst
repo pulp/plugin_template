@@ -13,6 +13,20 @@ Changelog
 
 .. towncrier release notes start
 
+2021.08.26 (2021-08-26)
+=======================
+
+
+Bugfixes
+--------
+
+- Use RELEASE_TOKEN to create changelog PRs in order to properly trigger Github Actions.
+  `#475 <https://github.com/pulp/plugin_template/issues/475>`_
+
+
+----
+
+
 2021.08.04 (2021-08-04)
 =======================
 
