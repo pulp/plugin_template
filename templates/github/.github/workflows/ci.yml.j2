@@ -1,14 +1,14 @@
 {% include 'header.j2' %}
-{% from 'macros.j2' import 
-  set_env_vars, 
-  checkout, 
-  setup_python, 
+{% from 'macros.j2' import
+  set_env_vars,
+  checkout,
+  setup_python,
   setup_ruby,
-  install_httpie, 
-  after_failure, 
-  run_script, 
+  install_httpie,
+  after_failure,
+  run_script,
   set_secrets,
-  install_python_deps, 
+  install_python_deps,
 with context %}
 ---
 name: {{ plugin_camel_short | default("Pulp") }} CI
@@ -124,6 +124,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        env:
+          - TEST: upgrade
         include:
         {%- for test in upgrade_range %}
           - FROM_PULPCORE_BRANCH: "{{ test.pulpcore_branch }}"
