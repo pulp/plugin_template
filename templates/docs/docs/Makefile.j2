@@ -50,9 +50,7 @@ diagrams:
 ifneq ($(wildcard $(DIAGRAM_SOURCE_DIR)), )
 	mkdir -p $(DIAGRAM_BUILD_DIR)
 	python3 -m plantuml $(DIAGRAM_SOURCE_DIR)/*.dot
-	# cp + rm = mv  workaround https://pulp.plan.io/issues/4791#note-3
-	cp $(DIAGRAM_SOURCE_DIR)/*.png $(DIAGRAM_BUILD_DIR)/
-	rm $(DIAGRAM_SOURCE_DIR)/*.png
+	mv $(DIAGRAM_SOURCE_DIR)/*.png $(DIAGRAM_BUILD_DIR)/
 else
 	@echo "Did not find $(DIAGRAM_SOURCE_DIR)."
 endif
