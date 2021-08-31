@@ -166,6 +166,8 @@ then
   exit $s
 fi
 
+sed -i -e 's/DEBUG = False/DEBUG = True/' pulpcore/pulpcore/app/settings.py
+
 cd {{ plugin_name }}
 
 if [ -f $POST_BEFORE_INSTALL ]; then
