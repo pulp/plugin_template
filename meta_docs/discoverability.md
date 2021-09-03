@@ -19,7 +19,7 @@ application (the Python namespace that contains at least models and
 viewsets). Additionally, it should also set its `label` attribute to
 something that unambiguously labels which plugin is represented by that
 subclass. See
-[how it is done](https://github.com/pulp/pulp_file/blob/master/pulp_file/app/__init__.py)
+[how it is done](https://github.com/pulp/pulp_file/blob/main/pulp_file/app/__init__.py)
 in `pulp_file` plugin.
 
 
@@ -54,9 +54,9 @@ your plugin's application config class, just as `default_app_config`
 does.
 
 Check out `pulp_file` plugin:
-[default_app_config](https://github.com/pulp/pulp_file/blob/master/pulp_file/__init__.py)
+[default_app_config](https://github.com/pulp/pulp_file/blob/main/pulp_file/__init__.py)
 and
-[setup.py example](https://github.com/pulp/pulp_file/blob/master/setup.py).
+[setup.py example](https://github.com/pulp/pulp_file/blob/main/setup.py).
 
 
 Model, Serializer, Viewset Discovery
@@ -74,5 +74,5 @@ to auto-discover plugin components, particularly for both models and
 viewsets.
 
 Take a look at
-[the structure](https://github.com/pulp/pulp_file/tree/master/pulp_file/app)
+[the structure](https://github.com/pulp/pulp_file/tree/main/pulp_file/app)
 of the `pulp_file` plugin.
