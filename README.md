@@ -160,7 +160,7 @@ The following settings are stored in `template_config.yml`.
 
   plugin_dash_short     Suppose our plugin is named 'pulp_test', then this is 'test'
 
-  plugin_default_branch The default branch in your plugin repo, defaults to 'master'.
+  plugin_default_branch The default branch in your plugin repo, defaults to 'main'.
 
   plugin_name           Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
 

@@ -26,7 +26,7 @@ Pulp Core needs to be able to recognize two Content Units as being the same. Spe
 already has a saved copy of a specific content unit, when it encounters that content unit again, how
 can Pulp recognize it already has it saved.
 
-Consider `File Content Type <https://github.com/pulp/pulp_file/blob/master/pulp_file/app/models.py#L11-L32>`_
+Consider `File Content Type <https://github.com/pulp/pulp_file/blob/main/pulp_file/app/models.py#L11-L32>`_
 which is unique on ``path`` and ``digest`` together. ``path`` is the file's relative path, and
 ``digest`` is the SHA256 HEX digest. This causes Pulp to treat a file with the same ``path`` and
 ``digest`` as the same. Pulp Core enforces uniqueness constraints at the database level and rejects
