@@ -60,6 +60,7 @@ DEFAULT_SETTINGS = {
     "release_user": "pulpbot",
     "release_email": "pulp-infra@redhat.com",
     "noissue_marker": "[noissue]",
+    "single_commit_check": True,
     "sync_ci": True,
     "test_bindings": True,
     "test_cli": False,

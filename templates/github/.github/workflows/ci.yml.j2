@@ -17,6 +17,23 @@ jobs:
 
 {% if pre_job_template -%}{{ "  " | indent }}{% include pre_job_template.path %}{%- endif %}
 
+  {%- if single_commit_check %}
+  single_commit:
+    name: Assert single commit
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 30
+    - name: Checkout {{ plugin_default_branch }}
+      run: git fetch origin {{ plugin_default_branch }}
+    - name: create local {{ plugin_default_branch }} branch
+      run: git branch {{ plugin_default_branch }} origin/{{ plugin_default_branch }}
+    - name: Commit Count Check
+      run: test `git log  --oneline --no-merges HEAD ^{{ plugin_default_branch }}  | wc -l ` = 1
+    runs-on: ubuntu-latest
+  {%- endif %}
+
   lint:
     runs-on: ubuntu-latest
     {% if pre_job_template %}needs: {{ pre_job_template.name }}{% endif %}
