@@ -64,6 +64,9 @@ services:
     image: "pulp:${TAG}"
     volumes:
       - ./settings:/etc/pulp
+{%- if pulp_env %}
+    env: {{ pulp_env | tojson }}
+{%- endif %}
 VARSYAML
 else
   cat >> vars/main.yaml << VARSYAML
@@ -84,6 +87,9 @@ services:
     image: "pulp:${TAG}"
     volumes:
       - ./settings:/etc/pulp
+{%- if pulp_env %}
+    env: {{ pulp_env | tojson }}
+{%- endif %}
 VARSYAML
 fi
 {%- else %}
@@ -108,6 +114,9 @@ services:
     image: "pulp:${TAG}"
     volumes:
       - ./settings:/etc/pulp
+{%- if pulp_env %}
+    env: {{ pulp_env | tojson }}
+{%- endif %}
 VARSYAML
 {%- endif %}
 

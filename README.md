@@ -53,7 +53,7 @@ The following settings are stored in `template_config.yml`.
                         bindings (optional): boolean whether or not generate bindings
                         org (optional): github organization
                         revision (optional): the git commit hash to install.
-                                             "Required PR" in a commit message will override this. 
+                                             "Required PR" in a commit message will override this.
                         branch: the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
                                                Applies to TAGGED (release) jobs.
@@ -83,7 +83,7 @@ The following settings are stored in `template_config.yml`.
 
   check_stray_pulpcore_imports
                         Check that plugins are importing from pulpcore.plugin and not pulpcore directly.
-  
+
   core_import_allowed   A list of string patterns to be allowed to import from pulpcore explicitly.
 
   coverage              Include collection of coverage and reporting to coveralls.io
@@ -170,6 +170,8 @@ The following settings are stored in `template_config.yml`.
                         Include a job for publishing documentation to
                         docs.pulpproject.org/<plugin_name>/. This job requires the project-specific
                         authorized ssh key to be set as a secret named `PULP_DOCS_KEY`.
+
+  pulp_env              A dictionary of environment variables to be set in the pulp container.
 
   pulp_settings         A dictionary of settings that the plugin tests require to be set.
 
