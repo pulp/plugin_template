@@ -1,14 +1,14 @@
 {% include 'header.j2' %}
-{% from 'macros.j2' import 
-  set_env_vars, 
-  checkout, 
-  setup_python, 
+{% from 'macros.j2' import
+  set_env_vars,
+  checkout,
+  setup_python,
   setup_ruby,
-  install_httpie, 
-  after_failure, 
-  run_script, 
+  install_httpie,
+  after_failure,
+  run_script,
   set_secrets,
-  install_python_deps, 
+  install_python_deps,
   configure_git,
 with context %}
 ---
@@ -69,6 +69,9 @@ jobs:
           - TEST: pulp
           {%- if docs_test %}
           - TEST: docs
+          {%- endif %}
+          {%- if test_azure %}
+          - TEST: azure
           {%- endif %}
           {%- if test_s3 %}
           - TEST: s3
