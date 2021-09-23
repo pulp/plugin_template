@@ -53,7 +53,7 @@ The following settings are stored in `template_config.yml`.
                         bindings (optional): boolean whether or not generate bindings
                         org (optional): github organization
                         revision (optional): the git commit hash to install.
-                                             "Required PR" in a commit message will override this. 
+                                             "Required PR" in a commit message will override this.
                         branch: the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
                                                Applies to TAGGED (release) jobs.
@@ -83,7 +83,7 @@ The following settings are stored in `template_config.yml`.
 
   check_stray_pulpcore_imports
                         Check that plugins are importing from pulpcore.plugin and not pulpcore directly.
-  
+
   core_import_allowed   A list of string patterns to be allowed to import from pulpcore explicitly.
 
   coverage              Include collection of coverage and reporting to coveralls.io
@@ -230,6 +230,9 @@ The following settings are stored in `template_config.yml`.
                         Include a cron job that tests the latest released version of the plugin to
                         see if it is compatible with pulpcore's master branch. This helps ensure
                         that pulpcore is following the deprecation policy for the plugin API.
+
+  test_azure            Include azure job for running tests using [azurite](https://github.com/Azure/Azurite)
+                        to emulate Azure.
 
   test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
                         to emulate S3.
