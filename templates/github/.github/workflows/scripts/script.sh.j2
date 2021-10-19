@@ -107,11 +107,13 @@ cmd_prefix bash -c "django-admin makemigrations --check --dry-run"
 cmd_prefix bash -c "PULP_DATABASES__default__USER=postgres django-admin test --noinput /usr/local/lib/python{{ python_version }}/site-packages/{{ plugin_snake }}/tests/unit/"
 
 # Run functional tests
-{%- if plugin_name == 'pulpcore' %}
-export PYTHONPATH=$REPO_ROOT${PYTHONPATH:+:${PYTHONPATH}}
-{%- else %}
-export PYTHONPATH=$REPO_ROOT:$REPO_ROOT/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
+{%- for repo in additional_repos %}
+export PYTHONPATH=$REPO_ROOT/../{{repo.name}}${PYTHONPATH:+:${PYTHONPATH}}
+{%- endfor %}
+{%- if not plugin_name == 'pulpcore' %}
+export PYTHONPATH=$REPO_ROOT/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
 {%- endif %}
+export PYTHONPATH=$REPO_ROOT${PYTHONPATH:+:${PYTHONPATH}}
 
 {% if upgrade_range %}
 if [[ "$TEST" == "upgrade" ]]; then
