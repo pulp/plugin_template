@@ -1,4 +1,4 @@
-{%- macro set_env_vars() -%} 
+{%- macro set_env_vars() -%}
 PY_COLORS: '1'
 ANSIBLE_FORCE_COLOR: '1'
 GITHUB_PULL_REQUEST: {{ "${{ github.event.number }}" }}
@@ -7,7 +7,7 @@ GITHUB_BRANCH: {{ "${{ github.head_ref }}" }}
 GITHUB_REPO_SLUG: {{ "${{ github.repository }}" }}
 GITHUB_TOKEN: {{ "${{ secrets.GITHUB_TOKEN }}" }}
 GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
-{%- for key, value in ci_env.items() %} 
+{%- for key, value in ci_env.items() %}
 {{ key }}: {{ value }}
 {%- endfor %}
 {%- endmacro -%}
@@ -61,9 +61,9 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro after_failure() -%}
-- name: After failure
-  if: failure()
+{%- macro display_logs() -%}
+- name: Logs
+  if: always()
   run: |
     echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
     http --timeout 30 --check-status --pretty format --print hb {{ pulp_scheme }}://pulp/pulp/api/v3/status/ || true
@@ -114,4 +114,4 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
   run: |
     git config --global user.name '{{ release_user }}'
     git config --global user.email '{{ release_email }}'
-{%- endmacro -%}    
+{%- endmacro -%}

@@ -5,7 +5,7 @@
   setup_python,
   setup_ruby,
   install_httpie,
-  after_failure,
+  display_logs,
   run_script,
   set_secrets,
   install_python_deps,
@@ -133,7 +133,7 @@ jobs:
 
       {{ run_script(name="Script", file="script.sh") | indent(6) }}
 
-      {{ after_failure() | indent(6) }}
+      {{ display_logs() | indent(6) }}
 
 {%- if upgrade_range %}
 
@@ -177,7 +177,7 @@ jobs:
 
       {{ run_script(name="Upgrade Test", file="script.sh") | indent(6) }}
 
-      {{ after_failure() | indent(6) }}
+      {{ display_logs() | indent(6) }}
 {%- endif %}
 
 

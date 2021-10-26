@@ -5,7 +5,7 @@
   setup_python,
   setup_ruby,
   install_httpie,
-  after_failure,
+  display_logs,
   run_script,
   set_secrets,
   install_python_deps,
@@ -154,7 +154,7 @@ jobs:
           name: docs.tar
           path: docs/docs.tar
 
-      {{ after_failure() | indent(6) }}
+      {{ display_logs() | indent(6) }}
 
 
   publish:
