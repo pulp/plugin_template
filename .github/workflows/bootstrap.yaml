@@ -103,8 +103,7 @@ jobs:
       - name: Install httpie
         run: |
           echo ::group::HTTPIE
-          sudo apt-get update -yq
-          sudo -E apt-get -yq --no-install-suggests --no-install-recommends install httpie
+          pip install httpie
           echo ::endgroup::
           echo "TEST=${{ matrix.env.TEST }}" >> $GITHUB_ENV
 
