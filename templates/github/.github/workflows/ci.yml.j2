@@ -5,6 +5,7 @@
   setup_python,
   setup_ruby,
   install_httpie,
+  setup_env,
   display_logs,
   run_script,
   set_secrets,
@@ -119,6 +120,8 @@ jobs:
 
       {{ install_httpie() | indent(6) }}
 
+      {{ setup_env() | indent(6) }}
+
       {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
@@ -162,6 +165,8 @@ jobs:
       {{ setup_python() | indent(6) }}
 
       {{ install_httpie() | indent(6) }}
+
+      {{ setup_env(test="upgrade") | indent(6) }}
 
       {{ install_python_deps("wheel") | indent(6) }}
 

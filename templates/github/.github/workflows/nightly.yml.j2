@@ -5,6 +5,7 @@
   setup_python,
   setup_ruby,
   install_httpie,
+  setup_env,
   display_logs,
   run_script,
   set_secrets,
@@ -51,6 +52,8 @@ jobs:
       {{ setup_python() | indent(6) }}
 
       {{ install_httpie() | indent(6) }}
+
+      {{ setup_env() | indent(6) }}
 
       {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
@@ -106,6 +109,8 @@ jobs:
       {{ setup_ruby() | indent(6) }}
 
       {{ install_httpie() | indent(6) }}
+
+      {{ setup_env() | indent(6) }}
 
       {{ install_python_deps("wheel") | indent(6) }}
 
@@ -172,6 +177,8 @@ jobs:
       fail-fast: false
       matrix:
         env:
+          - TEST: performance
+        include:
         {%- for test in test_performance %}
           - PERFORMANCE_TEST: {{test}}
         {%- endfor %}
@@ -183,6 +190,8 @@ jobs:
       {{ setup_python() | indent(6) }}
 
       {{ install_httpie() | indent(6) }}
+
+      {{ setup_env(test="performance") | indent(6) }}
 
       {{ install_python_deps("wheel") | indent(6) }}
 
