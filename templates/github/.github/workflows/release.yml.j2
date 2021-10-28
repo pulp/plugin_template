@@ -5,6 +5,7 @@
   setup_python,
   setup_ruby,
   install_httpie,
+  setup_env,
   display_logs,
   run_script,
   set_secrets,
@@ -108,6 +109,8 @@ jobs:
           git checkout "origin/${GITHUB_REF##*/}" -- .github
 
       {{ install_httpie() | indent(6) }}
+
+      {{ setup_env() | indent(6) }}
 
       {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
