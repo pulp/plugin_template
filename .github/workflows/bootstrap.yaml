@@ -78,6 +78,7 @@ jobs:
         env:
           - TEST: pulp
           - TEST: docs
+          - TEST: azure
           - TEST: s3
 
     defaults:
