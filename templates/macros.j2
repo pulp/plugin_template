@@ -78,10 +78,6 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
     docker exec pulp ls -latr /etc/yum.repos.d/ || true
     docker exec pulp cat /etc/yum.repos.d/* || true
     docker exec pulp pip3 list
-    {%- if plugin_name == 'pulp_rpm' %}
-    docker exec pulp ls -latr /etc/yum.repos.d/
-    docker exec pulp cat /etc/yum.repos.d/*
-    {%- endif %}
 {%- endmacro -%}
 
 
