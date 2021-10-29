@@ -55,6 +55,7 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
     {%- if test_performance %}
     {%- if test_performance is iterable and test_performance|length > 1 %}
     echo "PERFORMANCE_TEST={{ "${{ matrix.env.PERFORMANCE_TEST }}" }}" >> $GITHUB_ENV
+    sed -i s/TEST=$/TEST=performance/ $GITHUB_ENV
     {%- endif %}
     {%- endif %}
 {%- endmacro -%}
@@ -69,12 +70,10 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
     docker images || true
     docker ps -a || true
     docker logs pulp || true
+    docker exec pulp pip3 list || true
+    {%- if plugin_name == 'pulp_rpm' %}
     docker exec pulp ls -latr /etc/yum.repos.d/ || true
     docker exec pulp cat /etc/yum.repos.d/* || true
-    docker exec pulp pip3 list
-    {%- if plugin_name == 'pulp_rpm' %}
-    docker exec pulp ls -latr /etc/yum.repos.d/
-    docker exec pulp cat /etc/yum.repos.d/*
     {%- endif %}
 {%- endmacro -%}
 
