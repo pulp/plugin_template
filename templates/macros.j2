@@ -54,13 +54,13 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
     {%- if upgrade_range and test == "upgrade" %}
     {%- for plugin_branch, version in upgrade_range[0].items() %}
-    echo "FROM_{{ plugin_branch| upper| replace("-", "_") }}={{ "${{ matrix.FROM_" + plugin_branch| upper| replace("-", "_") +" }}" }}" >> $GITHUB_ENV
+    echo "FROM_{{ plugin_branch| upper| replace("-", "_") }}={{ "${{ matrix.env.FROM_" + plugin_branch| upper| replace("-", "_") +" }}" }}" >> $GITHUB_ENV
     {%- endfor %}
     {%- endif %}
 
     {%- if test_performance and test == "performance" %}
     {%- if test_performance is iterable and test_performance|length > 1 %}
-    echo "PERFORMANCE_TEST={{ "${{ matrix.PERFORMANCE_TEST }}" }}" >> $GITHUB_ENV
+    echo "PERFORMANCE_TEST={{ "${{ matrix.env.PERFORMANCE_TEST }}" }}" >> $GITHUB_ENV
     {%- endif %}
     {%- endif %}
 {%- endmacro -%}
