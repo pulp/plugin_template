@@ -144,20 +144,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
 
-    {%- if upgrade_range is iterable and upgrade_range|length > 0 %}
     strategy:
       fail-fast: false
       matrix:
         env:
+        {%- if upgrade_range is iterable and upgrade_range|length > 0 %}
+          {%- for test in upgrade_range %}
           - TEST: upgrade
-        include:
-        {%- for test in upgrade_range %}
-          - FROM_PULPCORE_BRANCH: "{{ test.pulpcore_branch }}"
-          {%- for plugin_branch, version in test.items() if plugin_branch != "pulpcore_branch" %}
+            FROM_PULPCORE_BRANCH: "{{ test.pulpcore_branch }}"
+            {%- for plugin_branch, version in test.items() if plugin_branch != "pulpcore_branch" %}
             FROM_{{ plugin_branch| upper| replace("-", "_") }}: "{{version}}"
+            {%- endfor %}
           {%- endfor %}
-        {%- endfor %}
-    {%- endif %}
+        {%- else %}
+          - TEST: upgrade
+        {%- endif %}
 
     steps:
       {{ checkout() | indent(6) }}
