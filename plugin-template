@@ -66,6 +66,7 @@ DEFAULT_SETTINGS = {
     "test_cli": False,
     "test_performance": False,
     "test_released_plugin_with_next_pulpcore_release": False,
+    "disabled_redis_runners": [],
     "test_azure": False,
     "test_s3": False,
     "update_redmine": False,
