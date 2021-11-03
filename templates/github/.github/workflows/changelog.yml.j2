@@ -1,0 +1,45 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  checkout,
+  setup_python,
+  set_secrets,
+  install_python_deps,
+with context %}
+---
+name: {{ plugin_camel_short | default("Pulp") }} changelog update
+on:
+  push:
+    branches:
+      - {{ plugin_default_branch }}
+    paths:
+      - CHANGES.rst
+      - CHANGES.md
+
+jobs:
+
+  update-changelog:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      {{ checkout() | indent(6) }}
+
+      {{ setup_python() | indent(6) }}
+
+      {{ install_python_deps(deps="-r doc_requirements.txt") | indent(6) }}
+
+      - name: Fake api schema
+        run: |
+          mkdir -p docs/_build/html
+          echo "{}" > docs/_build/html/api.json
+          mkdir -p docs/_static
+          echo "{}" > docs/_static/api.json
+      - name:
+        run: make html
+        working-directory: ./docs
+        env:
+          PULP_CONTENT_ORIGIN: "http://localhost/"
+
+      - name: Publish changlog to pulpproject.org
+        run: .github/workflows/scripts/publish_docs.sh changelog {{ "${{ github.ref }}" }}

@@ -1,0 +1,2 @@
+Added a workflow to publish the changelog from the default branch to include changes on bugfix
+releases.
