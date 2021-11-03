@@ -231,6 +231,11 @@ The following settings are stored in `template_config.yml`.
                         see if it is compatible with pulpcore's master branch. This helps ensure
                         that pulpcore is following the deprecation policy for the plugin API.
 
+  disabled_redis_runners
+                        A list of test runners that should have the Redis service disabled. By
+                        default, all runners execute tests with the Redis service enabled. The list
+                        can be adjusted by specifying the names of runners (e.g., [s3, azure]).
+
   test_azure            Include azure job for running tests using [azurite](https://github.com/Azure/Azurite)
                         to emulate Azure.
 

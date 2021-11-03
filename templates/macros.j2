@@ -1,4 +1,4 @@
-{%- macro set_env_vars() -%}
+{%- macro set_env_vars(extra_env=None) -%}
 PY_COLORS: '1'
 ANSIBLE_FORCE_COLOR: '1'
 GITHUB_PULL_REQUEST: {{ "${{ github.event.number }}" }}
@@ -10,6 +10,11 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- for key, value in ci_env.items() %}
 {{ key }}: {{ value }}
 {%- endfor %}
+{%- if extra_env is not none %}
+{%- for key, value in extra_env.items() %}
+{{ key }}: {{ value }}
+{%- endfor %}
+{%- endif %}
 {%- endmacro -%}
 
 
@@ -81,14 +86,14 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro run_script(name, file, withenv=True, condition=None) -%}
+{%- macro run_script(name, file, withenv=True, condition=None, extra_env=None) -%}
 - name: {{ name }}
   {%if condition %}if: {{ condition }}{% endif %}
   run: .github/workflows/scripts/{{ file }}
   shell: bash
   {%- if withenv %}
   env:
-    {{ set_env_vars() | indent(4) }}
+    {{ set_env_vars(extra_env) | indent(4) }}
   {%- endif %}
 {%- endmacro -%}
 
