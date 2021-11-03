@@ -55,9 +55,11 @@ else
 	@echo "Did not find $(DIAGRAM_SOURCE_DIR)."
 endif
 
-html:
+$(STATIC_BUILD_DIR)/api.json:
 	mkdir -p $(STATIC_BUILD_DIR)
 	curl --fail -o $(STATIC_BUILD_DIR)/api.json "$(PULP_URL)/pulp/api/v3/docs/api.json?plugin={{ plugin_snake }}&include_html=1"
+
+html: $(STATIC_BUILD_DIR)/api.json
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
