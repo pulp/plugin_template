@@ -254,8 +254,8 @@ jobs:
       - name: Cleanup repository before making changelog PR
         run: rm -rf .lock generation {{ plugin_snake }}_client* *-client.tar {{ plugin_name }}.tar todo web docs.tar
 
-      - name: Stage changelog for master branch
-        run: python .github/workflows/scripts/stage-changelog-for-master.py {{ "${{ github.event.inputs.release }}" }}
+      - name: Stage changelog for {{ plugin_default_branch }} branch
+        run: python .github/workflows/scripts/stage-changelog-for-default-branch.py {{ "${{ github.event.inputs.release }}" }}
 
       - name: Create Pull Request for Changelog
         uses: peter-evans/create-pull-request@v3

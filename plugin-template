@@ -87,6 +87,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/release_requirements.txt",
         ".ci/scripts/release.py",
         ".github/workflows/fips.yml",
+        ".github/workflows/scripts/stage-changelog-for-master.py",
         ".travis",
         ".travis.yml",
     ],
