@@ -49,7 +49,7 @@ DEFAULT_SETTINGS = {
     "plugin_snake": None,
     "publish_docs_to_pulpprojectdotorg": False,
     "pulp_settings": None,
-    "pulpcore_branch": "master",
+    "pulpcore_branch": "main",
     "pulpcore_revision": None,
     "pulpcore_pip_version_specifier": None,
     "pulpprojectdotorg_key_id": None,
