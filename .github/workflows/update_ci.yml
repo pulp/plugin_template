@@ -29,7 +29,7 @@ jobs:
               -X POST \
               -H "Accept: application/vnd.github.v3+json" \
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-              "https://api.github.com/repos/pulp/${repo}/actions/workflows/update_ci.yaml/dispatches" \
+              "https://api.github.com/repos/pulp/${repo}/actions/workflows/update_ci.yml/dispatches" \
               -d @data.json
           done
         env:
