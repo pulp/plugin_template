@@ -1,0 +1,36 @@
+---
+name: CI Update
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run update
+        run: |
+          REPOS=(
+            "pulpcore"
+            "pulp_file"
+            "pulp_rpm"
+            "pulp_container"
+            "pulp_ansible"
+            "pulp_deb"
+            "pulp-certguard"
+            "pulp-2to3-migration"
+            "pulp_python"
+            "pulp_ostree"
+          )
+          echo "{\"ref\": \"main\"}" > data.json
+          for repo in "${REPOS[@]}"; do
+              echo "Updating ${repo}..."
+              curl \
+              -X POST \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              "https://api.github.com/repos/pulp/${repo}/actions/workflows/update_ci.yaml/dispatches" \
+              -d @data.json
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
