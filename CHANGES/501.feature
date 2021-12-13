@@ -1,1 +1,0 @@
-Enable azure tests
