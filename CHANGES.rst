@@ -13,6 +13,35 @@ Changelog
 
 .. towncrier release notes start
 
+2021.12.14 (2021-12-14)
+
+Features
+--------
+
+- Added a workflow to check that PRs contain a single commit.
+  `#494 <https://github.com/pulp/plugin_template/issues/494>`_
+- Enable azure tests
+  `#501 <https://github.com/pulp/plugin_template/issues/501>`_
+- Enabled plugin writers to specify which test runners should start with disabled redis services.
+  `#524 <https://github.com/pulp/plugin_template/issues/524>`_
+
+
+Bugfixes
+--------
+
+- Made the file for staging changelogs branch agnostic.
+  `#526 <https://github.com/pulp/plugin_template/issues/526>`_
+
+
+Misc
+----
+
+- `#528 <https://github.com/pulp/plugin_template/issues/528>`_
+
+
+----
+
+
 2021.09.07 (2021-09-07)
 
 No significant changes.
