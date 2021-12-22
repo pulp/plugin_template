@@ -21,6 +21,8 @@ jobs:
             "pulp-2to3-migration"
             "pulp_python"
             "pulp_ostree"
+            "pulp_npm"
+            "pulp_maven"
           )
           echo "{\"ref\": \"main\"}" > data.json
           for repo in "${REPOS[@]}"; do

@@ -85,12 +85,14 @@ jobs:
           name: ruby-client.tar
           path: ruby-client.tar
 
+      {%- if docs_test %}
       - name: Upload built docs
         if: {{ "${{ env.TEST == 'docs' }}" }}
         uses: actions/upload-artifact@v2
         with:
           name: docs.tar
           path: docs/docs.tar
+      {%- endif %}
 
       {{ display_logs() | indent(6) }}
 
@@ -152,7 +154,7 @@ jobs:
         run: bash .github/workflows/scripts/publish_client_pypi.sh
       {% endif %}
 
-      {% if publish_docs_to_pulpprojectdotorg %}
+      {% if publish_docs_to_pulpprojectdotorg and docs_test %}
       - name: Download built docs
         uses: actions/download-artifact@v2
         with:
