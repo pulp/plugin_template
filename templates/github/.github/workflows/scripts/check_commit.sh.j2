@@ -7,6 +7,11 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 set -euv
 
+if [[ "$GITHUB_PULL_REQUEST_BODY" == *"backport"* ]]; then
+  echo "This PR is a backport, skipping"
+  exit 0
+fi
+
 echo ::group::REQUESTS
 pip3 install requests
 {% if issue_tracker == 'github' %}

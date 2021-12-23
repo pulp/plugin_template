@@ -51,7 +51,7 @@ jobs:
 
       {% if check_commit_message -%}
       - name: Check commit message
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.actor != 'patchback[bot]'
         env:
           {{ set_env_vars() | indent(10) }}
         run: sh .github/workflows/scripts/check_commit.sh
