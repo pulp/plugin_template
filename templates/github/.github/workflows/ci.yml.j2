@@ -175,7 +175,7 @@ jobs:
           - TEST: upgrade
         {%- endif %}
     outputs:
-      deprecations-upgrade: ${{ steps.deprecations.outputs.deprecations-upgrade }}
+      deprecations-upgrade: {{ "${{ steps.deprecations.outputs.deprecations-upgrade }}" }}
 
     steps:
       {{ checkout() | indent(6) }}
