@@ -208,6 +208,7 @@ jobs:
 
   deprecations:
     runs-on: ubuntu-latest
+    if: always()
     needs: test
     steps:
       - name: Fail on deprecations
