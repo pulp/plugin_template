@@ -207,7 +207,7 @@ jobs:
       {{ display_logs() | indent(6) }}
 {%- endif %}
 
-
+{%- if test_deprecations %}
   deprecations:
     runs-on: ubuntu-latest
     if: always()
@@ -244,6 +244,6 @@ jobs:
           {%- if upgrade_range %}
           echo "{{ "${{ needs.test.outputs.deprecations-upgrade }}" }}" | base64 -d
           {%- endif %}
-
+{%- endif %}
 
 {% if post_job_template -%}{{ "  " | indent }}{% include post_job_template.path %}{%- endif %}

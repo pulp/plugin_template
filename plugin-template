@@ -65,6 +65,7 @@ DEFAULT_SETTINGS = {
     "sync_ci": True,
     "test_bindings": True,
     "test_cli": False,
+    "test_deprecations": True,
     "test_performance": False,
     "test_released_plugin_with_next_pulpcore_release": False,
     "disabled_redis_runners": [],
