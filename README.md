@@ -253,6 +253,8 @@ The following settings are stored in `template_config.yml`.
   update_redmine        The CI will automatically change the state of tickets when PRs are opened,
                         or merged, and when the changes are released.
 
+  update_github         The CI will automatically change the state of tickets when changes are released.
+
   ci_trigger            Value for the `on` clause on workflow/ci.yml (push, pull_request, etc...)
   ci_env                Environment variables to set for the CI build.
   pre_job_template      holds name and a path for a template to be included to run before jobs.
