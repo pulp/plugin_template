@@ -14,9 +14,9 @@ from bandersnatch.configuration import BandersnatchConfig
 from git import Repo
 
 from packaging.requirements import Requirement
+from pathlib import Path
 {% if issue_tracker == 'redmine' %}
 from collections import defaultdict
-from pathlib import Path
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError, ResourceSetIndexError
 import json
@@ -115,7 +115,6 @@ async def get_package_from_pypi(package_name, plugin_path):
 
 def create_release_commits(repo, release_version, plugin_path):
     """Build changelog, set version, commit, bump to next dev version, commit."""
-{%- if issue_tracker == 'redmine' %}
     issues_to_close = set()
     for filename in Path(f"{plugin_path}/CHANGES").rglob("*"):
         if filename.stem.isdigit():
@@ -123,6 +122,7 @@ def create_release_commits(repo, release_version, plugin_path):
             issues_to_close.add(issue)
 
     issues = ",".join(issues_to_close)
+{%- if issue_tracker == 'redmine' %}
     redmine_final_query = f"{REDMINE_QUERY_URL}{issues}"
     milestone_url = validate_and_update_redmine_data(
         redmine_final_query, issues_to_close, release_version
@@ -157,7 +157,7 @@ def create_release_commits(repo, release_version, plugin_path):
         ),
     )
 {% else %}
-    git.commit("-m", f"Release {release_version}\n\n[noissue]")
+    git.commit("-m", f"Release {release_version}\nGH Issues: {issues}\n\n[noissue]")
 {% endif %}
     sha = repo.head.object.hexsha
     short_sha = git.rev_parse(sha, short=7)

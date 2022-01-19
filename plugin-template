@@ -58,7 +58,6 @@ DEFAULT_SETTINGS = {
     "pydocstyle": True,
     "pypi_username": None,
     "python_version": "3.8",
-    "redmine_project": None,
     "release_user": "pulpbot",
     "release_email": "pulp-infra@redhat.com",
     "noissue_marker": "[noissue]",
@@ -71,7 +70,7 @@ DEFAULT_SETTINGS = {
     "disabled_redis_runners": [],
     "test_azure": False,
     "test_s3": False,
-    "update_redmine": False,
+    "update_github": False,
     "ci_trigger": "{pull_request: {branches: ['*']}}",
     "ci_env": {},
     "pre_job_template": None,
@@ -316,6 +315,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
     for relative_path in generate_relative_path_set(section_template_dir):
         if config["issue_tracker"] != "redmine" and "redmine" in relative_path:
+            continue
+        if config["issue_tracker"] != "github" and "github" in relative_path:
             continue
         destination_relative_path = relative_path.replace("plugin_name", config["plugin_snake"])
         necessary_dir_structure = os.path.dirname(
