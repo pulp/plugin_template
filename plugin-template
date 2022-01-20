@@ -71,7 +71,7 @@ DEFAULT_SETTINGS = {
     "disabled_redis_runners": [],
     "test_azure": False,
     "test_s3": False,
-    "update_github": False,
+    "update_github": True,
     "ci_trigger": "{pull_request: {branches: ['*']}}",
     "ci_env": {},
     "pre_job_template": None,
