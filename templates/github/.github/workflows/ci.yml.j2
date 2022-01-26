@@ -44,9 +44,9 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-        # dev_requirements contains tools needed for flake8, etc.
+        # lint_requirements contains tools needed for flake8, etc.
       - name: Install requirements
-        run: pip3 install -r dev_requirements.txt
+        run: pip3 install -r lint_requirements.txt
 
       {% if check_commit_message -%}
       - name: Check commit message
@@ -67,7 +67,7 @@ jobs:
       {% if flake8 -%}
       # Lint code.
       - name: Run flake8
-        run: flake8 --config flake8.cfg
+        run: flake8
       {%- endif %}
 
       - name: Run extra lint checks
