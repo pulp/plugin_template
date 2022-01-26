@@ -111,6 +111,7 @@ DEPRECATED_FILES = {
         ".github/workflows/scripts/stage-changelog-for-master.py",
         ".travis",
         ".travis.yml",
+        "flake8.cfg",
     ],
     "docs": [
         "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",

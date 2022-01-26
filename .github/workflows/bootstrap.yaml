@@ -30,7 +30,7 @@ jobs:
           pip3 install black flake8
           black --version
           black --check --diff plugin-template utils.py
-          flake8 --config flake8.cfg plugin-template utils.py
+          flake8 plugin-template utils.py
       - name: Bootstrap catdog plugin
         working-directory: plugin_template
         run: |
@@ -38,9 +38,9 @@ jobs:
 
   # Below this line we include the steps of the ci workflow of the generated plugin
 
-        # dev_requirements contains tools needed for flake8, etc.
+        # lint_requirements contains tools needed for flake8, etc.
       - name: Install requirements
-        run: pip3 install -r dev_requirements.txt
+        run: pip3 install -r lint_requirements.txt
 
       # This check tries to lookup nonexisting commits
       # - name: Check commit message
@@ -64,7 +64,7 @@ jobs:
 
       # Lint code.
       - name: Run flake8
-        run: flake8 --config flake8.cfg
+        run: flake8
 
       - name: Run extra lint checks
         run: "[ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh"
@@ -78,6 +78,9 @@ jobs:
 
       - name: Check for gettext problems
         run: sh .ci/scripts/check_gettext.sh
+
+      - name: Verify upper bound requirements
+        run: python .ci/scripts/upper_bound.py
 
   test:
     runs-on: ubuntu-latest
@@ -105,8 +108,7 @@ jobs:
         with:
           path: plugin_template
           fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - uses: actions/setup-python@v3
         with:
           python-version: "3.8"
       - name: Bootstrap catdog plugin
@@ -160,11 +162,6 @@ jobs:
         run: .github/workflows/scripts/install_python_client.sh
         shell: bash
 
-      - name: Install Ruby client
-        if: ${{ env.TEST == 'bindings' }}
-        run: .github/workflows/scripts/install_ruby_client.sh
-        shell: bash
-
       - name: Before Script
 
         run: .github/workflows/scripts/before_script.sh
@@ -208,7 +205,7 @@ jobs:
         if: always()
         run: |
           echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
-          http --timeout 30 --check-status --pretty format --print hb https://pulp/pulp/api/v3/status/ || true
+          http --timeout 30 --check-status --pretty format --print hb "https://pulp${PULP_API_ROOT}api/v3/status/" || true
           docker images || true
           docker ps -a || true
           docker logs pulp || true
