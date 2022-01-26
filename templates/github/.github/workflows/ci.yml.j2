@@ -68,7 +68,7 @@ jobs:
       {% if flake8 -%}
       # Lint code.
       - name: Run flake8
-        run: flake8 --config flake8.cfg
+        run: flake8
       {%- endif %}
 
       - name: Run extra lint checks

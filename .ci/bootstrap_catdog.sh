@@ -26,8 +26,8 @@ sed -i "s/disabled_redis_runners: \[\]/disabled_redis_runners: [s3]/g" ../pulp_c
 cd ../pulp_catdog
 
 # ignore unused imports
-flake8 --config flake8.cfg .ci || exit 1 # check ci files before ignoring imports
-sed -i -e '/^ignore/s/$/,F401/' flake8.cfg
+flake8 .ci || exit 1 # check ci files before ignoring imports
+sed -i -e '/^ignore/s/$/,F401/' .flake8
 
 # include post_before_script to generate migrations
 cp ../plugin_template/.ci/post_before_script.sh .github/workflows/scripts

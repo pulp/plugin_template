@@ -30,7 +30,7 @@ jobs:
           pip3 install black flake8
           black --version
           black --check --diff plugin-template utils.py
-          flake8 --config flake8.cfg plugin-template utils.py
+          flake8 plugin-template utils.py
       - name: Bootstrap catdog plugin
         working-directory: plugin_template
         run: |
@@ -64,7 +64,7 @@ jobs:
 
       # Lint code.
       - name: Run flake8
-        run: flake8 --config flake8.cfg
+        run: flake8
 
       - name: Run extra lint checks
         run: "[ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh"

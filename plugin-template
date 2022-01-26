@@ -102,6 +102,9 @@ DEPRECATED_FILES = {
         "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
         "docs/_static/api.json",
     ],
+    "bootstrap": [
+        "flake8.cfg",
+    ],
 }
 
 
