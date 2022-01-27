@@ -194,6 +194,11 @@ else
 {% endif %}
 fi
 
+# Nightly tests
+if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+    pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m nightly
+fi
+
 {%- if test_cli %}
 {%- if docker_fixtures %}
 export PULP_FIXTURES_URL="http://pulp-fixtures:8080"
