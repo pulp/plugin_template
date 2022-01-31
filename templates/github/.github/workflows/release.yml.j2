@@ -245,20 +245,22 @@ jobs:
         run: bash .github/workflows/scripts/publish_client_gem.sh
       {%- endif %}
 
-      {% if update_redmine -%}
+      {% if update_redmine and not update_github -%}
       - name: Update Redmine
+        continue-on-error: true
         run: bash .ci/scripts/update_redmine.sh
       {%- endif %}
 
-      {% if update_github -%}
+      {% if update_github and not update_redmine -%}
       - name: Update GitHub
+        continue-on-error: true
         run: |
           set -euv
           export COMMIT_MSG=$(git log --format=%B --no-merges -1)
           export GH_ISSUES=$(echo $COMMIT_MSG | grep -o "GH Issues: .*" | awk '{print $3}')
 
           echo "GH Issues $GH_ISSUES"
-          bash .ci/scripts/update_github.py $GH_ISSUES
+          .ci/scripts/update_github.py
       {%- endif %}
 
       - name: Create release on GitHub
