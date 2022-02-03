@@ -187,10 +187,19 @@ if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT
 else
 {% if parallel_test_workers == 0 %}
-    pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional
+    if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+        pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional
+    else
+        pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not nightly"
+    fi
 {% else %}
-    pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}
-    pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel"
+    if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}
+        pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel"
+    else
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m "parallel and not nightly" -n {{ parallel_test_workers }}
+        pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel and not nightly"
+    fi
 {% endif %}
 fi
 
