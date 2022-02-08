@@ -187,13 +187,13 @@ if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT
 else
 {% if parallel_test_workers == 0 %}
-    if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional
     else
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not nightly"
     fi
 {% else %}
-    if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
         pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel"
     else
