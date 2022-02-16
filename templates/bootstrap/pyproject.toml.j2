@@ -14,7 +14,7 @@ template = "CHANGES/.TEMPLATE.rst"
 {% if issue_tracker == 'redmine' %}
 issue_format = "`#{issue} <https://pulp.plan.io/issues/{issue}>`_"
 {% elif issue_tracker == 'github' %}
-issue_format = "`#{issue} <https://github.com/pulp/{{ plugin_name }}/issues/{issue}>`_"
+issue_format = "`#{issue} <https://github.com/pulp/{{ plugin_name }}/issues/{issue}>`__"
 {% endif %}
 
     [[tool.towncrier.type]]
