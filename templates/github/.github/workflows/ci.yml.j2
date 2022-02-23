@@ -71,6 +71,9 @@ jobs:
         run: flake8 --config flake8.cfg
       {%- endif %}
 
+      - name: Run extra lint checks
+        run: [ -x .ci/scripts/extra_linting.sh ] && .ci/scripts/extra_linting.sh
+
       {% if check_manifest -%}
       # check for any files unintentionally left out of MANIFEST.in
       - name: Check manifest
