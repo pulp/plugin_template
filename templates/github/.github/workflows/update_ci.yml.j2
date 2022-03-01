@@ -37,6 +37,7 @@ jobs:
           author: {{release_user}} <{{ release_email }}>
           title: 'Update CI files'
           body: '{{ noissue_marker | default("[noissue]") }}'
+          branch: 'create-pull-request/{{ "${{ github.ref }}" }}/patch'
           commit-message: |
             Update CI files
 
