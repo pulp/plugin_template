@@ -87,7 +87,6 @@ DEFAULT_SETTINGS = {
     "ci_env": {},
     "pre_job_template": None,
     "post_job_template": None,
-    "tasking_allow_async_unsafe": True,
     "lint_requirements": True,
 }
 
