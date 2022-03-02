@@ -146,12 +146,6 @@ then
   exit $s
 fi
 
-{%- if not tasking_allow_async_unsafe %}
-# Patch DJANGO_ALLOW_ASYNC_UNSAFE out of the pulpcore tasking_system
-# Don't let it fail. Be opportunistic.
-sed -i -e '/DJANGO_ALLOW_ASYNC_UNSAFE/d' pulpcore/pulpcore/tasking/entrypoint.py || true
-{%- endif %}
-
 cd {{ plugin_name }}
 
 if [ -f $POST_BEFORE_INSTALL ]; then
