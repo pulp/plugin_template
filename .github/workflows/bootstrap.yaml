@@ -46,20 +46,28 @@ jobs:
       # - name: Check commit message
       #   if: github.event_name == 'pull_request'
       #   env:
+      #     PY_COLORS: '1'
+      #     ANSIBLE_FORCE_COLOR: '1'
+      #     GITHUB_PULL_REQUEST: ${{ github.event.number }}
+      #     GITHUB_PULL_REQUEST_BODY: ${{ github.event.pull_request.body }}
+      #     GITHUB_BRANCH: ${{ github.head_ref }}
+      #     GITHUB_REPO_SLUG: ${{ github.repository }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #     GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
       #   run: sh .github/workflows/scripts/check_commit.sh
 
       # run black separately from flake8 to get a diff
-      - name: Run black on pulp_catdog
+      - name: Run black
         run: |
           black --version
           black --check --diff .
 
       # Lint code.
-      - name: Run flake8 on pulp_catdog
-        run: |
-          flake8 --version
-          flake8 --config flake8.cfg
+      - name: Run flake8
+        run: flake8 --config flake8.cfg
+
+      - name: Run extra lint checks
+        run: "[ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh"
 
       # check for any files unintentionally left out of MANIFEST.in
       - name: Check manifest
@@ -67,6 +75,9 @@ jobs:
 
       - name: Check for pulpcore imports outside of pulpcore.plugin
         run: sh .ci/scripts/check_pulpcore_imports.sh
+
+      - name: Check for gettext problems
+        run: sh .ci/scripts/check_gettext.sh
 
   test:
     runs-on: ubuntu-latest
@@ -191,7 +202,7 @@ jobs:
 
       - name: Extract Deprecations from Logs
         id: deprecations
-        run: echo "::set-output name=deprecations-${{ matrix.env.TEST }}::$(docker logs pulp 2>&1 | grep -i pulpcore.deprecation | base64)"
+        run: echo "::set-output name=deprecations-${{ matrix.env.TEST }}::$(docker logs pulp 2>&1 | grep -i pulpcore.deprecation | base64 -w 0)"
 
       - name: Logs
         if: always()
@@ -204,8 +215,6 @@ jobs:
           docker exec pulp ls -latr /etc/yum.repos.d/ || true
           docker exec pulp cat /etc/yum.repos.d/* || true
           docker exec pulp pip3 list
-
-
   deprecations:
     runs-on: ubuntu-latest
     if: always()
@@ -222,6 +231,5 @@ jobs:
           echo "${{ needs.test.outputs.deprecations-pulp }}" | base64 -d
           echo "${{ needs.test.outputs.deprecations-azure }}" | base64 -d
           echo "${{ needs.test.outputs.deprecations-s3 }}" | base64 -d
-
 
 
