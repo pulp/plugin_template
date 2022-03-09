@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Script for running CI locally
+
+set -euv
+
+# Modify variables bellow as you need
+LOCAL_GITHUB_REF="refs/heads/$(git rev-parse --abbrev-ref HEAD)"
+export GITHUB_REF="${GITHUB_REF:-$LOCAL_GITHUB_REF}"
+export TEST="${TEST:-pulp}"
+export GITHUB_EVENT_NAME="${GITHUB_EVENT_NAME:-pull_request}"
+export GITHUB_WORKFLOW="${GITHUB_WORKFLOW:-local}"
+
+.github/workflows/scripts/before_install.sh
+.github/workflows/scripts/install.sh
+.github/workflows/scripts/before_script.sh
+.github/workflows/scripts/script.sh

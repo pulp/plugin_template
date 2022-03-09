@@ -78,8 +78,9 @@ fi
 
 cd ..
 
-
-git clone --depth=1 https://github.com/pulp/pulp-smash.git
+if [ ! -d "pulp-smash" ]; then
+  git clone --depth=1 https://github.com/pulp/pulp-smash.git
+fi
 
 if [ -n "$PULP_SMASH_PR_NUMBER" ]; then
   cd pulp-smash
@@ -91,7 +92,9 @@ fi
 pip install --upgrade --force-reinstall ./pulp-smash
 
 
-git clone --depth=1 https://github.com/pulp/pulp-openapi-generator.git
+if [ ! -d "pulp-openapi-generator" ]; then
+  git clone --depth=1 https://github.com/pulp/pulp-openapi-generator.git
+fi
 if [ -n "$PULP_OPENAPI_GENERATOR_PR_NUMBER" ]; then
   cd pulp-openapi-generator
   git fetch origin pull/$PULP_OPENAPI_GENERATOR_PR_NUMBER/head:$PULP_OPENAPI_GENERATOR_PR_NUMBER
@@ -100,7 +103,9 @@ if [ -n "$PULP_OPENAPI_GENERATOR_PR_NUMBER" ]; then
 fi
 
 {% if test_cli or upgrade_range %}
-git clone --depth=1 https://github.com/pulp/pulp-cli.git
+if [ ! -d "pulp-cli" ]; then
+  git clone --depth=1 https://github.com/pulp/pulp-cli.git
+fi
 if [ -n "$PULP_CLI_PR_NUMBER" ]; then
   cd pulp-cli
   git fetch origin pull/$PULP_CLI_PR_NUMBER/head:$PULP_CLI_PR_NUMBER
@@ -110,14 +115,18 @@ fi
 
 cd pulp-cli
 pip install -e .
-pulp config create --base-url {{ pulp_scheme }}://pulp --location tests/cli.toml {% if pulp_scheme != 'https' %}--no-verify-ssl{% endif %}
-mkdir ~/.config/pulp
+pulp config create --overwrite --base-url {{ pulp_scheme }}://pulp --location tests/cli.toml {% if pulp_scheme != 'https' %}--no-verify-ssl{% endif %}
+mkdir -p ~/.config/pulp
 cp tests/cli.toml ~/.config/pulp/cli.toml
 cd ..
 {% endif %}
 
 {% if plugin_name != 'pulpcore' -%}
-git clone --depth=1 https://github.com/pulp/pulpcore.git --branch {{ pulpcore_branch }}
+if [ ! -d "pulpcore" ]; then
+  git clone --depth=1 https://github.com/pulp/pulpcore.git --branch {{ pulpcore_branch }}
+else
+  git checkout {{ pulpcore_branch }}
+fi
 
 cd pulpcore
 {% if pulpcore_revision %}git checkout {{ pulpcore_revision }}{% endif %}
@@ -130,7 +139,9 @@ cd ..
 
 {%- for plugin in additional_repos %}
 
-git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git --branch {{ plugin.branch }}
+if [ ! -d "{{ plugin.name }}" ]; then
+  git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git --branch {{ plugin.branch }}
+fi
 cd {{ plugin.name }}
 {% if plugin.revision %}git checkout {{ plugin.revision }}{% endif %}
 if [ -n "${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER" ]; then
