@@ -97,6 +97,34 @@ jobs:
 
       {{ display_logs() | indent(6) }}
 
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      {{ checkout() | indent(6) }}
+
+      {{ setup_python() | indent(6) }}
+
+      {{ install_python_deps("gitpython") | indent(6) }}
+
+      - name: Changelog history
+        run: python .ci/scripts/changelog.py
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
+          committer: {{release_user}} <{{ release_email }}>
+          author: {{release_user}} <{{ release_email }}>
+          title: 'Update Changelog'
+          body: '{{ noissue_marker | default("[noissue]") }}'
+          branch: 'changelog/update'
+          base: {{ plugin_default_branch }}
+          commit-message: |
+            Update Changelog
+
+            {{ noissue_marker | default("[noissue]") }}
+          delete-branch: true
+
   publish:
     runs-on: ubuntu-latest
     needs: test
