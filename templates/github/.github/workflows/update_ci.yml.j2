@@ -20,6 +20,28 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set short_ref
+        id: vars
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+
+      - name: Dispatching
+        if: github.event_name == 'schedule'
+        run: |
+          for version in $(git ls-remote --heads https://github.com/{{ github_org }}/{{ plugin_name }}.git | grep -o "[[:digit:]]\.[[:digit:]]*" | sort -V | tail -{{ keep_ci_update_for_latest_branches }})
+            do
+              echo $version
+              echo "{\"ref\": \"${version}\"}" > data.json
+              cat data.json
+              curl \
+                -X POST \
+                -H "Accept: application/vnd.github.v3+json" \
+                -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                https://api.github.com/repos/{{ github_org }}/{{ plugin_name }}/actions/workflows/update_ci.yaml/dispatches \
+                -d @data.json
+            done
+        env:
+          GITHUB_TOKEN: {{ "${{ secrets.RELEASE_TOKEN }}" }}
+
       - name: Configure Git with {{ release_user }} name and email
         run: |
           git config --global user.name '{{ release_user }}'
@@ -35,9 +57,9 @@ jobs:
           token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
           committer: {{release_user}} <{{ release_email }}>
           author: {{release_user}} <{{ release_email }}>
-          title: 'Update CI files'
+          title: 'Update CI files from {{ "${{ steps.vars.outputs.short_ref }}" }} branch'
           body: '{{ noissue_marker | default("[noissue]") }}'
-          branch: 'create-pull-request/{{ "${{ github.ref }}" }}/patch'
+          branch: 'create-pull-request/{{ "${{ steps.vars.outputs.short_ref }}" }}/patch'
           commit-message: |
             Update CI files
 

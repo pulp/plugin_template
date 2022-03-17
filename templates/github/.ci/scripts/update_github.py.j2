@@ -4,7 +4,7 @@ import os
 from github import Github
 
 g = Github(os.environ.get("GITHUB_TOKEN"))
-repo = g.get_repo("pulp/{{ plugin_name }}")
+repo = g.get_repo("{{ github_org }}/{{ plugin_name }}")
 
 GH_ISSUES = os.environ.get("GH_ISSUES")
 
