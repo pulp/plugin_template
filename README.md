@@ -144,9 +144,14 @@ The following settings are stored in `template_config.yml`.
   aiohttp_fixtures_origin
                         Identifies the network origin of the aiohttp fixtures.
 
+  github_org            The Github organization to use for the plugin.
+
   issue_tracker         Which issue tracker the project will use. Valid values are 'redmine' and
                         'github'. To switch from Redmine to GitHub use the --migrate-github-issues
                         option.
+
+  keep_ci_update_for_latest_branches
+                        Total of X.Y branches for which CI updates are kept. The default is 5.
 
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
