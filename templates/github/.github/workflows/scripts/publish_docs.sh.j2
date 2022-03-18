@@ -26,3 +26,41 @@ eval "$(ssh-agent -s)" #start the ssh agent
 ssh-add ~/.ssh/pulp-infra
 
 python3 .github/workflows/scripts/docs-publisher.py --build-type $1 --branch $2
+
+if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} changelog update" ]]; then
+  # Do not build bindings docs on changelog update
+  exit
+fi
+
+# Building python bindings
+VERSION=$(http $PULP_URL/pulp/api/v3/status/ | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')
+cd ../pulp-openapi-generator
+rm -rf {{ plugin_snake }}-client
+./generate.sh {{ plugin_snake }} python $VERSION
+cd {{ plugin_snake }}-client
+
+# Adding mkdocs
+cp README.md docs/index.md
+sed -i 's/docs\///g' docs/index.md
+sed -i 's/\.md//g' docs/index.md
+cat >> mkdocs.yml << DOCSYAML
+---
+site_name: {{ plugin_camel }} Client
+site_description: {{ plugin_camel_short }} bindings
+site_author: Pulp Team
+site_url: https://docs.pulpproject.org/{{ plugin_snake }}_client/
+repo_name: pulp/{{ plugin_snake }}
+repo_url: https://github.com/pulp/{{ plugin_snake }}
+theme: readthedocs
+DOCSYAML
+
+pip install mkdocs pymdown-extensions
+
+# Building the bindings docs
+mkdocs build
+
+# publish to docs.pulpproject.org/{{ plugin_snake }}_client
+rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/
+
+# publish to docs.pulpproject.org/{{ plugin_snake }}_client/en/{release}
+rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/en/"$1"
