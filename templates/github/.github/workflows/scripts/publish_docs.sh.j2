@@ -33,6 +33,7 @@ if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} changelo
 fi
 
 # Building python bindings
+export PULP_URL="${PULP_URL:-https://pulp}"
 VERSION=$(http $PULP_URL/pulp/api/v3/status/ | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')
 cd ../pulp-openapi-generator
 rm -rf {{ plugin_snake }}-client
