@@ -55,4 +55,4 @@ mkdocs build
 rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/
 
 # publish to docs.pulpproject.org/{{ plugin_snake }}_client/en/{release}
-rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/en/"$1"
+rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/en/"$2"
