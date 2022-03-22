@@ -197,6 +197,18 @@ jobs:
 
       {{ set_secrets() | indent(6) }}
 
+      {{ install_httpie() | indent(6) }}
+
+      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
+
+      - name: Install
+        run: |
+          export PLUGIN_VERSION={{ "${{ github.event.inputs.release }}" }}
+          .github/workflows/scripts/install.sh
+        env:
+          {{ set_env_vars() | indent(10) }}
+        shell: bash
+
       {{ install_python_deps("gitpython python-redmine requests packaging") | indent(6) }}
 
       - name: Push branch and tag to GitHub
