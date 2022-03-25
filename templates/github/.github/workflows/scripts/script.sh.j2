@@ -196,16 +196,34 @@ else
 {% if parallel_test_workers == 0 %}
     if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional
+
+    {%- for item in additional_repos if item.pytest_args | default(false) %}
+        pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }}
+    {%- endfor %}
     else
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not nightly"
+
+    {%- for item in additional_repos if item.pytest_args | default(false) %}
+        pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m "not nightly"
+    {%- endfor %}
     fi
 {% else %}
     if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
         pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel"
+
+    {%- for item in additional_repos if item.pytest_args | default(false) %}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }}
+        pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m "not parallel"
+    {%- endfor %}
     else
         pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m "parallel and not nightly" -n {{ parallel_test_workers }}
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel and not nightly"
+
+    {%- for item in additional_repos if item.pytest_args | default(false) %}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m "parallel and not nightly" -n {{ parallel_test_workers }}
+        pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m "not parallel and not nightly"
+    {%- endfor %}
     fi
 {% endif %}
 fi
