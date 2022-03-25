@@ -32,7 +32,7 @@ if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} changelo
   exit
 fi
 
-pip install mkdocs pymdown-extensions
+pip install mkdocs pymdown-extensions "Jinja2<3.1"
 
 mkdir -p ../bindings
 tar -xvf python-client-docs.tar --directory ../bindings
