@@ -54,6 +54,7 @@ The following settings are stored in `template_config.yml`.
                         org (optional): github organization
                         revision (optional): the git commit hash to install.
                                              "Required PR" in a commit message will override this.
+                        pytest_args (optional): string to by passed to a pytest call.
                         branch: the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
                                                Applies to TAGGED (release) jobs.
