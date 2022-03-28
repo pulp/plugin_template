@@ -27,8 +27,7 @@ jobs:
       - name: Lint plugin_template
         working-directory: plugin_template
         run: |
-          # Unpin click when https://github.com/psf/black/issues/2964 is solved
-          pip3 install black flake8 "click<8.1"
+          pip3 install black flake8
           black --version
           black --check --diff plugin-template utils.py
           flake8 --config flake8.cfg plugin-template utils.py
