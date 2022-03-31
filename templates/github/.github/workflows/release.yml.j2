@@ -279,7 +279,7 @@ jobs:
         run: bash .github/workflows/scripts/create_release_from_tag.sh {{ "${{ github.event.inputs.release }}" }}
 
       - name: Cleanup repository before making changelog PR
-        run: rm -rf .lock generation {{ plugin_snake }}_client* *-client.tar {{ plugin_name }}.tar todo web docs.tar
+        run: rm -rf .lock generation {{ plugin_snake }}_client* *-client.tar {{ plugin_name }}.tar todo web *docs.tar
 
       - name: Stage changelog for {{ plugin_default_branch }} branch
         run: python .github/workflows/scripts/stage-changelog-for-default-branch.py {{ "${{ github.event.inputs.release }}" }}
