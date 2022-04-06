@@ -38,7 +38,7 @@ DEFAULT_SETTINGS = {
     "docs_test": True,
     "github_org": "pulp",
     "issue_tracker": "github",
-    "keep_ci_update_for_latest_branches": 5,
+    "keep_ci_update_since_branch": None,
     "parallel_test_workers": 8,
     "pulp_scheme": "https",
     "plugin_app_label": None,
