@@ -130,9 +130,12 @@ cd ..
 
 {%- for plugin in additional_repos %}
 
-git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git --branch {{ plugin.branch }}
+git clone --depth=1 https://github.com/{{plugin.org | default("pulp")}}/{{ plugin.name }}.git {%- if plugin.branch %} --branch {{ plugin.branch }}{% endif %}
 cd {{ plugin.name }}
-{% if plugin.revision %}git checkout {{ plugin.revision }}{% endif %}
+{% if plugin.revision %}
+git fetch --depth=1 origin {{ plugin.revision }}
+git checkout {{ plugin.revision }}
+{% endif %}
 if [ -n "${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER" ]; then
   git fetch --depth=1 origin pull/${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER/head:${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER
   git checkout ${{ plugin.name | upper | replace("-", "_") }}_PR_NUMBER
