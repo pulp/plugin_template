@@ -108,11 +108,17 @@ jobs:
           {%- if test_s3 %}
           - TEST: s3
           {%- endif %}
+          {%- if test_stream %}
+          - TEST: stream
+          {%- endif %}
           {%- if test_bindings %}
           - TEST: bindings
           {%- endif %}
     outputs:
       deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
+      {%- if test_stream %}
+      deprecations-stream: {{ "${{ steps.deprecations.outputs.deprecations-stream }}" }}
+      {%- endif %}
       {%- if test_azure %}
       deprecations-azure: {{ "${{ steps.deprecations.outputs.deprecations-azure }}" }}
       {%- endif %}
@@ -219,6 +225,9 @@ jobs:
       - name: Fail on deprecations
         run: |
           test -z "{{ "${{ needs.test.outputs.deprecations-pulp }}" }}"
+          {%- if test_stream %}
+          test -z "{{ "${{ needs.test.outputs.deprecations-stream }}" }}"
+          {%- endif %}
           {%- if test_azure %}
           test -z "{{ "${{ needs.test.outputs.deprecations-azure }}" }}"
           {%- endif %}
@@ -235,6 +244,9 @@ jobs:
         if: failure()
         run: |
           echo "{{ "${{ needs.test.outputs.deprecations-pulp }}" }}" | base64 -d
+          {%- if test_stream %}
+          echo "{{ "${{ needs.test.outputs.deprecations-stream }}" }}" | base64 -d
+          {%- endif %}
           {%- if test_azure %}
           echo "{{ "${{ needs.test.outputs.deprecations-azure }}" }}" | base64 -d
           {%- endif %}
