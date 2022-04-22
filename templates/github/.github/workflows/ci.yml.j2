@@ -108,6 +108,9 @@ jobs:
           {%- if test_s3 %}
           - TEST: s3
           {%- endif %}
+          {%- if test_stream %}
+          - TEST: stream
+          {%- endif %}
           {%- if test_bindings %}
           - TEST: bindings
           {%- endif %}
