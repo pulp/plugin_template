@@ -1,9 +1,9 @@
 {% include 'header.j2' %}
-{% from 'macros.j2' import 
-  checkout, 
-  setup_python, 
-  set_secrets, 
-  install_python_deps 
+{% from 'macros.j2' import
+  checkout,
+  setup_python,
+  set_secrets,
+  install_python_deps
 with context %}
 ---
 name: Create New Release Branch
@@ -53,7 +53,7 @@ jobs:
           bump2version --no-commit minor
 
       - name: Make a PR with version bump
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
           committer: {{release_user}} <{{ release_email }}>

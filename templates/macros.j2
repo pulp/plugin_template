@@ -19,7 +19,7 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro checkout() -%}
-- uses: actions/checkout@v2
+- uses: actions/checkout@v3
   with:
     # by default, it uses a depth of 1
     # this fetches all history so that we can read each commit
@@ -28,14 +28,14 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro setup_python(pyversion=python_version) -%}
-- uses: actions/setup-python@v2
+- uses: actions/setup-python@v3
   with:
     python-version: "{{ pyversion }}"
 {%- endmacro -%}
 
 
 {%- macro setup_ruby(condition=None) -%}
-- uses: actions/setup-ruby@v1
+- uses: ruby/setup-ruby@v1
   {%if condition %}if: {{ condition }}{% endif %}
   with:
     ruby-version: "2.6"
