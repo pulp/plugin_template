@@ -113,16 +113,13 @@ cmd_prefix bash -c "django-admin makemigrations --check --dry-run"
 
 if [[ "$TEST" != "upgrade" ]]; then
   # Run unit tests.
-  cmd_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.unit"
+  cmd_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes -p no:pulpcore --pyargs {{ plugin_snake }}.tests.unit"
 fi
 
 # Run functional tests
 {%- for repo in additional_repos %}
 export PYTHONPATH=$REPO_ROOT/../{{repo.name}}${PYTHONPATH:+:${PYTHONPATH}}
 {%- endfor %}
-{%- if not plugin_name == 'pulpcore' %}
-export PYTHONPATH=$REPO_ROOT/../pulpcore${PYTHONPATH:+:${PYTHONPATH}}
-{%- endif %}
 export PYTHONPATH=$REPO_ROOT${PYTHONPATH:+:${PYTHONPATH}}
 
 {% if upgrade_range %}
@@ -154,6 +151,13 @@ if [[ "$TEST" == "upgrade" ]]; then
 
   echo "Restarting in 60 seconds"
   sleep 60
+
+  # Let's reinstall pulpcore so we can ensure we have the correct dependencies
+  cd ../pulpcore
+  git checkout -f ci_upgrade_test
+  pip install --upgrade --force-reinstall .
+  cd ..
+  pip install --upgrade ../pulp-cli ../pulp-smash
 
   # CLI commands to display plugin versions and content data
   pulp status
