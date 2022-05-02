@@ -40,7 +40,12 @@ jobs:
 
         # dev_requirements contains tools needed for flake8, etc.
       - name: Install requirements
-        run: pip3 install -r dev_requirements.txt
+        run: |
+          pip3 install -r dev_requirements.txt
+          pip3 install bandit
+
+      - name: Run bandit
+        run: bandit -r .
 
       # This check tries to lookup nonexisting commits
       # - name: Check commit message
