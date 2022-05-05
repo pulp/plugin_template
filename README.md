@@ -221,6 +221,12 @@ The following settings are stored in `template_config.yml`.
 
   release_email         The email address associated with the release_user.
 
+  run_pulpcore_tests_for_plugins
+                        Pulpcore ships some functional tests that make sense for plugins to run.
+                        These are pytest marked with the `from_pulpcore_for_all_plugins`. If true,
+                        the CI will run an additional pytest call running pulpcore tests with that
+                        mark.
+
   noissue_marker        A string that is used to mark a commit as not attached to an issue.
 
   single_commit_check   Runs a job to check whether a PR contains a single commit or not.

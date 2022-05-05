@@ -32,13 +32,6 @@ if [[ "$TEST" = "docs" ]]; then
   make PULP_URL="$PULP_URL" diagrams html
   tar -cvf docs.tar ./_build
   cd ..
-{%- if check_openapi_schema %}
-
-  echo "Validating OpenAPI schema..."
-  cat $PWD/.ci/scripts/schema.py | cmd_stdin_prefix bash -c "cat > /tmp/schema.py"
-  cmd_prefix bash -c "python3 /tmp/schema.py"
-  cmd_prefix bash -c "pulpcore-manager spectacular --file pulp_schema.yml --validate"
-{%- endif %}
 
   if [ -f $POST_DOCS_TEST ]; then
     source $POST_DOCS_TEST
@@ -210,12 +203,20 @@ else
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }}
     {%- endfor %}
+
+    {% if run_pulpcore_tests_for_plugins %}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m "from_pulpcore_for_all_plugins"
+    {% endif %}
     else
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not nightly"
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m "not nightly"
     {%- endfor %}
+
+    {% if run_pulpcore_tests_for_plugins %}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m "from_pulpcore_for_all_plugins and not nightly"
+    {% endif %}
     fi
 {% else %}
     if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
@@ -226,6 +227,11 @@ else
         pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }}
         pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m "not parallel"
     {%- endfor %}
+
+    {% if run_pulpcore_tests_for_plugins %}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m "from_pulpcore_for_all_plugins and parallel" -n  {{ parallel_test_workers }}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m "from_pulpcore_for_all_plugins and not parallel"
+    {% endif %}
     else
         pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m "parallel and not nightly" -n {{ parallel_test_workers }}
         pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m "not parallel and not nightly"
@@ -234,6 +240,11 @@ else
         pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m "parallel and not nightly" -n {{ parallel_test_workers }}
         pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m "not parallel and not nightly"
     {%- endfor %}
+
+    {% if run_pulpcore_tests_for_plugins %}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m "from_pulpcore_for_all_plugins and not nightly and parallel" -n  {{ parallel_test_workers }}
+        pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m "from_pulpcore_for_all_plugins and not nightly and not parallel"
+    {% endif %}
     fi
 {% endif %}
 fi
