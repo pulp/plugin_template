@@ -61,7 +61,6 @@ DEFAULT_SETTINGS = {
     "python_version": "3.8",
     "release_user": "pulpbot",
     "release_email": "pulp-infra@redhat.com",
-    "run_pulpcore_tests_for_plugins": True,
     "noissue_marker": "[noissue]",
     "single_commit_check": True,
     "sync_ci": True,
@@ -82,6 +81,16 @@ DEFAULT_SETTINGS = {
     "pre_job_template": None,
     "post_job_template": None,
     "tasking_allow_async_unsafe": True,
+}
+
+
+DEFAULT_SETTINGS_MAIN = {
+    "run_pulpcore_tests_for_plugins": True,
+}
+
+
+DEFAULT_SETTINGS_NONMAIN = {
+    "run_pulpcore_tests_for_plugins": False,
 }
 
 
@@ -227,6 +236,15 @@ def main():
                     config = config_in_file
                     # Add any missing value from the list of defaults
                     for key, value in DEFAULT_SETTINGS.items():
+                        if key not in config:
+                            config[key] = value
+                            write_new_config = True
+                    additional_settings = (
+                        DEFAULT_SETTINGS_MAIN
+                        if config["pulpcore_branch"] == "main"
+                        else DEFAULT_SETTINGS_NONMAIN
+                    )
+                    for key, value in additional_settings.items():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
