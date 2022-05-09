@@ -2,6 +2,11 @@
 name: CI Update
 on:
   workflow_dispatch:
+    inputs:
+      all_branches:
+        description: "Run on all branches"
+        default: 'no'
+        required: true
 
 jobs:
   update:
@@ -26,7 +31,7 @@ jobs:
             "pulp_gem"
             "pulp_cookbook"
           )
-          echo "{\"ref\": \"main\"}" > data.json
+          echo "{\"ref\": \"main\", \"all_branches\": \"${{ github.event.inputs.all_branches }}\"}" > data.json
           for repo in "${REPOS[@]}"; do
               echo "Updating ${repo}..."
               curl \
