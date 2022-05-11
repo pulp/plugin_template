@@ -10,6 +10,8 @@ set -euv
 
 source .github/workflows/scripts/utils.sh
 
+export PULP_API_ROOT="{{ api_root }}"
+
 if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
 {%- if plugin_name == 'pulpcore' %}
   pip install psycopg2-binary
@@ -160,7 +162,6 @@ minio_access_key: "'$MINIO_ACCESS_KEY'"\
 minio_secret_key: "'$MINIO_SECRET_KEY'"' vars/main.yaml
 
   {%- if test_reroute %}
-  echo "PULP_API_ROOT=/rerouted/djnd/" >> "$GITHUB_ENV"
   export PULP_API_ROOT="/rerouted/djnd/"
   {%- endif %}
 fi
@@ -184,6 +185,8 @@ if [ "$TEST" = "azure" ]; then
   sed -i -e '$a azure_test: true' vars/main.yaml
 fi
 {%- endif %}
+
+echo "PULP_API_ROOT=${PULP_API_ROOT}" >> "$GITHUB_ENV"
 
 if [ "${PULP_API_ROOT:-}" ]; then
   sed -i -e '$a api_root: "'"$PULP_API_ROOT"'"' vars/main.yaml
