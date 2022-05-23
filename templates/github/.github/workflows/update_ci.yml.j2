@@ -42,11 +42,13 @@ jobs:
         id: vars
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
+      {% if keep_ci_update_since_branch -%}
       - name: Dispatching
         if: github.event_name == 'schedule' || github.event.inputs.all_branches == 'yes'
         run: python .ci/scripts/update_ci_branches.py {{ keep_ci_update_since_branch }}
         env:
           GITHUB_TOKEN: {{ "${{ secrets.RELEASE_TOKEN }}" }}
+      {%- endif %}
 
       - name: Run update
         run: |
