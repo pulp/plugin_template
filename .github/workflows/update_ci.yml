@@ -31,7 +31,7 @@ jobs:
             "pulp_gem"
             "pulp_cookbook"
           )
-          echo "{\"ref\": \"main\", \"all_branches\": \"${{ github.event.inputs.all_branches }}\"}" > data.json
+          echo "{\"ref\": \"main\", \"inputs\":{\"all_branches\": \"${{ github.event.inputs.all_branches }}\"}}" > data.json
           for repo in "${REPOS[@]}"; do
               echo "Updating ${repo}..."
               curl \
