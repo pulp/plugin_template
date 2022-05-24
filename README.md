@@ -231,6 +231,15 @@ The following settings are stored in `template_config.yml`.
 
   single_commit_check   Runs a job to check whether a PR contains a single commit or not.
 
+  stalebot              A boolean that indicates whether to use stalebot or not.
+
+  stalebot_days_until_stale
+                        The number of days of inactivity before an Issue or Pull Request becomes stale.
+
+  stalebot_days_until_close
+                        The number of days of inactivity before an Issue or Pull Request with the stale
+                        label is closed.
+
   sync_ci               Enables a nightly workflow to update the CI files.
 
   test_bindings         Include a job that runs a script to test generated client
