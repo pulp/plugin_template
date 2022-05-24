@@ -64,6 +64,9 @@ DEFAULT_SETTINGS = {
     "release_email": "pulp-infra@redhat.com",
     "noissue_marker": "[noissue]",
     "single_commit_check": True,
+    "stalebot": False,
+    "stalebot_days_until_stale": 90,
+    "stalebot_days_until_close": 30,
     "sync_ci": True,
     "test_bindings": True,
     "test_cli": False,
@@ -339,6 +342,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     files_copied = 0
     gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
     for relative_path in generate_relative_path_set(section_template_dir):
+        if not config["stalebot"] and "stale" in relative_path:
+            continue
         if config["issue_tracker"] != "redmine" and "redmine" in relative_path:
             continue
         if config["issue_tracker"] != "github" and "update_github" in relative_path:
