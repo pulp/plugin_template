@@ -57,12 +57,6 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
   run: |
     echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
 
-    {%- if upgrade_range and test == "upgrade" %}
-    {%- for plugin_branch, version in upgrade_range[0].items() %}
-    echo "FROM_{{ plugin_branch| upper| replace("-", "_") }}={{ "${{ matrix.env.FROM_" + plugin_branch| upper| replace("-", "_") +" }}" }}" >> $GITHUB_ENV
-    {%- endfor %}
-    {%- endif %}
-
     {%- if test_performance and test == "performance" %}
     {%- if test_performance is iterable and test_performance|length > 1 %}
     echo "PERFORMANCE_TEST={{ "${{ matrix.env.PERFORMANCE_TEST }}" }}" >> $GITHUB_ENV
