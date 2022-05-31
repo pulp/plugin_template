@@ -20,7 +20,6 @@ DEFAULT_SETTINGS = {
     "additional_repos": [],
     "aiohttp_fixtures_origin": "172.18.0.1",  # The IP for Github Actions
     "api_root": "/pulp/",
-    "upgrade_range": [],
     "black": True,
     "flake8": True,
     "check_commit_message": True,

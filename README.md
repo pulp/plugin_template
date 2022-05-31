@@ -60,16 +60,6 @@ The following settings are stored in `template_config.yml`.
                                                Applies to TAGGED (release) jobs.
                                                See pulpcore_pip_version_specifier, but defaults to undefined, the latest.
 
-  upgrade_range       A list with plugin branches to be installed on Github Actions.
-                        Each item in the list is a dict with the following fields:
-                        {{ plugin_name }}_branch: the branch of the plugin
-                        Example:
-                            upgrade_range:
-                                - pulp_file_branch: 1.6
-                                  pulpcore_branch: 3.11
-                                - pulp_file_branch: 1.5
-                                  pulpcore_branch: 3.10
-
   black                 Boolean, whether to use black to format python source files.
 
   flake8                Boolean, whether to use flake8 to lint python source files.
