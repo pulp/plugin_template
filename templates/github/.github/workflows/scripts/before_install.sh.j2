@@ -120,7 +120,7 @@ cd ..
 git clone --depth=1 https://github.com/pulp/pulpcore.git --branch {{ pulpcore_branch }}
 
 cd pulpcore
-{% if pulpcore_revision %}git checkout {{ pulpcore_revision }}{% endif %}
+{% if pulpcore_revision %}git fetch --depth=1 origin {{ pulpcore_revision }} && git checkout {{ pulpcore_revision }}{% endif %}
 if [ -n "$PULPCORE_PR_NUMBER" ]; then
   git fetch --depth=1 origin pull/$PULPCORE_PR_NUMBER/head:$PULPCORE_PR_NUMBER
   git checkout $PULPCORE_PR_NUMBER
