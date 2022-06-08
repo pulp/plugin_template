@@ -30,15 +30,23 @@ TAG=ci_build
 
 {#- For pulpcore, and any other repo that might check out some plugin PR #}
 {%- for item in additional_repos %}
-
+{%- if item.branch %}
 if [ -e $REPO_ROOT/../{{ item.name }} ]; then
   {{ item.name | upper | replace("-", "_") }}=./{{ item.name }}
 else
-  {{ item.name | upper | replace("-", "_") }}=git+https://github.com/{{item.org | default("pulp")}}/{{ item.name }}.git@{{ item.revision | default(item.branch) }}
+  {{ item.name | upper | replace("-", "_") }}=git+https://github.com/{{item.org | default("pulp")}}/{{ item.name }}.git@{{ item.branch }}
 fi
+{%- else %}
+{{ item.name | upper | replace("-", "_") }}=git+https://github.com/{{item.org | default("pulp")}}/{{ item.name }}.git@{{ item.revision }}#egg={{ item.name | replace("_", "-") }}
+{%- endif %}
 {%- endfor %}
 
 {%- if plugin_name != 'pulpcore' %}
+{%- if pulpcore_revision %}
+PULPCORE=git+https://github.com/pulp/pulpcore.git@{{ pulpcore_revision }}#egg=pulpcore
+{%- else %}
+PULPCORE=./pulpcore
+{%- endif %}
 if [[ "$TEST" == "plugin-from-pypi" ]]; then
   PLUGIN_NAME={{ plugin_name }}
 elif [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
@@ -76,7 +84,7 @@ plugins:
     source: ${{ item.name|upper| replace("-", "_") }}
 {%- endfor %}
   - name: pulpcore
-    source: ./pulpcore
+    source: "${PULPCORE}"
 VARSYAML
 fi
 {%- else %}
