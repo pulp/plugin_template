@@ -68,7 +68,6 @@ DEFAULT_SETTINGS = {
     "stalebot_days_until_close": 30,
     "stalebot_limit_to_pulls": True,
     "sync_ci": True,
-    "test_bindings": True,
     "test_cli": False,
     "test_deprecations": True,
     "test_performance": False,

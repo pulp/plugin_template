@@ -42,10 +42,8 @@ jobs:
           {%- if test_stream %}
           - TEST: stream
           {%- endif %}
-          {%- if (deploy_daily_client_to_pypi or deploy_daily_client_to_rubygems) and not test_bindings %}
+          {%- if (deploy_daily_client_to_pypi or deploy_daily_client_to_rubygems) %}
           - TEST: generate-bindings
-          {%- elif test_bindings  %}
-          - TEST: bindings
           {%- endif %}
           {%- if test_released_plugin_with_next_pulpcore_release %}
           - TEST: plugin-from-pypi
