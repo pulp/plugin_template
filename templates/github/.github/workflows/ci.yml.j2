@@ -111,9 +111,6 @@ jobs:
           {%- if test_stream %}
           - TEST: stream
           {%- endif %}
-          {%- if test_bindings %}
-          - TEST: bindings
-          {%- endif %}
     outputs:
       deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
       {%- if test_stream %}
@@ -125,18 +122,11 @@ jobs:
       {%- if test_s3 %}
       deprecations-s3: {{ "${{ steps.deprecations.outputs.deprecations-s3 }}" }}
       {%- endif %}
-      {%- if test_bindings %}
-      deprecations-bindings: {{ "${{ steps.deprecations.outputs.deprecations-bindings }}" }}
-      {%- endif %}
 
     steps:
       {{ checkout() | indent(6) }}
 
       {{ setup_python() | indent(6) }}
-
-      {%- if test_bindings %}
-      {{ setup_ruby() | indent(6) }}
-      {%- endif %}
 
       {{ install_httpie() | indent(6) }}
 
@@ -180,9 +170,6 @@ jobs:
           {%- if test_s3 %}
           test -z "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}"
           {%- endif %}
-          {%- if test_bindings %}
-          test -z "{{ "${{ needs.test.outputs.deprecations-bindings }}" }}"
-          {%- endif %}
       - name: Print deprecations
         if: failure()
         run: |
@@ -195,9 +182,6 @@ jobs:
           {%- endif %}
           {%- if test_s3 %}
           echo "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}" | base64 -d
-          {%- endif %}
-          {%- if test_bindings %}
-          echo "{{ "${{ needs.test.outputs.deprecations-bindings }}" }}" | base64 -d
           {%- endif %}
 {%- endif %}
 

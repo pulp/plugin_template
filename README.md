@@ -232,13 +232,6 @@ The following settings are stored in `template_config.yml`.
 
   sync_ci               Enables a nightly workflow to update the CI files.
 
-  test_bindings         Include a job that runs a script to test generated client
-                        library.
-
-                        This job requires the plugin author to include a 'test_bindings.rb'
-                        script in the ./.ci/assets/bindings directory of the plugin repository. This
-                        script is supposed to exercise the generated client library.
-
   test_cli              Run the pulp-cli tests as part of the CI tests
 
   test_performance      Include a nightly job that runs a script to test performance. If using a
