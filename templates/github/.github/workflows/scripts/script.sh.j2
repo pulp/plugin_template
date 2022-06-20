@@ -150,12 +150,12 @@ else
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         cmd_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }} --nightly"
-        cmd_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m 'not parallel' --nightly"
+        cmd_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m 'not parallel'"
     {%- endfor %}
 
     {% if run_pulpcore_tests_for_plugins %}
-        cmd_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m 'from_pulpcore_for_all_plugins and parallel' -n  {{ parallel_test_workers }} --nightly"
-        cmd_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m 'from_pulpcore_for_all_plugins and not parallel' --nightly"
+        cmd_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m 'from_pulpcore_for_all_plugins and parallel' -n  {{ parallel_test_workers }}"
+        cmd_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m 'from_pulpcore_for_all_plugins and not parallel'"
     {% endif %}
     fi
 {% endif %}
