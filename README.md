@@ -132,9 +132,6 @@ The following settings are stored in `template_config.yml`.
   docker_fixtures       In Github Actions, use the pulp-fixtures docker container to serve up
                         fixtures instead of using fedorapeople.org.
 
-  aiohttp_fixtures_origin
-                        Identifies the network origin of the aiohttp fixtures.
-
   github_org            The Github organization to use for the plugin.
 
   issue_tracker         Which issue tracker the project will use. Valid values are 'redmine' and
