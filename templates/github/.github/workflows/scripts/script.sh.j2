@@ -109,7 +109,7 @@ if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT
 else
 {% if parallel_test_workers == 0 %}
-    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
+    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]] || [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
         cmd_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional --nightly"
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
@@ -131,7 +131,7 @@ else
     {% endif %}
     fi
 {% else %}
-    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]]; then
+    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]] || [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
         cmd_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
         cmd_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m 'not parallel' --nightly"
 
