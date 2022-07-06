@@ -89,6 +89,9 @@ jobs:
         run: sh .ci/scripts/check_gettext.sh
       {%- endif %}
 
+      - name: Verify upper bound requirements
+        run: python .ci/scripts/upper_bound.py
+
   test:
     runs-on: ubuntu-latest
     # run only after lint finishes
