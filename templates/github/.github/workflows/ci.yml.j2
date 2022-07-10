@@ -89,8 +89,10 @@ jobs:
         run: sh .ci/scripts/check_gettext.sh
       {%- endif %}
 
+      {% if lint_requirements -%}
       - name: Verify upper bound requirements
         run: python .ci/scripts/upper_bound.py
+      {%- endif %}
 
   test:
     runs-on: ubuntu-latest
