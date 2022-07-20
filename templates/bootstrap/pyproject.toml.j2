@@ -68,6 +68,7 @@ exclude = '''
 {% if check_manifest %}
 [tool.check-manifest]
 ignore = [
+    ".git-blame-ignore-revs",
     ".bumpversion.cfg",
     "CHANGES/**",
     "CONTRIBUTING.rst",
@@ -78,6 +79,8 @@ ignore = [
     "docs/**",
     ".flake8",
     "template_config.yml",
+    ".coveragerc",
+    ".dependabot/config.yml",
     ".ci/**",
     ".github/**",
 ]
