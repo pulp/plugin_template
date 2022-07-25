@@ -494,6 +494,8 @@ def update_pyproject_toml(plugin_root_dir, sections):
             if i >= len(data):
                 return
         while "]" not in data[i]:
+            if not data[i].endswith(",\n") and "[" not in data[i]:
+                data[i] = data[i].replace("\n", ",\n")
             if ".flake8" in data[i]:
                 found_dot_flake8 = True
             if "lint_requirements.txt" in data[i]:
