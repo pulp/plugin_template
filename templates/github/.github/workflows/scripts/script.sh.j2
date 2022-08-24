@@ -30,6 +30,7 @@ if [[ "$TEST" = "docs" ]]; then
   fi
   cmd_prefix bash -c "cd {{ plugin_name }}/docs; make diagrams html; tar -cvf docs.tar ./_build"
   docker cp pulp:/{{ plugin_name }}//docs/docs.tar docs.tar
+  cd ..
 
   if [ -f $POST_DOCS_TEST ]; then
     source $POST_DOCS_TEST
