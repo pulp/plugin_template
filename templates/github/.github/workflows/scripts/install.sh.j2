@@ -12,6 +12,15 @@ source .github/workflows/scripts/utils.sh
 
 export PULP_API_ROOT="{{ api_root }}"
 
+if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
+{%- if plugin_name == 'pulpcore' %}
+  pip install psycopg2-binary
+{%- else %}
+  pip install -r ../pulpcore/doc_requirements.txt
+{%- endif %}
+  pip install -r doc_requirements.txt
+fi
+
 cd .ci/ansible/
 
 TAG=ci_build
@@ -194,15 +203,6 @@ fi
 
 ansible-playbook build_container.yaml
 ansible-playbook start_container.yaml
-
-if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
-{%- if plugin_name == 'pulpcore' %}
-  pip install psycopg2-binary
-{%- else %}
-  cmd_prefix bash -c "cd pulpcore; pip install -r doc_requirements.txt"
-{%- endif %}
-  cmd_prefix bash -c "cd {{ plugin_name }}; pip install -r doc_requirements.txt"
-fi
 
 {%- if pulp_scheme == "https" %}
 echo ::group::SSL
