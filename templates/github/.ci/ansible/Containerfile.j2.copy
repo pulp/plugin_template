@@ -10,7 +10,7 @@ ADD {{ item.source }} {{ item.source }}
 # Install python packages
 # Hacking botocore (https://github.com/boto/botocore/pull/1990)
 
-RUN pip3 install \
+RUN pip3 install --no-binary pulpcore \
 {%- if stream_test | default(false) -%}
 {{ " " }}django-storages[sftp]
 {%- endif -%}
