@@ -21,6 +21,7 @@ DEFAULT_SETTINGS = {
     "api_root": "/pulp/",
     "black": True,
     "flake8": True,
+    "flake8_ignore": [],
     "check_commit_message": True,
     "check_gettext": True,
     "check_manifest": True,
