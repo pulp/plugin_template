@@ -317,7 +317,6 @@ def main():
 
     if plugin_root_dir:
         print("\nDeprecation check:")
-        update_pyproject_toml(plugin_root_dir, sections)
         check_for_deprecated_files(plugin_root_dir, sections)
 
 
@@ -472,53 +471,6 @@ def check_for_deprecated_files(plugin_root_dir, sections):
 
     if not files_found:
         print("No deprecated files found.")
-
-
-def update_pyproject_toml(plugin_root_dir, sections):
-    """Update pyproject.toml for the flake8 config migration."""
-    if "github" not in sections:
-        return
-    path = Path(plugin_root_dir) / "pyproject.toml"
-    if path.exists():
-        changed = False
-        found_dot_flake8 = False
-        found_lint_req = False
-        with open(path) as infile:
-            data = infile.readlines()
-        i = 0
-        while "check-manifest" not in data[i]:
-            i += 1
-            if i >= len(data):
-                return
-        while "ignore =" not in data[i]:
-            i += 1
-            if i >= len(data):
-                return
-        while "]" not in data[i]:
-            if not data[i].endswith(",\n") and "[" not in data[i]:
-                data[i] = data[i].replace("\n", ",\n")
-            if ".flake8" in data[i]:
-                found_dot_flake8 = True
-            if "lint_requirements.txt" in data[i]:
-                found_lint_req = True
-            if "flake8.cfg" in data[i]:
-                del data[i]
-                changed = True
-            else:
-                i += 1
-        if not found_dot_flake8:
-            data.insert(i, '    ".flake8",\n')
-            changed = True
-        if not found_lint_req:
-            data.insert(i, '    "lint_requirements.txt",\n')
-            changed = True
-        if changed:
-            print("Update pyproject.toml.")
-            with open(path, "w") as outfile:
-                outfile.writelines(data)
-            old_flake_path = Path(plugin_root_dir) / "flake8.cfg"
-            if os.path.exists(old_flake_path):
-                os.remove(old_flake_path)
 
 
 def migrate_github_issues(config, plugin_root_dir, verbose=False):
