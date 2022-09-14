@@ -174,6 +174,10 @@ The following settings are stored in `template_config.yml`.
 
   pulp_settings         A dictionary of settings that the plugin tests require to be set.
 
+  pulp_settings_<scenario>
+                        A dictionary of settings that the plugin <scenario> tests can set
+                        additionally. `<scenario>` is one of "azure", "s6", "stream".
+
   pulpcore_revision     The git commit hash to check out and install in Github Actions.
                         "Required PR" in a commit message will override this.
   pulpcore_branch       The branch of pulpcore to check out and install in Github Actions.
