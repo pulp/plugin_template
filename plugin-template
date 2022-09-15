@@ -37,7 +37,7 @@ DEFAULT_SETTINGS = {
     "docs_test": True,
     "github_org": "pulp",
     "issue_tracker": "github",
-    "keep_ci_update_since_branch": None,
+    "ci_update_branches": [],
     "parallel_test_workers": 8,
     "pulp_scheme": "https",
     "plugin_app_label": None,
@@ -257,6 +257,10 @@ def main():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
+                    # remove deprecated options
+                    if "keep_ci_update_since_branch" in config:
+                        config.pop("keep_ci_update_since_branch")
+                        write_new_config = True
                     print(
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)
