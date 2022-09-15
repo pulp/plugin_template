@@ -138,8 +138,7 @@ The following settings are stored in `template_config.yml`.
                         'github'. To switch from Redmine to GitHub use the --migrate-github-issues
                         option.
 
-  keep_ci_update_since_branch
-                        Keep CI updated for all starting from the specified branch.
+  ci_update_branches    Specify the branches that should receive regular CI updates.
 
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
