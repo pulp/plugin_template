@@ -37,6 +37,7 @@ DEFAULT_SETTINGS = {
     "docs_test": True,
     "github_org": "pulp",
     "issue_tracker": "github",
+    "kanban": True,
     "ci_update_branches": [],
     "parallel_test_workers": 8,
     "pulp_scheme": "https",
@@ -358,6 +359,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         if config["issue_tracker"] != "github" and "update_github" in relative_path:
             continue
         if config["use_issue_template"] is False and "ISSUE_TEMPLATE" in relative_path:
+            continue
+        if config["kanban"] is False and "kanban" in relative_path:
             continue
         destination_relative_path = relative_path.replace("plugin_name", config["plugin_snake"])
         necessary_dir_structure = os.path.dirname(
