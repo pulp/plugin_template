@@ -212,6 +212,8 @@ fi
 ansible-playbook build_container.yaml
 ansible-playbook start_container.yaml
 
+sudo chown -R 700:700 ~runner/.config
+
 {%- if pulp_scheme == "https" %}
 echo ::group::SSL
 # Copy pulp CA
