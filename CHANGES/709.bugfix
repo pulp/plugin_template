@@ -1,0 +1,2 @@
+Fix static content not existing in the images since the latest change to pulp_ci_centos.
+
