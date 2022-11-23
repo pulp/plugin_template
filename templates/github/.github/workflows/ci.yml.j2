@@ -115,6 +115,7 @@ jobs:
           {%- if test_stream %}
           - TEST: stream
           {%- endif %}
+          - TEST: lowerbounds
     outputs:
       deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
       {%- if test_stream %}
@@ -126,6 +127,7 @@ jobs:
       {%- if test_s3 %}
       deprecations-s3: {{ "${{ steps.deprecations.outputs.deprecations-s3 }}" }}
       {%- endif %}
+      deprecations-lowerbounds: {{ "${{ steps.deprecations.outputs.deprecations-lowerbounds }}" }}
 
     steps:
       {{ checkout() | indent(6) }}
@@ -142,7 +144,7 @@ jobs:
 
       {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
 
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default([]) | join(' '))}) | indent(6) }}
+      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ set_secrets(condition="github.event_name != 'pull_request'") | indent(6) }}
 
@@ -172,6 +174,7 @@ jobs:
           {%- if test_s3 %}
           test -z "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}"
           {%- endif %}
+          test -z "{{ "${{ needs.test.outputs.deprecations-lowerbounds }}" }}"
       - name: Print deprecations
         if: failure()
         run: |
@@ -185,6 +188,7 @@ jobs:
           {%- if test_s3 %}
           echo "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}" | base64 -d
           {%- endif %}
+          echo "{{ "${{ needs.test.outputs.deprecations-lowerbounds }}" }}" | base64 -d
 {%- endif %}
 
 {% if post_job_template -%}{{ "  " | indent }}{% include post_job_template.path %}{%- endif %}

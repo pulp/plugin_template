@@ -86,6 +86,7 @@ jobs:
           {%- if (deploy_client_to_pypi or deploy_client_to_rubygems) %}
           - TEST: generate-bindings
           {%- endif %}
+          - TEST: lowerbounds
 
     steps:
       - uses: actions/download-artifact@v3
@@ -126,7 +127,7 @@ jobs:
           {{ set_env_vars() | indent(10) }}
         shell: bash
 
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default([]) | join(' '))}) | indent(6) }}
+      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ set_secrets() | indent(6) }}
 
