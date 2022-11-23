@@ -48,6 +48,7 @@ jobs:
           {%- if test_released_plugin_with_next_pulpcore_release %}
           - TEST: plugin-from-pypi
           {%- endif %}
+          - TEST: lowerbounds
 
     steps:
       {{ checkout() | indent(6) }}
@@ -64,7 +65,7 @@ jobs:
 
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default([]) | join(' '))}) | indent(6) }}
+      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ set_secrets() | indent(6) }}
 
@@ -164,7 +165,7 @@ jobs:
 
       {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False) | indent(6) }}
 
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default([]) | join(' '))}) | indent(6) }}
+      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ set_secrets() | indent(6) }}
 
@@ -249,7 +250,7 @@ jobs:
 
       {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
 
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default([]) | join(' '))}) | indent(6) }}
+      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ set_secrets() | indent(6) }}
 
