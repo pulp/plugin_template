@@ -251,6 +251,9 @@ The following settings are stored in `template_config.yml`.
   test_azure            Include azure job for running tests using [azurite](https://github.com/Azure/Azurite)
                         to emulate Azure.
 
+  test_gcp              Include gcp job for running tests using [fake-gcs-server](https://github.com/fsouza/fake-gcs-server)
+                        to emulate GCP.
+
   test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
                         to emulate S3.
 
