@@ -135,7 +135,7 @@ VARSYAML
 
 {%- if docker_fixtures %}
 
-SCENARIOS=("pulp" "performance" "azure" "s3" "stream" "plugin-from-pypi" "generate-bindings" "lowerbounds")
+SCENARIOS=("pulp" "performance" "azure" "gcp" "s3" "stream" "plugin-from-pypi" "generate-bindings" "lowerbounds")
 if [[ " ${SCENARIOS[*]} " =~ " ${TEST} " ]]; then
   sed -i -e '/^services:/a \
   - name: pulp-fixtures\
@@ -199,6 +199,27 @@ if [ "$TEST" = "azure" ]; then
     command: "azurite-blob --blobHost 0.0.0.0{% if pulp_scheme == "https" %} --cert /etc/pulp/azcert.pem --key /etc/pulp/azkey.pem{% endif %}"' vars/main.yaml
   sed -i -e '$a azure_test: true\
 pulp_scenario_settings: {{ pulp_settings_azure | tojson }}\
+' vars/main.yaml
+fi
+{%- endif %}
+
+{%- if test_gcp %}
+
+if [ "$TEST" = "gcp" ]; then
+  mkdir -p cigcp
+  cd cigcp
+  openssl req -newkey rsa:2048 -x509 -nodes -keyout gcpkey.pem -new -out gcpcert.pem -sha256 -days 365 -addext "subjectAltName=DNS:ci-gcp" -subj "/C=CO/ST=ST/L=LO/O=OR/OU=OU/CN=CN"
+  sudo cp gcpcert.pem /usr/local/share/ca-certificates/gcpcert.crt
+  sudo dpkg-reconfigure ca-certificates
+  cd ..
+  sed -i -e '/^services:/a \
+  - name: ci-gcp\
+    image: fsouza/fake-gcs-server\
+    volumes:\
+      - storage_data:/etc/pulp\
+    command: "{% if pulp_scheme == "https" %} -cert-location /etc/pulp/gcpcert.pem {% else %} -scheme http{% endif %}"' vars/main.yaml
+  sed -i -e '$a gcp_test: true\
+pulp_scenario_settings: {{ pulp_settings_gcp | tojson }}\
 ' vars/main.yaml
 fi
 {%- endif %}

@@ -16,6 +16,7 @@ pip install -r test_requirements.txt
 mkdir -p ../pulp_catdog/.ci/assets/bindings
 echo 'pypi_username: the_pypi_user' >> ../pulp_catdog/template_config.yml
 sed -i "s/test_s3: false/test_s3: true/g" ../pulp_catdog/template_config.yml
+sed -i "s/test_gcp: false/test_gcp: true/g" ../pulp_catdog/template_config.yml
 sed -i "s/test_azure: false/test_azure: true/g" ../pulp_catdog/template_config.yml
 sed -i "s/disabled_redis_runners: \[\]/disabled_redis_runners: [s3]/g" ../pulp_catdog/template_config.yml
 ./plugin-template --all pulp_catdog

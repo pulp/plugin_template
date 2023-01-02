@@ -93,6 +93,7 @@ jobs:
           - TEST: pulp
           - TEST: docs
           - TEST: azure
+          - TEST: gcp
           - TEST: s3
           - TEST: lowerbounds
     outputs:

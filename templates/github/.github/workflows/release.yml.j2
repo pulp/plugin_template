@@ -77,6 +77,9 @@ jobs:
           {%- if test_azure %}
           - TEST: azure
           {%- endif %}
+          {%- if test_gcp %}
+          - TEST: gcp
+          {%- endif %}
           {%- if test_s3 %}
           - TEST: s3
           {%- endif %}
