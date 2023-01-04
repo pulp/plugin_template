@@ -118,7 +118,9 @@ jobs:
           {%- if test_stream %}
           - TEST: stream
           {%- endif %}
+          {%- if test_lowerbounds %}
           - TEST: lowerbounds
+          {%- endif %}
     outputs:
       deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
       {%- if test_stream %}
@@ -130,7 +132,9 @@ jobs:
       {%- if test_s3 %}
       deprecations-s3: {{ "${{ steps.deprecations.outputs.deprecations-s3 }}" }}
       {%- endif %}
+      {%- if test_lowerbounds %}
       deprecations-lowerbounds: {{ "${{ steps.deprecations.outputs.deprecations-lowerbounds }}" }}
+      {%- endif %}
 
     steps:
       {{ checkout() | indent(6) }}
@@ -177,7 +181,9 @@ jobs:
           {%- if test_s3 %}
           test -z "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}"
           {%- endif %}
+          {%- if test_lowerbounds %}
           test -z "{{ "${{ needs.test.outputs.deprecations-lowerbounds }}" }}"
+          {%- endif %}
       - name: Print deprecations
         if: failure()
         run: |
@@ -191,7 +197,9 @@ jobs:
           {%- if test_s3 %}
           echo "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}" | base64 -d
           {%- endif %}
+          {%- if test_lowerbounds %}
           echo "{{ "${{ needs.test.outputs.deprecations-lowerbounds }}" }}" | base64 -d
+          {%- endif %}
 {%- endif %}
 
 {% if post_job_template -%}{{ "  " | indent }}{% include post_job_template.path %}{%- endif %}
