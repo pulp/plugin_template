@@ -89,7 +89,9 @@ jobs:
           {%- if (deploy_client_to_pypi or deploy_client_to_rubygems) %}
           - TEST: generate-bindings
           {%- endif %}
+          {%- if test_lowerbounds %}
           - TEST: lowerbounds
+          {%- endif %}
 
     steps:
       - uses: actions/download-artifact@v3
