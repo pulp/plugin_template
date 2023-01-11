@@ -121,6 +121,7 @@ services:
       - ../../../pulp-openapi-generator:/root/pulp-openapi-generator
     env:
       PULP_WORKERS: "4"
+      GOOGLE_APPLICATION_CREDENTIALS: "/etc/pulp/credentials.json"
 VARSYAML
 
 cat >> vars/main.yaml << VARSYAML
@@ -204,9 +205,17 @@ fi
 {%- endif %}
 
 {%- if test_gcp %}
-
+cat >> credentials.json << GCP_JSON
+{
+  "client_id": "pulp-ci-test.apps.googleusercontent.com",
+  "client_secret": "pulp-Secret",
+  "refresh_token": "Pulp-CI-Refresh-Token",
+  "type": "authorized_user"
+}
+GCP_JSON
 if [ "$TEST" = "gcp" ]; then
-  mkdir -p cigcp
+  mkdir -p cigcp gcpdata/gcppulp
+  mv credentials.json cigcp/credentials.json
   cd cigcp
   openssl req -newkey rsa:2048 -x509 -nodes -keyout gcpkey.pem -new -out gcpcert.pem -sha256 -days 365 -addext "subjectAltName=DNS:ci-gcp" -subj "/C=CO/ST=ST/L=LO/O=OR/OU=OU/CN=CN"
   sudo cp gcpcert.pem /usr/local/share/ca-certificates/gcpcert.crt
@@ -216,8 +225,11 @@ if [ "$TEST" = "gcp" ]; then
   - name: ci-gcp\
     image: fsouza/fake-gcs-server\
     volumes:\
-      - storage_data:/etc/pulp\
-    command: "{% if pulp_scheme == "https" %} -cert-location /etc/pulp/gcpcert.pem {% else %} -scheme http{% endif %}"' vars/main.yaml
+      - ./cigcp:/etc/pulp\
+      - ./gcpdata:/data\
+    env:\
+      GOOGLE_APPLICATION_CREDENTIALS: "/etc/pulp/credentials.json"\
+    command: "-public-host {{ pulp_scheme }}://ci-gcp:4443 {% if pulp_scheme == "https" %} -cert-location /etc/pulp/gcpcert.pem {% else %} -scheme http{% endif %}"' vars/main.yaml
   sed -i -e '$a gcp_test: true\
 pulp_scenario_settings: {{ pulp_settings_gcp | tojson }}\
 ' vars/main.yaml
@@ -264,6 +276,10 @@ cat "$CERTIFI" | sudo tee -a "$CERT" > /dev/null
 sudo update-ca-certificates
 echo ::endgroup::
 {%- endif %}
+
+if [[ "$TEST" = "gcp" ]]; then
+  cp cigcp/credentials.json settings/credentials.json
+fi
 
 if [[ "$TEST" = "azure" ]]; then
   {%- if pulp_scheme == "https" %}
