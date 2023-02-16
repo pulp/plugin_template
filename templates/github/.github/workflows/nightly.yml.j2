@@ -45,9 +45,6 @@ jobs:
           {%- if test_stream %}
           - TEST: stream
           {%- endif %}
-          {%- if (deploy_daily_client_to_pypi or deploy_daily_client_to_rubygems) %}
-          - TEST: generate-bindings
-          {%- endif %}
           {%- if test_released_plugin_with_next_pulpcore_release %}
           - TEST: plugin-from-pypi
           {%- endif %}
@@ -173,32 +170,6 @@ jobs:
       {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ set_secrets() | indent(6) }}
-
-      {% if deploy_daily_client_to_rubygems %}
-      - name: Download Ruby client
-        uses: actions/download-artifact@v3
-        with:
-          name: ruby-client.tar
-
-      - name: Untar Ruby client packages
-        run: tar -xvf ruby-client.tar
-
-      - name: Publish client to rubygems
-        run: bash .github/workflows/scripts/publish_client_gem.sh
-      {% endif %}
-
-      {% if deploy_daily_client_to_pypi %}
-      - name: Download Python client
-        uses: actions/download-artifact@v3
-        with:
-          name: python-client.tar
-
-      - name: Untar python client packages
-        run: tar -xvf python-client.tar
-
-      - name: Publish client to pypi
-        run: bash .github/workflows/scripts/publish_client_pypi.sh
-      {% endif %}
 
       {% if publish_docs_to_pulpprojectdotorg and docs_test %}
       - name: Download built docs
