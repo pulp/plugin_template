@@ -98,29 +98,6 @@ The following settings are stored in `template_config.yml`.
                         secure environment variable called RUBYGEMS_API_KEY. The variable can
                         be added in the Github secrets settings page for the repository.
 
-  deploy_daily_client_to_pypi
-                        Include a Github Actions job that publishes a client library to PyPI.
-
-                        This job only executes when a tag is associated with the commit being
-                        built. When enabling this job, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the Github secrets settings page for the repository[0]. The PYPI
-                        username is specified using --pypi-username option.
-
-                        This job uses the OpenAPI schema for the plugin to generate a Python
-                        client library using openapi-generator-cli.
-
-                        [0] https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets
-
-  deploy_daily_client_to_rubygems
-                        Include a Github Actions job that publishes a client library to RubyGems.org
-                        with each CRON build.
-
-                        This job only executes on builds trigerred by CRON. When enabling
-                        this job, the user is expected to provide a secure environment
-                        variable called RUBYGEMS_API_KEY. The variable can be added in the
-                        Github secrets settings page for the repository.
-
   deploy_to_pypi        Include a Github Actions job that publishes builds to PyPI
 
                         This job only executes when a tag is associated with the commit being
@@ -196,8 +173,7 @@ The following settings are stored in `template_config.yml`.
                         Python docstring conventions.
 
   pypi_username         The username that should be used when uploading packages to PyPI. It
-                        is required unless deploy_client_to_pypi and deploy_daily_client_to_pypi
-                        and deploy_to_pypi are specified.
+                        is required if deploy_client_to_pypi is specified.
 
   python_version        Python version to use in the CI. Currently only 3.6 and 3.8 are supported.
 
