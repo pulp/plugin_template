@@ -15,6 +15,7 @@ setup(
     url="http://example.com/",
     python_requires=">=3.8",
     install_requires=requirements,
+    extra_require={"ci": []},
     include_package_data=True,
     packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[

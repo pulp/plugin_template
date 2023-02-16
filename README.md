@@ -53,7 +53,6 @@ The following settings are stored in `template_config.yml`.
                         bindings (optional): boolean whether or not generate bindings
                         org (optional): github organization
                         revision (optional): the git commit hash to install.
-                                             "Required PR" in a commit message will override this.
                         pytest_args (optional): string to by passed to a pytest call.
                         branch (optional): the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
                         pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
@@ -155,10 +154,8 @@ The following settings are stored in `template_config.yml`.
                         additionally. `<scenario>` is one of "azure", "s3", "stream".
 
   pulpcore_revision     The git commit hash to check out and install in Github Actions.
-                        "Required PR" in a commit message will override this.
   pulpcore_branch       The branch of pulpcore to check out and install in Github Actions.
                         This only applies to non-tagged jobs, such as PRs & cron jobs.
-                        "Required PR" in a commit message will override this.
                         Your requirements in "setup.py" may inadvertently override this as well.
 
   pulpcore_pip_version_specifier

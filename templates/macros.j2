@@ -18,12 +18,10 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro checkout() -%}
+{%- macro checkout(depth=1) -%}
 - uses: actions/checkout@v3
   with:
-    # by default, it uses a depth of 1
-    # this fetches all history so that we can read each commit
-    fetch-depth: 0
+    fetch-depth: {{ depth }}
 {%- endmacro -%}
 
 
@@ -36,7 +34,9 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 {%- macro setup_ruby(condition=None) -%}
 - uses: ruby/setup-ruby@v1
-  {%if condition %}if: {{ condition }}{% endif %}
+  {%- if condition %}
+  if: {{ condition }}
+  {%- endif %}
   with:
     ruby-version: "2.6"
 {%- endmacro -%}
@@ -82,7 +82,9 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 {%- macro run_script(name, file, withenv=True, condition=None, extra_env=None) -%}
 - name: {{ name }}
-  {%if condition %}if: {{ condition }}{% endif %}
+  {%- if condition %}
+  if: {{ condition }}
+  {%- endif %}
   run: .github/workflows/scripts/{{ file }}
   shell: bash
   {%- if withenv %}
@@ -94,7 +96,9 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 {%- macro set_secrets(condition=None) -%}
 - name: Setting secrets
-  {%if condition %}if: {{ condition }}{% endif %}
+  {%- if condition %}
+  if: {{ condition }}
+  {%- endif %}
   run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
   env:
     SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
