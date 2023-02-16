@@ -41,7 +41,7 @@ jobs:
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      {{ install_python_deps("packaging~=21.3 bandersnatch bump2version gitpython python-redmine towncrier==19.9.0 wheel") | indent(6) }}
+      {{ install_python_deps("packaging~=21.3 bandersnatch bump2version gitpython towncrier==19.9.0 wheel") | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
@@ -214,7 +214,7 @@ jobs:
 
       {{ set_secrets() | indent(6) }}
 
-      {{ install_python_deps("gitpython python-redmine requests packaging~=21.3 tweepy") | indent(6) }}
+      {{ install_python_deps("gitpython requests packaging~=21.3 tweepy") | indent(6) }}
 
       - name: Push branch and tag to GitHub
         run: bash .github/workflows/scripts/push_branch_and_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }}
@@ -267,13 +267,7 @@ jobs:
         run: bash .github/workflows/scripts/publish_client_gem.sh
       {%- endif %}
 
-      {% if update_redmine and not update_github -%}
-      - name: Update Redmine
-        continue-on-error: true
-        run: bash .ci/scripts/update_redmine.sh
-      {%- endif %}
-
-      {% if update_github and not update_redmine -%}
+      {% if update_github -%}
       - name: Update GitHub
         continue-on-error: true
         run: |

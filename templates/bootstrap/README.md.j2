@@ -8,25 +8,8 @@ For more information, please see the [documentation](docs/index.rst) or the [Pul
 How to File an Issue
 --------------------
 
-{% if issue_tracker == 'redmine' %}
-Visit [our tracker](https://pulp.plan.io/projects/{{ redmine_project }}/issues/new) to file a {{ plugin_dash }} issue.
-{% elif issue_tracker == 'github' %}
+{% if issue_tracker == 'github' %}
 File through this project's GitHub issues and appropriate labels.
 {% endif %}
 
 > **WARNING** Is this security related? If so, please follow the [Security Disclosures](https://docs.pulpproject.org/pulpcore/bugs-features.html#security-bugs) procedure.
-
-{% if issue_tracker == 'redmine' %}
-Please set **only the fields in this table**. See [Redmine Fields](https://docs.pulpproject.org/pulpcore/bugs-features.html#redmine-fields) for more detailed
-descriptions of all the fields and how they are used.
-
-| Field | Instructions |
-| ----- | ----------- |
-| Tracker | For a bug, select `Issue`, for a feature-request, choose `Story` |
-| Subject | Strive to be specific and concise. |
-| Description | This is the most important part! Please see [Description Field](https://docs.pulpproject.org/bugs-features.html#issue-description). |
-| Category | Choose one if applicable, blank is OK. |
-| Version | The version of {{ plugin_dash }} that you discovered the issue. |
-| OS | Please select your operating system. |
-| Tags | For searching. Select 0 or many, best judgement. |
-{% endif %}
