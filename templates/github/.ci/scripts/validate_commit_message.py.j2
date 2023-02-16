@@ -4,11 +4,7 @@ import re
 import sys
 from pathlib import Path
 import subprocess
-{% if issue_tracker == 'redmine' %}
-
-import warnings
-import requests
-{% elif issue_tracker == 'github' %}
+{% if issue_tracker == 'github' %}
 
 import os
 import warnings
@@ -37,34 +33,6 @@ def __check_status(issue):
             "'(cherry picked from commit ...)' to the original commit message."
         )
         sys.exit(f"Error: issue #{issue} is closed.")
-{% elif issue_tracker == 'redmine' %}
-KEYWORDS = ["fixes", "closes", "re", "ref"]
-STATUSES = ["NEW", "ASSIGNED", "POST", "MODIFIED"]
-REDMINE_URL = "https://pulp.plan.io"
-
-project = "{{ redmine_project if redmine_project }}"
-
-
-def __check_status(issue):
-    response = requests.get(f"{REDMINE_URL}/issues/{issue}.json")
-    response.raise_for_status()
-    bug_json = response.json()
-    status = bug_json["issue"]["status"]["name"]
-    if status not in STATUSES and "cherry picked from commit" not in message:
-        warnings.warn(
-            "When backporting, use the -x flag to append a line that says "
-            "'(cherry picked from commit ...)' to the original commit message."
-        )
-        sys.exit(
-            "Error: issue #{issue} has invalid status of {status}. Status must be one of "
-            "{statuses}.".format(issue=issue, status=status, statuses=", ".join(STATUSES))
-        )
-
-    if project:
-        project_id = bug_json["issue"]["project"]["id"]
-        project_json = requests.get(f"{REDMINE_URL}/projects/{project_id}.json").json()
-        if project_json["project"]["identifier"] != project:
-            sys.exit(f"Error: issue {issue} is not in the {project} project.")
 {% else %}
 KEYWORDS = []
 

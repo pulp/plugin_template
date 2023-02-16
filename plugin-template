@@ -30,8 +30,8 @@ DEFAULT_SETTINGS = {
     "coverage": False,
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
-    "deploy_daily_client_to_pypi": True,
-    "deploy_daily_client_to_rubygems": True,
+    "deploy_daily_client_to_pypi": False,
+    "deploy_daily_client_to_rubygems": False,
     "deploy_to_pypi": True,
     "docker_fixtures": False,
     "docs_test": True,
@@ -107,13 +107,16 @@ DEFAULT_SETTINGS_NONMAIN = {
 DEPRECATED_FILES = {
     "github": [
         ".ci/assets/bindings/.gitkeep",
+        ".ci/scripts/cherrypick.sh",
         ".ci/scripts/docs-builder.py",
         ".ci/scripts/publish_docs.sh",
         ".ci/scripts/publish_client_gem.sh",
         ".ci/scripts/publish_client_pypi.sh",
         ".ci/scripts/publish_plugin_pypi.sh",
+        ".ci/scripts/redmine.py",
         ".ci/scripts/release_requirements.txt",
         ".ci/scripts/release.py",
+        ".ci/scripts/update_redmine.sh",
         ".github/workflows/fips.yml",
         ".github/workflows/scripts/stage-changelog-for-master.py",
         ".travis",
@@ -223,15 +226,6 @@ def main():
                         """
         ),
     )
-    parser.add_argument(
-        "--migrate-github-issues",
-        action="store_true",
-        help=textwrap.dedent(
-            """\
-                            Migrate plugin's issue checker CI/CD from Redmine to GitHub
-                        """
-        ),
-    )
     args = parser.parse_args()
 
     here = os.path.dirname(os.path.abspath(__file__))
@@ -298,13 +292,6 @@ def main():
     # the config. (note: uses .copy() to avoid a self reference)
     config["config"] = config.copy()
 
-    if args.migrate_github_issues:
-        if config["issue_tracker"] == "github":
-            print(f"{args.plugin_name} is already using GitHub as the issue tracker")
-            return 2
-        migrate_github_issues(config, plugin_root_dir, verbose=args.verbose)
-        return 0
-
     if args.github or args.all:
         if not config["pypi_username"] and (
             config["deploy_client_to_pypi"] or config["deploy_to_pypi"]
@@ -355,8 +342,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
     for relative_path in generate_relative_path_set(section_template_dir):
         if not config["stalebot"] and "stale" in relative_path:
-            continue
-        if config["issue_tracker"] != "redmine" and "redmine" in relative_path:
             continue
         if config["issue_tracker"] != "github" and "update_github" in relative_path:
             continue
@@ -483,38 +468,6 @@ def check_for_deprecated_files(plugin_root_dir, sections):
 
     if not files_found:
         print("No deprecated files found.")
-
-
-def migrate_github_issues(config, plugin_root_dir, verbose=False):
-    """Moves the plugin's issue checker CI/CD off of Redmine and onto GitHub"""
-    print("Updating template_config.yml and templating ci section")
-    name = config["plugin_name"]
-    redmine = config["redmine_project"]
-    if not redmine:
-        print(
-            "Redmine project name not set. Please set 'redmine_project' in template_config.yml"
-            " and rerun this command"
-        )
-        return 2
-    config["issue_tracker"] = "github"
-    config["redmine_project"] = None
-    config["update_redmine"] = False
-    config.pop("config")
-    config["config"] = config.copy()
-    write_template_section(config, "generate_config", plugin_root_dir, verbose=verbose)
-    write_template_section(config, "github", plugin_root_dir, verbose=verbose)
-    print("Updating pyproject.toml to point to GitHub issues\n")
-    search_string = "pulp.plan.io"
-    replace_string = "github.com\\/pulp\\/{name}".format(name=name)
-    os.system(f"sed -i 's/{search_string}/{replace_string}/' {plugin_root_dir}/pyproject.toml")
-    print(
-        f"Please check the Pulp-CI PR processor (https://git.io/Jtsz5) and remove {name}"
-        f" if present\n"
-    )
-    print(
-        f"Don't forget to migrate current issues from https://pulp.plan.io/projects/{redmine}"
-        f" and remove the repo from the project settings\n"
-    )
 
 
 if __name__ == "__main__":
