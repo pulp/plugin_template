@@ -45,6 +45,9 @@ jobs:
           {%- if test_stream %}
           - TEST: stream
           {%- endif %}
+          {% if publish_docs_to_pulpprojectdotorg and docs_test %}
+          - TEST: generate-bindings
+          {%- endif %}
           {%- if test_released_plugin_with_next_pulpcore_release %}
           - TEST: plugin-from-pypi
           {%- endif %}
