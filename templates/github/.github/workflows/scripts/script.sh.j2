@@ -3,11 +3,11 @@
 
 {% include 'header.j2' %}
 
+set -mveuo pipefail
+
 # make sure this script runs at the repo root
 cd "$(dirname "$(realpath -e "$0")")"/../../..
 REPO_ROOT="$PWD"
-
-set -mveuo pipefail
 
 source .github/workflows/scripts/utils.sh
 
@@ -39,10 +39,10 @@ if [[ "$TEST" = "docs" ]]; then
   exit
 fi
 
+REPORTED_STATUS="$(pulp status)"
+
 if [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
-  STATUS_ENDPOINT="${PULP_URL}${PULP_API_ROOT}api/v3/status/"
-  echo $STATUS_ENDPOINT
-  REPORTED_VERSION=$(http $STATUS_ENDPOINT | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')
+  REPORTED_VERSION="$(echo $REPORTED_STATUS | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')"
   response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_dash }}/$REPORTED_VERSION/)
   if [ "$response" == "200" ];
   then
@@ -59,19 +59,13 @@ password password
 cmd_user_stdin_prefix bash -c "chmod 600 ~pulp/.netrc"
 
 cd ../pulp-openapi-generator
-{%- if plugin_name != 'pulpcore' %}
-./generate.sh {{ plugin_snake }} python
-cmd_prefix pip3 install /root/pulp-openapi-generator/{{ plugin_snake }}-client
-sudo rm -rf ./{{ plugin_snake }}-client
-{%- endif %}
-./generate.sh pulpcore python
-cmd_prefix pip3 install /root/pulp-openapi-generator/pulpcore-client
-sudo rm -rf ./pulpcore-client
-{%- for item in additional_repos if item.bindings | default(true) %}
-./generate.sh {{ item.name | replace("-", "_") }} python
-cmd_prefix pip3 install /root/pulp-openapi-generator/{{ item.name | replace("-", "_") }}-client
-sudo rm -rf ./{{ item.name | replace("-", "_") }}-client
-{%- endfor %}
+for item in $(echo "$REPORTED_STATUS" | jq -r '.versions[].package|sub("-"; "_")')
+do
+./generate.sh "${item}" python
+cmd_prefix pip3 install "/root/pulp-openapi-generator/${item}-client"
+sudo rm -rf "./${item}-client"
+done
+
 cd $REPO_ROOT
 
 cat unittest_requirements.txt | cmd_stdin_prefix bash -c "cat > /tmp/unittest_requirements.txt"

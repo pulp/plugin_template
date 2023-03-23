@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: {{  plugin_name }}.tar
+          name: {{ plugin_name }}.tar
 
       {{ setup_python() | indent(6) }}
 
@@ -104,7 +104,7 @@ jobs:
       - name: Untar repository
         run: |
           shopt -s dotglob
-          tar -xf {{  plugin_name }}.tar
+          tar -xf {{ plugin_name }}.tar
           mv home/runner/work/{{ plugin_name }}/{{ plugin_name }}/* ./
 
       # update to the branch's latest ci files rather than the ones from the release tag. this is
