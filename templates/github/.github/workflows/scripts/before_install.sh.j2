@@ -55,21 +55,17 @@ cd ..
 
 git clone --depth=1 https://github.com/pulp/pulp-openapi-generator.git
 
-{% if test_cli %}
 if [ -f ../clitest_requirement.txt ]
 then
   pip install -r clitest_requirements.txt
 else
   pip install pulp-cli
 fi
+{% if test_cli %}
 PULP_CLI_VERSION="$(python -c "from pulpcore.cli.common import __version__; print(__version__)")"
 git clone https://github.com/pulp/pulp-cli.git
 cd pulp-cli
 git checkout "$PULP_CLI_VERSION"
-
-pulp config create --base-url {{ pulp_scheme }}://pulp {% if pulp_scheme != 'https' %}--no-verify-ssl{% endif %} --location tests/cli.toml
-mkdir ~/.config/pulp
-cp tests/cli.toml ~/.config/pulp/cli.toml
 cd ..
 {% endif %}
 
