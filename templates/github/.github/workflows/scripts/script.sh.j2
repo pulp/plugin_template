@@ -51,11 +51,6 @@ if [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
   fi
 fi
 
-if [[ "$TEST" == "plugin-from-pypi" ]]; then
-  COMPONENT_VERSION=$(http https://pypi.org/pypi/{{ plugin_dash }}/json | jq -r '.info.version')
-  git checkout ${COMPONENT_VERSION} -- {{ plugin_name }}/tests/
-fi
-
 echo "machine pulp
 login admin
 password password

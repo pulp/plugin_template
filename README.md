@@ -153,19 +153,6 @@ The following settings are stored in `template_config.yml`.
                         A dictionary of settings that the plugin <scenario> tests can set
                         additionally. `<scenario>` is one of "azure", "s3", "stream".
 
-  pulpcore_revision     The git commit hash to check out and install in Github Actions.
-  pulpcore_branch       The branch of pulpcore to check out and install in Github Actions.
-                        This only applies to non-tagged jobs, such as PRs & cron jobs.
-                        Your requirements in "setup.py" may inadvertently override this as well.
-
-  pulpcore_pip_version_specifier
-                        A pip version specifier for when pulpcore gets installed from PyPI.
-                        This is only for Github Actions, and only applies to TAGGED (release) jobs.
-                        An example is "~=3.0.0", which installs the latest 3.0.z,
-                        and is equivalent to `pip install pulpcore~=3.0.0`.
-                        Defaults to null, which installs the latest release from PyPI.
-                        Your requirements in "setup.py" may inadvertently override this as well.
-
   pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
                         Python docstring conventions.
 
