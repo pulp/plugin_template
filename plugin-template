@@ -20,25 +20,28 @@ DEFAULT_SETTINGS = {
     "additional_repos": [],
     "api_root": "/pulp/",
     "black": True,
-    "flake8": True,
-    "flake8_ignore": [],
     "check_commit_message": True,
     "check_gettext": True,
     "check_manifest": True,
     "check_stray_pulpcore_imports": True,
+    "ci_env": {},
+    "ci_trigger": "{pull_request: {branches: ['*']}}",
+    "ci_update_branches": [],
     "core_import_allowed": [],
-    "coverage": False,
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
     "deploy_to_pypi": True,
+    "disabled_redis_runners": [],
     "docker_fixtures": False,
     "docs_test": True,
+    "flake8_ignore": [],
+    "flake8": True,
     "github_org": "pulp",
     "issue_tracker": "github",
     "kanban": True,
-    "ci_update_branches": [],
+    "lint_requirements": True,
+    "noissue_marker": "[noissue]",
     "parallel_test_workers": 8,
-    "pulp_scheme": "https",
     "plugin_app_label": None,
     "plugin_camel": None,
     "plugin_camel_short": None,
@@ -49,56 +52,39 @@ DEFAULT_SETTINGS = {
     "plugin_default_branch": "main",
     "plugin_name": None,
     "plugin_snake": None,
+    "post_job_template": None,
+    "pre_job_template": None,
     "publish_docs_to_pulpprojectdotorg": False,
-    "pulp_settings": None,
+    "pulpprojectdotorg_key_id": None,
+    "pulp_scheme": "https",
     "pulp_settings_azure": None,
     "pulp_settings_gcp": None,
+    "pulp_settings": None,
     "pulp_settings_s3": None,
     "pulp_settings_stream": None,
-    "pulpcore_branch": "main",
-    "pulpcore_revision": None,
-    "pulpcore_pip_version_specifier": None,
-    "pulpprojectdotorg_key_id": None,
     "pydocstyle": True,
     "pypi_username": None,
     "python_version": "3.8",
-    "release_user": "pulpbot",
     "release_email": "pulp-infra@redhat.com",
-    "noissue_marker": "[noissue]",
+    "release_user": "pulpbot",
+    "run_pulpcore_tests_for_plugins": True,
     "single_commit_check": True,
-    "stalebot": True,
-    "stalebot_days_until_stale": 90,
     "stalebot_days_until_close": 30,
+    "stalebot_days_until_stale": 90,
     "stalebot_limit_to_pulls": True,
+    "stalebot": True,
     "sync_ci": True,
+    "test_azure": False,
     "test_cli": False,
     "test_deprecations": True,
+    "test_gcp": False,
     "test_lowerbounds": True,
     "test_performance": False,
-    "test_released_plugin_with_next_pulpcore_release": False,
     "test_reroute": True,
-    "disabled_redis_runners": [],
-    "test_azure": False,
-    "test_gcp": False,
     "test_s3": False,
     "test_stream": False,
     "update_github": True,
     "use_issue_template": True,
-    "ci_trigger": "{pull_request: {branches: ['*']}}",
-    "ci_env": {},
-    "pre_job_template": None,
-    "post_job_template": None,
-    "lint_requirements": True,
-}
-
-
-DEFAULT_SETTINGS_MAIN = {
-    "run_pulpcore_tests_for_plugins": True,
-}
-
-
-DEFAULT_SETTINGS_NONMAIN = {
-    "run_pulpcore_tests_for_plugins": False,
 }
 
 
@@ -244,18 +230,9 @@ def main():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
-                    additional_settings = (
-                        DEFAULT_SETTINGS_MAIN
-                        if config["pulpcore_branch"] == "main"
-                        else DEFAULT_SETTINGS_NONMAIN
-                    )
-                    for key, value in additional_settings.items():
-                        if key not in config:
-                            config[key] = value
-                            write_new_config = True
                     # remove deprecated options
-                    if "keep_ci_update_since_branch" in config:
-                        config.pop("keep_ci_update_since_branch")
+                    for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
+                        config.pop(key)
                         write_new_config = True
                     print(
                         "\nLoaded plugin template config from "

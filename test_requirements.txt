@@ -1,6 +1,5 @@
 black
 check-manifest
-coverage
 flake8
 flake8-docstrings
 flake8-tuple

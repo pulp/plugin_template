@@ -25,11 +25,8 @@ fi
 COMMIT_MSG=$(git log --format=%B --no-merges -1)
 export COMMIT_MSG
 
-if [[ "$TEST" == "plugin-from-pypi" ]]; then
-  COMPONENT_VERSION=$(http https://pypi.org/pypi/{{ plugin_dash }}/json | jq -r '.info.version')
-else
-  COMPONENT_VERSION=$(sed -ne "s/\s*version.*=.*['\"]\(.*\)['\"][\s,]*/\1/p" setup.py)
-fi
+COMPONENT_VERSION=$(sed -ne "s/\s*version.*=.*['\"]\(.*\)['\"][\s,]*/\1/p" setup.py)
+
 mkdir .ci/ansible/vars || true
 echo "---" > .ci/ansible/vars/main.yaml
 echo "legacy_component_name: {{ plugin_snake }}" >> .ci/ansible/vars/main.yaml
