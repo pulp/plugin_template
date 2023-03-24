@@ -153,8 +153,8 @@ fi
 export PULP_FIXTURES_URL="http://pulp-fixtures:8080"
 {%- endif %}
 pushd ../{{ cli_package }}
-pip install -r test_requirements.txt
-pytest -v -m {{ plugin_snake }}
+pip install -r test_requirements.txt pytest-custom_exit_code
+pytest --suppress-no-test-exit-code -v -m {{ plugin_snake }}
 popd
 {%- endif %}
 
