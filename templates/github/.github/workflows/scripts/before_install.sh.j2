@@ -55,18 +55,10 @@ cd ..
 
 git clone --depth=1 https://github.com/pulp/pulp-openapi-generator.git
 
-if [ -f ../clitest_requirement.txt ]
-then
-  pip install -r clitest_requirements.txt
-else
-  pip install pulp-cli
-fi
+pip install {{ cli_package }}
 {% if test_cli %}
-PULP_CLI_VERSION="$(python -c "from pulpcore.cli.common import __version__; print(__version__)")"
-git clone https://github.com/pulp/pulp-cli.git
-cd pulp-cli
-git checkout "$PULP_CLI_VERSION"
-cd ..
+PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
+git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }}
 {% endif %}
 
 # Intall requirements for ansible playbooks

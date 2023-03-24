@@ -169,7 +169,7 @@ fi
 
 pulp config create --base-url {{ pulp_scheme }}://pulp{% if pulp_scheme != 'https' %} --no-verify-ssl{% endif %} --api-root "$PULP_API_ROOT"
 {% if test_cli -%}
-cp ~/.config/pulp/cli.toml "${REPO_ROOT}/../pulp-cli/tests/cli.toml"
+cp ~/.config/pulp/cli.toml "${REPO_ROOT}/../{{ cli_package }}/tests/cli.toml"
 {%- endif %}
 
 ansible-playbook build_container.yaml
