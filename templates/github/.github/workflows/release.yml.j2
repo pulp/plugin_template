@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
 
     steps:
-      {{ checkout() | indent(6) }}
+      {{ checkout(depth=0) | indent(6) }}
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
