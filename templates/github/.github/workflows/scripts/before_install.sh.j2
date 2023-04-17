@@ -55,11 +55,14 @@ cd ..
 
 git clone --depth=1 https://github.com/pulp/pulp-openapi-generator.git
 
-pip install {{ cli_package }}
-{% if test_cli %}
-PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
-git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }}
-{% endif %}
+if [[ "$TEST" != "docs" ]]
+then
+  pip install {{ cli_package }}
+  {% if test_cli %}
+  PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
+  git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }}
+  {% endif %}
+fi
 
 # Intall requirements for ansible playbooks
 pip install docker netaddr boto3 ansible

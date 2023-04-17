@@ -14,14 +14,13 @@ export PULP_API_ROOT="{{ api_root }}"
 
 if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
 {%- if plugin_name == 'pulpcore' %}
-  pip install psycopg2-binary
+  pip install pulp-cli psycopg2-binary -r doc_requirements.txt
 {%- else %}
   cd ..
   git clone https://github.com/pulp/pulpcore.git
   cd -
-  pip install -r ../pulpcore/doc_requirements.txt
+  pip install pulp-cli psycopg2-binary -r ../pulpcore/doc_requirements.txt -r doc_requirements.txt
 {%- endif %}
-  pip install -r doc_requirements.txt
 fi
 
 cd .ci/ansible/
