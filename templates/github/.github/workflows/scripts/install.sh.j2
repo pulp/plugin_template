@@ -12,16 +12,27 @@ source .github/workflows/scripts/utils.sh
 
 export PULP_API_ROOT="{{ api_root }}"
 
-if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]; then
+PIP_REQUIREMENTS=("{{ cli_package }}")
+if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]
+then
+  PIP_REQUIREMENTS+=("-r" "doc_requirements.txt")
 {%- if plugin_name == 'pulpcore' %}
-  pip install pulp-cli psycopg2-binary -r doc_requirements.txt
-{%- else %}
-  cd ..
-  git clone https://github.com/pulp/pulpcore.git
-  cd -
-  pip install pulp-cli psycopg2-binary -r ../pulpcore/doc_requirements.txt -r doc_requirements.txt
+  PIP_REQUIREMENTS+=("psycopg2-binary")
+{%- elif doc_requirements_from_pulpcore %}
+  git clone https://github.com/pulp/pulpcore.git ../pulpcore
+  PIP_REQUIREMENTS+=("psycopg2-binary" "-r" "../pulpcore/doc_requirements.txt")
 {%- endif %}
 fi
+
+pip install ${PIP_REQUIREMENTS[*]}
+
+{% if test_cli -%}
+if [[ "$TEST" != "docs" ]]
+then
+  PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
+  git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }} ../{{ cli_package }}
+fi
+{%- endif %}
 
 cd .ci/ansible/
 
