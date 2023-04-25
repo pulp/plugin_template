@@ -1,0 +1,30 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  setup_python,
+  configure_git,
+  install_python_deps,
+with context %}
+
+---
+name: Update Labels
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - 'template_config.yml'
+
+jobs:
+  update_backport_labels:
+    runs-on: ubuntu-latest
+    steps:
+      {{ setup_python() | indent(6) }}
+      {{ configure_git() | indent(6) }}
+      {{ install_python_deps("requests pyyaml") | indent(6) }}
+      - uses: actions/checkout@v3
+      - name: Update labels
+        run: |
+          python3 .github/workflows/scripts/update_backport_labels.py
+        env:
+          GITHUB_TOKEN: {{ '${{ secrets.RELEASE_TOKEN }}' }}
+        
