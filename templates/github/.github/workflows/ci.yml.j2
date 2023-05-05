@@ -13,6 +13,11 @@ with context %}
 ---
 name: {{ plugin_camel_short | default("Pulp") }} CI
 on: {{ ci_trigger | default("{pull_request: {branches: ['*']}}") }}
+
+concurrency:
+  group: {{ '${{ github.ref_name }}-${{ github.workflow }}' }}
+  cancel-in-progress: true
+
 jobs:
 {% if pre_job_template -%}{{ "  " | indent }}{% include pre_job_template.path %}{%- endif %}
 
