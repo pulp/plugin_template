@@ -32,6 +32,11 @@ jobs:
     steps:
       {{ checkout() | indent(6) }}
 
+      - uses: actions/checkout@v3
+        with:
+          repository: pulp/plugin_template
+          path: ../plugin_template
+
       {{ setup_python() | indent(6) }}
 
       {{ install_python_deps("gitpython requests packaging jinja2 pyyaml") | indent(6) }}

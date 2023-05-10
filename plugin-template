@@ -29,14 +29,16 @@ DEFAULT_SETTINGS = {
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
     "ci_update_branches": [],
+    "ci_update_docs": False,
     "core_import_allowed": [],
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
     "deploy_to_pypi": True,
     "disabled_redis_runners": [],
-    "doc_requirements_from_pulpcore": True,
+    "doc_requirements_from_pulpcore": False,
     "docker_fixtures": False,
     "docs_test": True,
+    "extra_docs_requirements": [],
     "flake8_ignore": [],
     "flake8": True,
     "github_org": "pulp",
@@ -270,6 +272,17 @@ def main():
     # Config key is used by the template_config.yml.j2 template to dump
     # the config. (note: uses .copy() to avoid a self reference)
     config["config"] = config.copy()
+
+    # Determine the current version as needed by some templates
+    try:
+        b2v_config_path = os.path.join(plugin_root_dir, ".bumpversion.cfg")
+        with open(b2v_config_path) as b2v_config_file:
+            for line in b2v_config_file.readlines():
+                if line.startswith("current_version = "):
+                    config["current_version"] = line[18:].strip()
+                    break
+    except Exception:
+        config["current_version"] = "0.1.0a1.dev"
 
     if args.github or args.all:
         if not config["pypi_username"] and (

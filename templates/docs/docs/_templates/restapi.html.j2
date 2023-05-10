@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
+    {% if plugin_name == "pulpcore" -%}
+    <title>Pulp 3 REST API documentation</title>
+    {%- else -%}
     <title>REST API for Pulp 3 {{ plugin_dash_short }} Plugin</title>
+    {%- endif %}
     <!-- needed for adaptive design -->
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +22,7 @@
     </style>
   </head>
   <body>
-    <redoc spec-url='_static/api.json'></redoc>
+    <redoc spec-url='api.json'></redoc>
     <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"> </script>
   </body>
 </html>

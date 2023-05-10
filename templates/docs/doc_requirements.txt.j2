@@ -1,12 +1,13 @@
-coreapi
-django
-djangorestframework
-django-filter
-drf-nested-routers
+{% include 'header.j2' %}
+-r requirements.txt
 plantuml
-pyyaml
-sphinx
-sphinx-rtd-theme
+sphinx~=6.2.1
+sphinx-rtd-theme==1.2.0
+sphinxcontrib-jquery
 sphinxcontrib-openapi
 towncrier
 mistune<2.0.0
+Jinja2<3.2
+{%- for req in extra_docs_requirements %}
+{{ req }}
+{%- endfor %}
