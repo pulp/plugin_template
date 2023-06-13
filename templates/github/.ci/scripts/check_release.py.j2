@@ -94,9 +94,10 @@ def main():
                         ).split("=")[-1]
                         next_version = Version(next_version)
                         print(
-                            f"A new Y-release is needed!, New Version: {next_version.base_version}"
+                            f"A new Y-release is needed! New Version: {next_version.base_version}"
                         )
                         releases.append(next_version)
+                        break
 
         if len(releases) == 0:
             print("No new releases to perform.")
