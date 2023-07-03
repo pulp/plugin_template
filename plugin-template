@@ -105,6 +105,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/redmine.py",
         ".ci/scripts/release_requirements.txt",
         ".ci/scripts/release.py",
+        ".ci/scripts/update_ci_branches.py",
         ".ci/scripts/update_redmine.sh",
         ".ci/scripts/upper_bound.py",
         ".github/workflows/fips.yml",

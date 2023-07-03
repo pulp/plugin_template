@@ -16,11 +16,6 @@ on:
     - cron: '30 2 * * 0'
   {% endif %}
   workflow_dispatch:
-    inputs:
-      all_branches:
-        description: "Run on all branches"
-        default: 'no'
-        required: false
 
 jobs:
   update:
@@ -30,12 +25,11 @@ jobs:
       fail-fast: false
 
     steps:
-      {{ checkout() | indent(6) }}
-
       - uses: actions/checkout@v3
         with:
           repository: pulp/plugin_template
-          path: ../plugin_template
+          path: plugin_template
+          fetch-depth: 0
 
       {{ setup_python() | indent(6) }}
 
@@ -43,19 +37,15 @@ jobs:
 
       {{ configure_git() | indent(6) }}
 
-      - name: Set short_ref
-        id: vars
-        run: echo short_ref=${GITHUB_REF#refs/*/} >> $GITHUB_OUTPUT
-
-      {%- if ci_update_branches %}
-      - name: Dispatching
-        if: github.event_name == 'schedule' || github.event.inputs.all_branches == 'yes'
-        run: python .ci/scripts/update_ci_branches.py {{ ci_update_branches | join(" ") }}
-        env:
-          GITHUB_TOKEN: {{ "${{ secrets.RELEASE_TOKEN }}" }}
-      {%- endif %}
+      {%- for branch in [plugin_default_branch] + ci_update_branches  %}
+      - uses: actions/checkout@v3
+        with:
+          path: {{ plugin_name }}
+          ref: '{{ branch }}'
+          fetch-depth: 0
 
       - name: Run update
+        working-directory: {{ plugin_name }}
         run: |
           .github/workflows/scripts/update_ci.sh
 
@@ -63,13 +53,16 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
-          committer: {{release_user}} <{{ release_email }}>
-          author: {{release_user}} <{{ release_email }}>
-          title: 'Update CI files from {{ "${{ steps.vars.outputs.short_ref }}" }} branch'
+          path: {{ plugin_name }}
+          committer: {{ release_user }} <{{ release_email }}>
+          author: {{ release_user }} <{{ release_email }}>
+          title: 'Update CI files for branch {{ branch }}'
           body: '{{ noissue_marker | default("[noissue]") }}'
-          branch: 'create-pull-request/{{ "${{ steps.vars.outputs.short_ref }}" }}/patch'
+          branch: 'update-ci/{{ branch }}'
+          base: '{{ branch }}'
           commit-message: |
             Update CI files
 
             {{ noissue_marker | default("[noissue]") }}
           delete-branch: true
+      {%- endfor %}
