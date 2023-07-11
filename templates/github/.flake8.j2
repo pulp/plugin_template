@@ -4,6 +4,8 @@ exclude = ./docs/*,*/migrations/*
 {%- for item in flake8_ignore %}
 {{- "," + item }}
 {% endfor %}
+per-file-ignores = */__init__.py: F401
+
 ignore = E203,W503,Q000,Q003,D100,D104,D106,D200,D205,D400,D401,D402
 max-line-length = 100
 
