@@ -29,23 +29,23 @@ jobs:
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      {{ install_python_deps("bump2version") | indent(6) }}
+      {{ install_python_deps("bump2version jinja2 pyyaml") | indent(6) }}
 
       {{ set_secrets() | indent(6) }}
 
       - name: Verify that branch name matches current version string on {{ plugin_default_branch }} branch
         run: |
           X_Y_VERSION=$(grep version setup.py | sed -rn 's/version="(.*)\.0((a[0-9]+)|(b[0-9]+))?\.dev",/\1/p' | awk '{$1=$1};1')
-          if [[ "$X_Y_VERSION" != "{{ "${{ github.event.inputs.name }}" }}" ]]
+          if [[ "$X_Y_VERSION" != "{{ "${{ inputs.name }}" }}" ]]
           then
             echo "Branch name doesn't match the current version string $X_Y_VERSION."
             exit 1
           fi
 
-      - name: Create {{ "${{ github.event.inputs.name }}" }} release branch
+      - name: Create {{ "${{ inputs.name }}" }} release branch
         run: |
-          git checkout -b {{ "${{ github.event.inputs.name }}" }}
-          git push origin {{ "${{ github.event.inputs.name }}" }}
+          git checkout -b {{ "${{ inputs.name }}" }}
+          git push origin {{ "${{ inputs.name }}" }}
 
       - name: Bump version on {{ plugin_default_branch }} branch
         run: |
@@ -55,7 +55,20 @@ jobs:
       - name: Remove entries from CHANGES directory
         run: |
           find CHANGES -type f -regex ".*\.\(bugfix\|doc\|feature\|misc\|deprecation\|removal\)" -exec git rm {} +
+{% if ci_update_release_behavior %}
+      - name: Checkout plugin template
+        uses: actions/checkout@v3
+        with:
+          repository: pulp/plugin_template
+          path: plugin_template
+          fetch-depth: 0
 
+      - name: Update CI branches in template_config
+        working-directory: plugin_template
+        run: |
+          python3 ./plugin-template {{ plugin_name }} --github --add-version-ci-update-branches {{ "${{ inputs.name }}" }}
+          git add -A
+{% endif %}
       - name: Make a PR with version bump and without CHANGES/*
         uses: peter-evans/create-pull-request@v4
         with:
