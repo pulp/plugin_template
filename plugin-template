@@ -30,6 +30,7 @@ DEFAULT_SETTINGS = {
     "ci_trigger": "{pull_request: {branches: ['*']}}",
     "ci_update_branches": [],
     "ci_update_docs": False,
+    "ci_update_release_behavior": None,
     "core_import_allowed": [],
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
@@ -218,6 +219,19 @@ def main():
                         """
         ),
     )
+    parser.add_argument(
+        "--add-version-ci-update-branches",
+        metavar="VERSION_BRANCH",
+        action="store",
+        help=textwrap.dedent(
+            """\
+                            Add specified version to the ci_update_branches before templating.
+                            This new value will replace the previous latest version if
+                            `ci_update_release_behavior` is set to 'replace-previous-version'.
+
+                        """
+        ),
+    )
     args = parser.parse_args()
 
     here = os.path.dirname(os.path.abspath(__file__))
@@ -270,6 +284,26 @@ def main():
                 config = generate_config(args.plugin_name, args.plugin_app_label)
         else:
             return 2
+
+    valid_release_behavior = [None, "append-version", "replace-previous-version"]
+    if config["ci_update_release_behavior"] not in valid_release_behavior:
+        valid_release_behavior[0] = "null"
+        print("ci_update_release_behavior is not of a valid value: ", valid_release_behavior)
+        return 2
+
+    if new_version_branch := args.add_version_ci_update_branches:
+        write_new_config = True
+        if config["ci_update_release_behavior"] == "replace-previous-version":
+            major_v, minor_v = new_version_branch.split(".", maxsplit=1)
+            minor_v = int(minor_v) - 1
+            try:
+                index = config["ci_update_branches"].index(f"{major_v}.{minor_v}")
+            except ValueError:
+                config["ci_update_branches"].append(new_version_branch)
+            else:
+                config["ci_update_branches"][index] = new_version_branch
+        else:
+            config["ci_update_branches"].append(new_version_branch)
 
     # Config key is used by the template_config.yml.j2 template to dump
     # the config. (note: uses .copy() to avoid a self reference)
