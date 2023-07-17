@@ -6,7 +6,7 @@
 with context %}
 
 ---
-name: Update Labels
+name: {{ plugin_camel_short }} Update Labels
 on:
   push:
     branches:
@@ -27,4 +27,3 @@ jobs:
           python3 .github/workflows/scripts/update_backport_labels.py
         env:
           GITHUB_TOKEN: {{ '${{ secrets.RELEASE_TOKEN }}' }}
-        
