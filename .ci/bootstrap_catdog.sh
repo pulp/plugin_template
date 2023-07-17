@@ -9,7 +9,7 @@ then
 else
     COMMIT_MSG="Initial commit\n\n[noissue]"
 fi
-echo $COMMIT_MSG
+echo "${COMMIT_MSG}"
 
 pip install -r test_requirements.txt
 ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
