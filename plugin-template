@@ -96,6 +96,7 @@ DEFAULT_SETTINGS = {
 DEPRECATED_FILES = {
     "github": [
         ".ci/assets/bindings/.gitkeep",
+        ".ci/scripts/changelog.py",
         ".ci/scripts/cherrypick.sh",
         ".ci/scripts/docs-builder.py",
         ".ci/scripts/publish_docs.sh",
