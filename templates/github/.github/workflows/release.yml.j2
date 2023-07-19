@@ -40,7 +40,7 @@ jobs:
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      {{ install_python_deps("packaging~=21.3 bandersnatch bump2version gitpython towncrier==19.9.0 wheel") | indent(6) }}
+      {{ install_python_deps("packaging~=21.3 bump2version gitpython towncrier==19.9.0 wheel") | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
