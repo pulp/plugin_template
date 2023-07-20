@@ -118,7 +118,7 @@ jobs:
     steps:
       {{ checkout(depth=0) | indent(6) }}
 
-      {{ setup_python() | indent(6) }}
+      {{ setup_python(pyversion="3.11") | indent(6) }}
 
       {{ install_python_deps("gitpython toml") | indent(6) }}
 
