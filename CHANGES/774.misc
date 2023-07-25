@@ -1,0 +1,1 @@
+Removed the testing with SFTP storage backend from the GHA workflows.
