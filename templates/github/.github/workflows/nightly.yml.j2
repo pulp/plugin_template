@@ -46,9 +46,6 @@ jobs:
           {%- if test_s3 %}
           - TEST: s3
           {%- endif %}
-          {%- if test_stream %}
-          - TEST: stream
-          {%- endif %}
           {% if publish_docs_to_pulpprojectdotorg and docs_test %}
           - TEST: generate-bindings
           {%- endif %}
