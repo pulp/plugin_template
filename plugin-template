@@ -87,7 +87,6 @@ DEFAULT_SETTINGS = {
     "test_performance": False,
     "test_reroute": True,
     "test_s3": False,
-    "test_stream": False,
     "update_github": True,
     "use_issue_template": True,
 }
