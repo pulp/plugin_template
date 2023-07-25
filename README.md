@@ -219,9 +219,6 @@ The following settings are stored in `template_config.yml`.
   test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
                         to emulate S3.
 
-  test_stream           Include stream job for running tests using [sftp](https://github.com/atmoz/sftp)
-                        to emulate a private cloud.
-
   update_redmine        The CI will automatically change the state of tickets when PRs are opened,
                         or merged, and when the changes are released.
 
