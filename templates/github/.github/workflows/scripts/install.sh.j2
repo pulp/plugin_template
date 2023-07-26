@@ -80,7 +80,7 @@ VARSYAML
 
 {%- if docker_fixtures %}
 
-SCENARIOS=("pulp" "performance" "azure" "gcp" "s3" generate-bindings" "lowerbounds")
+SCENARIOS=("pulp" "performance" "azure" "gcp" "s3" "generate-bindings" "lowerbounds")
 if [[ " ${SCENARIOS[*]} " =~ " ${TEST} " ]]; then
   sed -i -e '/^services:/a \
   - name: pulp-fixtures\
