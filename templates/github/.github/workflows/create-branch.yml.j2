@@ -25,7 +25,10 @@ jobs:
       fail-fast: false
 
     steps:
-      {{ checkout() | indent(6) }}
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          path: {{ plugin_name }}
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
