@@ -15,7 +15,7 @@ if [[ -z "$noissue_marker" ]]; then
   noissue_marker="[noissue]"
 fi
 
-if [[ ci_update_docs == "True" ]]; then
+if [[ "$ci_update_docs" == "True" ]]; then
   docs="--docs"
 else
   docs=""
