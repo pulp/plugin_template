@@ -18,8 +18,11 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro checkout(depth=1) -%}
+{%- macro checkout(depth=1, path=None) -%}
 - uses: actions/checkout@v3
+  {%- if path %}
+  path: {{ path }}
+  {%- endif %}
   with:
     fetch-depth: {{ depth }}
 {%- endmacro -%}
@@ -80,8 +83,11 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro run_script(name, file, withenv=True, condition=None, extra_env=None) -%}
+{%- macro run_script(name, file, withenv=True, condition=None, extra_env=None, path=None) -%}
 - name: {{ name }}
+  {%- if path %}
+  working-directory: {{ path }}
+  {%- endif %}
   {%- if condition %}
   if: {{ condition }}
   {%- endif %}
@@ -94,8 +100,11 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro set_secrets(condition=None) -%}
+{%- macro set_secrets(condition=None, path=None) -%}
 - name: Setting secrets
+  {%- if path %}
+  working-directory: {{ path }}
+  {%- endif %}
   {%- if condition %}
   if: {{ condition }}
   {%- endif %}
