@@ -25,15 +25,16 @@ jobs:
       fail-fast: false
 
     steps:
-      {{ checkout() | indent(6) }}
+      {{ checkout(path=plugin_name) | indent(6) }}
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
       {{ install_python_deps("bump2version jinja2 pyyaml") | indent(6) }}
 
-      {{ set_secrets() | indent(6) }}
+      {{ set_secrets(path=plugin_name) | indent(6) }}
 
       - name: Verify that branch name matches current version string on {{ plugin_default_branch }} branch
+        working-directory: {{ plugin_name }}
         run: |
           X_Y_VERSION=$(grep version setup.py | sed -rn 's/version="(.*)\.0((a[0-9]+)|(b[0-9]+))?\.dev",/\1/p' | awk '{$1=$1};1')
           if [[ "$X_Y_VERSION" != "{{ "${{ inputs.name }}" }}" ]]
@@ -43,16 +44,19 @@ jobs:
           fi
 
       - name: Create {{ "${{ inputs.name }}" }} release branch
+        working-directory: {{ plugin_name }}
         run: |
           git checkout -b {{ "${{ inputs.name }}" }}
           git push origin {{ "${{ inputs.name }}" }}
 
       - name: Bump version on {{ plugin_default_branch }} branch
+        working-directory: {{ plugin_name }}
         run: |
           git checkout {{ plugin_default_branch }}
           bump2version --no-commit minor
 
       - name: Remove entries from CHANGES directory
+        working-directory: {{ plugin_name }}
         run: |
           find CHANGES -type f -regex ".*\.\(bugfix\|doc\|feature\|misc\|deprecation\|removal\)" -exec git rm {} +
 {% if ci_update_release_behavior %}
@@ -72,6 +76,7 @@ jobs:
       - name: Make a PR with version bump and without CHANGES/*
         uses: peter-evans/create-pull-request@v4
         with:
+          path: {{ plugin_name }}
           token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
           committer: {{release_user}} <{{ release_email }}>
           author: {{release_user}} <{{ release_email }}>
