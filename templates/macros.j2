@@ -20,11 +20,11 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 {%- macro checkout(depth=1, path=None) -%}
 - uses: actions/checkout@v3
-  {%- if path %}
-  path: {{ path }}
-  {%- endif %}
   with:
     fetch-depth: {{ depth }}
+    {%- if path %}
+    path: {{ path }}
+    {%- endif %}
 {%- endmacro -%}
 
 
