@@ -151,7 +151,16 @@ The following settings are stored in `template_config.yml`.
 
   pulp_settings_<scenario>
                         A dictionary of settings that the plugin <scenario> tests can set
-                        additionally. `<scenario>` is one of "azure", "s3", "stream".
+                        additionally. `<scenario>` is one of "azure", "s3", "gcp".
+
+  pulp_env              A dictionary of ENV variables used globally by all runners. The variables
+                        are translated to separate ENV layers in Containerfile configuring the base
+                        Pulp image.
+
+  pulp_env_<scenario>
+                        A dictionary of ENV variables that will be translated to separate ENV
+                        layers in Containerfile configuring the base Pulp image. `<scenario>` is one
+                        of "azure", "s3", "gcp".
 
   pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
                         Python docstring conventions.

@@ -70,6 +70,7 @@ services:
 VARSYAML
 
 cat >> vars/main.yaml << VARSYAML
+pulp_env: {{ pulp_env | tojson }}
 pulp_settings: {{ pulp_settings | tojson }}
 pulp_scheme: {{ pulp_scheme }}
 {% if python_version == "3.6" %}
@@ -108,6 +109,7 @@ if [ "$TEST" = "s3" ]; then
 minio_access_key: "'$MINIO_ACCESS_KEY'"\
 minio_secret_key: "'$MINIO_SECRET_KEY'"\
 pulp_scenario_settings: {{ pulp_settings_s3 | tojson }}\
+pulp_scenario_env: {{ pulp_env_s3 | tojson }}\
 ' vars/main.yaml
 
   {%- if test_reroute %}
@@ -133,6 +135,7 @@ if [ "$TEST" = "azure" ]; then
     command: "azurite-blob --blobHost 0.0.0.0{% if pulp_scheme == "https" %} --cert /etc/pulp/azcert.pem --key /etc/pulp/azkey.pem{% endif %}"' vars/main.yaml
   sed -i -e '$a azure_test: true\
 pulp_scenario_settings: {{ pulp_settings_azure | tojson }}\
+pulp_scenario_env: {{ pulp_env_azure | tojson }}\
 ' vars/main.yaml
 fi
 {%- endif %}
@@ -154,6 +157,7 @@ if [ "$TEST" = "gcp" ]; then
     command: "{% if pulp_scheme == "https" %} -cert-location /etc/pulp/gcpcert.pem {% else %} -scheme http{% endif %}"' vars/main.yaml
   sed -i -e '$a gcp_test: true\
 pulp_scenario_settings: {{ pulp_settings_gcp | tojson }}\
+pulp_scenario_env: {{ pulp_env_gcp | tojson }}\
 ' vars/main.yaml
 fi
 {%- endif %}
