@@ -19,7 +19,7 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro checkout(depth=1, path=None) -%}
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
   with:
     fetch-depth: {{ depth }}
     {%- if path %}
@@ -29,7 +29,7 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro setup_python(pyversion=python_version) -%}
-- uses: actions/setup-python@v3
+- uses: actions/setup-python@v4
   with:
     python-version: "{{ pyversion }}"
 {%- endmacro -%}
