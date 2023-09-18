@@ -13,11 +13,11 @@ jobs:
         working-directory: pulp_catdog
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: plugin_template
           fetch-depth: 0
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
       - name: Bootstrap catdog plugin
@@ -66,11 +66,11 @@ jobs:
         working-directory: pulp_catdog
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: plugin_template
           fetch-depth: 0
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
       - name: Lint plugin_template
@@ -137,13 +137,13 @@ jobs:
         working-directory: pulp_catdog
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: plugin_template
           # We need the full history for bootstrapping
           fetch-depth: 0
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
       - name: Bootstrap catdog plugin

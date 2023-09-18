@@ -9,10 +9,6 @@ with context %}
 name: Create New Release Branch
 on:
   workflow_dispatch:
-    inputs:
-      name:
-        description: "Branch name (e.g. 3.14)"
-        required: true
 
 env:
   RELEASE_WORKFLOW: true
@@ -25,7 +21,7 @@ jobs:
       fail-fast: false
 
     steps:
-      {{ checkout(path=plugin_name) | indent(6) }}
+      {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
@@ -33,26 +29,27 @@ jobs:
 
       {{ set_secrets(path=plugin_name) | indent(6) }}
 
-      - name: Verify that branch name matches current version string on {{ plugin_default_branch }} branch
+      - name: Determine new branch name
         working-directory: {{ plugin_name }}
         run: |
-          X_Y_VERSION=$(grep version setup.py | sed -rn 's/version="(.*)\.0((a[0-9]+)|(b[0-9]+))?\.dev",/\1/p' | awk '{$1=$1};1')
-          if [[ "$X_Y_VERSION" != "{{ "${{ inputs.name }}" }}" ]]
+          # Just to be sure...
+          git checkout {{ plugin_default_branch }}
+          NEW_BRANCH="$(bump2version --dry-run --list release | sed -Ene 's/^new_version=([[:digit:]]+\.[[:digit:]]+)\..*$/\1/p')"
+          if [ -z "$NEW_BRANCH" ]
           then
-            echo "Branch name doesn't match the current version string $X_Y_VERSION."
+            echo Could not determine the new branch name.
             exit 1
           fi
+          echo "NEW_BRANCH=${NEW_BRANCH}" >> "$GITHUB_ENV"
 
-      - name: Create {{ "${{ inputs.name }}" }} release branch
+      - name: Create release branch
         working-directory: {{ plugin_name }}
         run: |
-          git checkout -b {{ "${{ inputs.name }}" }}
-          git push origin {{ "${{ inputs.name }}" }}
+          git branch "${NEW_BRANCH}"
 
       - name: Bump version on {{ plugin_default_branch }} branch
         working-directory: {{ plugin_name }}
         run: |
-          git checkout {{ plugin_default_branch }}
           bump2version --no-commit minor
 
       - name: Remove entries from CHANGES directory
@@ -70,7 +67,7 @@ jobs:
       - name: Update CI branches in template_config
         working-directory: plugin_template
         run: |
-          python3 ./plugin-template {{ plugin_name }} --github --add-version-ci-update-branches {{ "${{ inputs.name }}" }}
+          python3 ./plugin-template {{ plugin_name }} --github --add-version-ci-update-branches "${NEW_BRANCH}"
           git add -A
 {% endif %}
       - name: Make a PR with version bump and without CHANGES/*
@@ -88,3 +85,8 @@ jobs:
             Bump minor version
             [noissue]
           delete-branch: true
+
+      - name: Push release branch
+        working-directory: {{ plugin_name }}
+        run: |
+          git push origin "${NEW_BRANCH}"
