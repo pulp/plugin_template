@@ -18,11 +18,6 @@ on:
     inputs:
       release:
         description: "Release tag (e.g. 3.2.1)"
-      before_script:
-        description: |
-          Bash code to run before bindings and docs are built. This should only be used when re-running
-          a workflow to correct some aspect of the docs. e.g.: git checkout origin/3.14 CHANGES.rst
-        required: false
 
 env:
   RELEASE_WORKFLOW: true
@@ -100,10 +95,6 @@ jobs:
           .github/workflows/scripts/install.sh
         env:
           {{ set_env_vars() | indent(10) }}
-        shell: bash
-
-      - name: Additional before_script
-        run: {{ "${{ github.event.inputs.before_script }}" }}
         shell: bash
 
       {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
