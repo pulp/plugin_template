@@ -107,6 +107,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/upper_bound.py",
         ".github/workflows/fips.yml",
         ".github/workflows/scripts/create_release_from_tag.sh",
+        ".github/workflows/scripts/release.py",
         ".github/workflows/scripts/stage-changelog-for-master.py",
         ".github/workflows/scripts/update_ci.sh",
         ".travis",
@@ -383,8 +384,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
 
     for relative_path in generate_relative_path_set(section_template_dir):
         if not config["stalebot"] and "stale" in relative_path:
-            continue
-        if config["issue_tracker"] != "github" and "update_github" in relative_path:
             continue
         if config["use_issue_template"] is False and "ISSUE_TEMPLATE" in relative_path:
             continue
