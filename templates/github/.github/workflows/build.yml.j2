@@ -1,0 +1,37 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  set_env_vars,
+  checkout,
+  setup_python,
+  install_python_deps,
+  setup_env,
+  display_logs,
+  run_script,
+  set_secrets,
+  install_python_deps,
+with context %}
+---
+name: Build
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    {%- if pre_job_template %}
+    needs: {{ pre_job_template.name }}
+    {%- endif %}
+
+    steps:
+      {{ checkout() | indent(6) }}
+      {{ setup_python() | indent(6) }}
+      {{ install_python_deps("packaging wheel") | indent(6) }}
+      - name: Build package
+        run: python3 setup.py sdist bdist_wheel --python-tag py3
+      - name: 'Upload Package whl'
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugin_package
+          path: dist/
+          if-no-files-found: error
+          retention-days: 5
