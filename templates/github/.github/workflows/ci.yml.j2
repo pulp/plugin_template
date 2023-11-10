@@ -58,111 +58,15 @@ jobs:
   {%- endif %}
 
   lint:
-    runs-on: ubuntu-latest
-    {%- if pre_job_template %}
-    needs: {{ pre_job_template.name }}
-    {%- endif %}
+    uses: "./.github/workflows/lint.yml"
 
-    steps:
-      {{ checkout() | indent(6) }}
-      {{ setup_python() | indent(6) }}
-      # lint_requirements contains tools needed for flake8, etc.
-      - name: Install requirements
-        run: pip3 install -r lint_requirements.txt
-
-      {% if black -%}
-      # run black separately from flake8 to get a diff
-      - name: Run black
-        run: |
-          black --version
-          black --check --diff .
-      {%- endif %}
-
-      {% if flake8 -%}
-      # Lint code.
-      - name: Run flake8
-        run: flake8
-      {%- endif %}
-
-      - name: Run extra lint checks
-        run: "[ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh"
-
-      {% if check_manifest -%}
-      # check for any files unintentionally left out of MANIFEST.in
-      - name: Check manifest
-        run: check-manifest
-      {%- endif %}
-
-      {% if check_stray_pulpcore_imports -%}
-      - name: Check for pulpcore imports outside of pulpcore.plugin
-        run: sh .ci/scripts/check_pulpcore_imports.sh
-      {%- endif %}
-
-      {% if check_gettext -%}
-      - name: Check for gettext problems
-        run: sh .ci/scripts/check_gettext.sh
-      {%- endif %}
+  build:
+    needs: lint
+    uses: "./.github/workflows/build.yml"
 
   test:
-    runs-on: ubuntu-latest
-    # run only after lint finishes
-    needs: lint
-    strategy:
-      fail-fast: false
-      matrix:
-        env:
-          - TEST: pulp
-          {%- if docs_test %}
-          - TEST: docs
-          {%- endif %}
-          {%- if test_azure %}
-          - TEST: azure
-          {%- endif %}
-          {%- if test_gcp %}
-          - TEST: gcp
-          {%- endif %}
-          {%- if test_s3 %}
-          - TEST: s3
-          {%- endif %}
-          {%- if test_lowerbounds %}
-          - TEST: lowerbounds
-          {%- endif %}
-    outputs:
-      deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
-      {%- if test_azure %}
-      deprecations-azure: {{ "${{ steps.deprecations.outputs.deprecations-azure }}" }}
-      {%- endif %}
-      {%- if test_s3 %}
-      deprecations-s3: {{ "${{ steps.deprecations.outputs.deprecations-s3 }}" }}
-      {%- endif %}
-      {%- if test_lowerbounds %}
-      deprecations-lowerbounds: {{ "${{ steps.deprecations.outputs.deprecations-lowerbounds }}" }}
-      {%- endif %}
-
-    steps:
-      {{ checkout() | indent(6) }}
-
-      {{ setup_python() | indent(6) }}
-
-      {{ install_httpie() | indent(6) }}
-
-      {{ setup_env() | indent(6) }}
-
-      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
-
-      {{ run_script(name="Install", file="install.sh") | indent(6) }}
-
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
-
-      {{ set_secrets(condition="github.event_name != 'pull_request'") | indent(6) }}
-
-      {{ run_script(name="Script", file="script.sh") | indent(6) }}
-
-      - name: Extract Deprecations from Logs
-        id: deprecations
-        run: echo deprecations-{{ "${{ matrix.env.TEST }}" }}=$(docker logs pulp 2>&1 | grep -i pulpcore.deprecation | base64 -w 0) >> $GITHUB_OUTPUT
-
-      {{ display_logs() | indent(6) }}
+    needs: build
+    uses: "./.github/workflows/test.yml"
 
 {%- if test_deprecations %}
   deprecations:

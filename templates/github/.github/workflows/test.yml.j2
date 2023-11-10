@@ -1,0 +1,81 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  set_env_vars,
+  checkout,
+  setup_python,
+  install_httpie,
+  setup_env,
+  display_logs,
+  run_script,
+  set_secrets,
+  install_python_deps,
+with context %}
+---
+name: Test
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - TEST: pulp
+          {%- if docs_test %}
+          - TEST: docs
+          {%- endif %}
+          {%- if test_azure %}
+          - TEST: azure
+          {%- endif %}
+          {%- if test_gcp %}
+          - TEST: gcp
+          {%- endif %}
+          {%- if test_s3 %}
+          - TEST: s3
+          {%- endif %}
+          {%- if test_lowerbounds %}
+          - TEST: lowerbounds
+          {%- endif %}
+    outputs:
+      deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
+      {%- if test_azure %}
+      deprecations-azure: {{ "${{ steps.deprecations.outputs.deprecations-azure }}" }}
+      {%- endif %}
+      {%- if test_s3 %}
+      deprecations-s3: {{ "${{ steps.deprecations.outputs.deprecations-s3 }}" }}
+      {%- endif %}
+      {%- if test_lowerbounds %}
+      deprecations-lowerbounds: {{ "${{ steps.deprecations.outputs.deprecations-lowerbounds }}" }}
+      {%- endif %}
+
+    steps:
+      {{ checkout() | indent(6) }}
+
+      {{ setup_python() | indent(6) }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: plugin_package
+          path: dist/
+
+      {{ install_httpie() | indent(6) }}
+
+      {{ setup_env() | indent(6) }}
+
+      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
+
+      {{ run_script(name="Install", file="install.sh") | indent(6) }}
+
+      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
+
+      {{ set_secrets(condition="github.event_name != 'pull_request'") | indent(6) }}
+
+      {{ run_script(name="Script", file="script.sh") | indent(6) }}
+
+      - name: Extract Deprecations from Logs
+        id: deprecations
+        run: echo deprecations-{{ "${{ matrix.env.TEST }}" }}=$(docker logs pulp 2>&1 | grep -i pulpcore.deprecation | base64 -w 0) >> $GITHUB_OUTPUT
+
+      {{ display_logs() | indent(6) }}
