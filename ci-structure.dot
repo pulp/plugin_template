@@ -1,0 +1,71 @@
+// dot -Tpdf -o ci-structure.pdf ci-structure.dot
+
+digraph "Pulp CI" {
+  {
+    rank=source
+
+    git [shape=parallelogram]
+    base [label="OCI-Base"]
+  }
+
+  subgraph cluster_jobs {
+    label="CI Jobs"
+
+    lint [shape=box]
+    prerelease [shape=box label="prerelease checks"]
+    build [shape=box, label="build wheel"]
+    build2 [shape=box label="build docs & bindings"]
+    tests [shape=box3d]
+    {
+      rank=same
+
+      deprecations [shape=box]
+      publish [shape=box]
+    }
+  }
+
+  {
+    rank=sink
+
+    PyPi [shape=parallelogram]
+    rubygems [shape=parallelogram]
+    ppo [shape=parallelogram label="pulpproject.org"]
+  }
+
+  subgraph cluster_built {
+    label="Build Artifacts"
+
+    wheel -> apidoc -> {
+      bindings
+      docs
+    }
+  }
+
+  git -> lint [label="PR"]
+  git -> build [label="nightly"]
+  git -> prerelease [label="tag"]
+  {lint prerelease} -> build -> build2
+  build2 -> tests [label="PR"]
+  build2 -> publish [label="Release"]
+  tests -> deprecations
+
+  {
+    edge [style=dotted]
+
+    publish -> PyPi
+    publish -> rubygems
+    publish -> ppo
+  }
+
+  {
+    edge [style=dashed]
+
+    base -> {build2 tests}
+
+    build -> wheel
+    build2 -> {apidoc bindings docs}
+    wheel -> {tests build2 publish}
+    bindings -> {tests publish}
+    docs -> publish
+  }
+}
