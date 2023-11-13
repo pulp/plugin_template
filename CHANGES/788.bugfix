@@ -1,0 +1,2 @@
+Fixed automatic backport label creation, which only supported plugins whose names use snake_case
+naming convention.
