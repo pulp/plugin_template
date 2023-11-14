@@ -49,12 +49,8 @@ jobs:
     if: github.base_ref == '{{ plugin_default_branch }}'
     steps:
       {{ checkout(0) | indent(6) }}
-      - name: Checkout {{ plugin_default_branch }}
-        run: git fetch origin {{ plugin_default_branch }}
-      - name: create local {{ plugin_default_branch }} branch
-        run: git branch {{ plugin_default_branch }} origin/{{ plugin_default_branch }}
       - name: Commit Count Check
-        run: test `git log  --oneline --no-merges HEAD ^{{ plugin_default_branch }}  | wc -l ` = 1
+        run: test "$(git log  --oneline --no-merges origin/{{ "${{ github.base_ref }}" }}.. | wc -l)" = 1
   {%- endif %}
 
   lint:
