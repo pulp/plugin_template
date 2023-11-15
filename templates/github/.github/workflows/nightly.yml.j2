@@ -26,8 +26,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
   test:
     runs-on: ubuntu-latest
+    needs: build
 
     strategy:
       fail-fast: false
@@ -55,6 +59,11 @@ jobs:
 
     steps:
       {{ checkout() | indent(6) }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: plugin_package
+          path: dist/
 
       {{ setup_python() | indent(6) }}
 
@@ -142,6 +151,11 @@ jobs:
 
     steps:
       {{ checkout() | indent(6) }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: plugin_package
+          path: dist/
 
       {{ setup_python() | indent(6) }}
 
