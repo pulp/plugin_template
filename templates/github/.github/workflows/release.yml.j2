@@ -80,14 +80,6 @@ jobs:
         run: |
           tar -xf {{ plugin_name }}.tar
 
-      # update to the branch's latest ci files rather than the ones from the release tag. this is
-      # helpful when there was a problem with the ci files during the release which needs to be
-      # fixed after the release tag has been created
-      - name: Update ci files
-        run: |
-          git checkout "origin/${GITHUB_REF##*/}" -- .ci
-          git checkout "origin/${GITHUB_REF##*/}" -- .github
-
       {{ install_httpie() | indent(6) }}
 
       # Building the bindings and docs requires accessing the OpenAPI specs endpoint, so we need to
@@ -108,25 +100,30 @@ jobs:
       {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False) | indent(6) }}
       {%- endif %}
 
+      {%- for plugin in plugins %}
       - name: "Upload python client packages"
         uses: actions/upload-artifact@v3
         with:
           name: "python-client.tar"
-          path: "{{ plugin_name }}/python-client.tar"
+          path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
+          if-no-files-found: "error"
 
       - name: "Upload python client docs"
         uses: actions/upload-artifact@v3
         with:
           name: "python-client-docs.tar"
-          path: "{{ plugin_name }}/python-client-docs.tar"
+          path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
+          if-no-files-found: "error"
 
       {%- if deploy_client_to_rubygems %}
       - name: "Upload ruby client packages"
         uses: actions/upload-artifact@v3
         with:
           name: "ruby-client.tar"
-          path: "{{ plugin_name }}/ruby-client.tar"
+          path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
+          if-no-files-found: "error"
       {%- endif %}
+      {%- endfor %}
 
       {%- if publish_docs_to_pulpprojectdotorg and docs_test %}
       - name: Build docs
@@ -170,14 +167,6 @@ jobs:
         run: |
           tar -xf {{  plugin_name }}.tar
 
-      # update to the branch's latest ci files rather than the ones from the release tag. this is
-      # helpful when there was a problem with the ci files during the release which needs to be
-      # fixed after the release tag has been created
-      - name: Update ci files
-        run: |
-          git checkout "origin/${GITHUB_REF##*/}" -- .ci
-          git checkout "origin/${GITHUB_REF##*/}" -- .github
-
       {{ set_secrets() | indent(6) }}
 
       {{ install_python_deps("gitpython requests packaging~=21.3 tweepy") | indent(6) }}
@@ -216,11 +205,13 @@ jobs:
           name: "python-client.tar"
           path: "{{ plugin_name }}/"
 
-      - name: Untar python client packages
-        run: tar -xvf python-client.tar
+      - name: "Untar python client packages"
+        run: |
+          tar -xvf python-client.tar
 
-      - name: Publish client to pypi
-        run: bash .github/workflows/scripts/publish_client_pypi.sh
+      - name: "Publish client to pypi"
+        run: |
+          bash .github/workflows/scripts/publish_client_pypi.sh
       {%- endif %}
 
       {%- if deploy_client_to_rubygems %}
@@ -230,11 +221,13 @@ jobs:
           name: "ruby-client.tar"
           path: "{{ plugin_name }}/"
 
-      - name: Untar Ruby client packages
-        run: tar -xvf ruby-client.tar
+      - name: "Untar Ruby client packages"
+        run: |
+          tar -xvf ruby-client.tar
 
-      - name: Publish client to rubygems
-        run: bash .github/workflows/scripts/publish_client_gem.sh
+      - name: "Publish client to rubygems"
+        run: |
+          bash .github/workflows/scripts/publish_client_gem.sh
       {%- endif %}
 
       - name: Create release on GitHub

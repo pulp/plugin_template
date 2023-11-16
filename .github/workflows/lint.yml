@@ -6,36 +6,36 @@
 # For more info visit https://github.com/pulp/plugin_template
 
 ---
-name: Lint
+name: "Lint"
 on:
   workflow_call:
+
+defaults:
+  run:
+    working-directory: "pulp_catdog"
 
 jobs:
   lint:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: pulp_catdog
-
     steps:
       - uses: actions/checkout@v4
         with:
-          path: plugin_template
+          path: "plugin_template"
           # We need the full history for bootstrapping
           fetch-depth: 0
       - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-      - name: Lint plugin_template
-        working-directory: plugin_template
+      - name: "Lint plugin_template"
+        working-directory: "plugin_template"
         run: |
           pip3 install black flake8
           black --version
           black --check --diff plugin-template utils.py
           flake8 plugin-template utils.py
-      - name: Bootstrap catdog plugin
-        working-directory: plugin_template
+      - name: "Bootstrap catdog plugin"
+        working-directory: "plugin_template"
         run: |
           .ci/bootstrap_catdog.sh
 
