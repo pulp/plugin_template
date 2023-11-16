@@ -51,6 +51,7 @@ DEFAULT_SETTINGS = {
     "plugin_app_label": None,
     "plugin_default_branch": "main",
     "plugin_name": None,
+    "plugins": None,
     "post_job_template": None,
     "pre_job_template": None,
     "publish_docs_to_pulpprojectdotorg": False,
@@ -249,6 +250,10 @@ def main():
                     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
                         config.pop(key)
                         write_new_config = True
+                    if config["plugins"] is None:
+                        config["plugins"] = [
+                            {"name": config["plugin_name"], "app_label": config["plugin_app_label"]}
+                        ]
                     print(
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)
@@ -470,6 +475,7 @@ def generate_config(plugin_name, plugin_app_label):
     config = DEFAULT_SETTINGS.copy()
     config["plugin_name"] = plugin_name
     config["plugin_app_label"] = plugin_app_label
+    config["plugins"] = [{"name": plugin_name, "app_label": plugin_app_label}]
     return config
 
 

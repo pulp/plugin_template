@@ -90,19 +90,24 @@ jobs:
         id: deprecations
         run: echo deprecations-{{ "${{ matrix.env.TEST }}" }}=$(docker logs pulp 2>&1 | grep -i pulpcore.deprecation | base64 -w 0) >> $GITHUB_OUTPUT
 
+      {%- for plugin in plugins %}
       - name: Upload python client packages
         if: {{ "${{ env.TEST == 'pulp' }}" }}
         uses: actions/upload-artifact@v3
         with:
           name: "python-client.tar"
-          path: "{{ plugin_name }}/python-client.tar"
+          path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
+          if-no-files-found: "error"
+          retention-days: 5
 
       - name: Upload python client docs
         if: {{ "${{ env.TEST == 'pulp' }}" }}
         uses: actions/upload-artifact@v3
         with:
           name: "python-client-docs.tar"
-          path: "{{ plugin_name }}/python-client-docs.tar"
+          path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
+          if-no-files-found: "error"
+          retention-days: 5
 
       {%- if deploy_client_to_rubygems %}
       - name: Upload Ruby client
@@ -110,8 +115,11 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: "ruby-client.tar"
-          path: "{{ plugin_name }}/ruby-client.tar"
+          path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
+          if-no-files-found: "error"
+          retention-days: 5
       {%- endif %}
+      {%- endfor %}
 
       {%- if docs_test %}
       - name: Upload built docs
