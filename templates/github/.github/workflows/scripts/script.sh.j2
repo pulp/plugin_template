@@ -113,22 +113,6 @@ fi
 if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT
 else
-{% if parallel_test_workers == 0 %}
-    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel }} Nightly CI/CD" ]]
-    then
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional --nightly"
-
-    {%- for item in additional_repos if item.pytest_args | default(false) %}
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} --nightly"
-    {%- endfor %}
-    else
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional"
-
-    {%- for item in additional_repos if item.pytest_args | default(false) %}
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }}"
-    {%- endfor %}
-    fi
-{% else %}
     if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel }} Nightly CI/CD" ]]
     then
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
@@ -148,7 +132,6 @@ else
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m 'not parallel'"
     {%- endfor %}
     fi
-{% endif %}
 fi
 
 {%- if test_cli %}

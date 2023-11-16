@@ -119,8 +119,7 @@ The following settings are stored in `template_config.yml`.
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
   parallel_test_workers Run tests in parallel using `pytest-xdist` with N parallel runners. This
-                        settings specifies N. By default it is 8. Setting to 0 will disable parallel
-                        test running.
+                        settings specifies N. By default it is 8.
 
   plugin_app_label      Suppose our plugin is named 'pulp_test', then this is 'test'
 
