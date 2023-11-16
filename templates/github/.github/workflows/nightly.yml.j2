@@ -13,7 +13,7 @@
   configure_git,
 with context %}
 ---
-name: {{ plugin_camel_short }} Nightly CI
+name: {{ plugin_app_label | camel }} Nightly CI
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string

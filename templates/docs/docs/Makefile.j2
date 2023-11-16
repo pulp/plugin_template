@@ -69,7 +69,7 @@ endif
 
 $(BUILDDIR)/html/api.json:
 	mkdir -p $(BUILDDIR)/html
-	curl --fail -o $(BUILDDIR)/html/api.json "$(PULP_V3_API_JSON_URL)?plugin={{ plugin_snake }}&include_html=1"
+	curl --fail -o $(BUILDDIR)/html/api.json "$(PULP_V3_API_JSON_URL)?plugin={{ plugin_name | snake }}&include_html=1"
 
 html: $(BUILDDIR)/html/api.json
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

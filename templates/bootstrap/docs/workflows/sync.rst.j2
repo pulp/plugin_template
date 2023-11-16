@@ -9,13 +9,13 @@ Create a Repository
 
 Start by creating a new repository named "foo"::
 
-    $ http POST ${BASE_ADDR}/pulp/api/v3/repositories/{{ plugin_dash_short }}/{{ plugin_dash_short }}/ name=foo
+    $ http POST ${BASE_ADDR}/pulp/api/v3/repositories/{{ plugin_app_label | dash }}/{{ plugin_app_label | dash }}/ name=foo
 
 Response::
 
     {
         ...
-        "pulp_href": "/pulp/api/v3/repositories/{{ plugin_dash_short }}/{{ plugin_dash_short }}/dfca3ec4-b5cf-474f-b561-25a9cb58f260/",
+        "pulp_href": "/pulp/api/v3/repositories/{{ plugin_app_label | dash }}/{{ plugin_app_label | dash }}/dfca3ec4-b5cf-474f-b561-25a9cb58f260/",
         ...
     }
 
@@ -25,13 +25,13 @@ Create a Remote
 
 Creating a remote object informs Pulp about an external content source::
 
-    $ http POST ${BASE_ADDR}/pulp/pulp/api/v3/remotes/{{ plugin_dash_short }}/{{ plugin_dash_short }}/ name='bar' url='http://some.url/somewhere/'
+    $ http POST ${BASE_ADDR}/pulp/pulp/api/v3/remotes/{{ plugin_app_label | dash }}/{{ plugin_app_label | dash }}/ name='bar' url='http://some.url/somewhere/'
 
 Response::
 
     {
         ...
-        "pulp_href": "/pulp/api/v3/remotes/{{ plugin_dash_short }}/{{ plugin_dash_short }}/e54203d8-afd5-4091-9fae-dad6419f8bfd/",
+        "pulp_href": "/pulp/api/v3/remotes/{{ plugin_app_label | dash }}/{{ plugin_app_label | dash }}/e54203d8-afd5-4091-9fae-dad6419f8bfd/",
         ...
     }
 
@@ -63,7 +63,7 @@ Response::
         "error": null,
         "finished_at": "2021-07-20T10:27:16.922875Z",
         "logging_cid": "014ba45a05514fb798b8475cd0c53c39",
-        "name": "pulp_{{ plugin_dash_short }}.app.tasks.synchronizing.synchronize",
+        "name": "pulp_{{ plugin_app_label | dash }}.app.tasks.synchronizing.synchronize",
         "parent_task": null,
         "progress_reports": [
             {
@@ -86,8 +86,8 @@ Response::
         "pulp_created": "2021-07-20T10:27:14.874408Z",
         "pulp_href": "/pulp/api/v3/tasks/88071cc2-10a7-4544-83ec-15f272cc28b1/",
         "reserved_resources_record": [
-            "/pulp/api/v3/repositories/{{ plugin_dash_short }}/{{ plugin_dash_short }}/dfca3ec4-b5cf-474f-b561-25a9cb58f260/",
-            "/pulp/api/v3/remotes/{{ plugin_dash_short }}/{{ plugin_dash_short }}/e54203d8-afd5-4091-9fae-dad6419f8bfd/"
+            "/pulp/api/v3/repositories/{{ plugin_app_label | dash }}/{{ plugin_app_label | dash }}/dfca3ec4-b5cf-474f-b561-25a9cb58f260/",
+            "/pulp/api/v3/remotes/{{ plugin_app_label | dash }}/{{ plugin_app_label | dash }}/e54203d8-afd5-4091-9fae-dad6419f8bfd/"
         ],
         "started_at": "2021-07-20T10:27:14.937455Z",
         "state": "completed",

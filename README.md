@@ -124,23 +124,9 @@ The following settings are stored in `template_config.yml`.
 
   plugin_app_label      Suppose our plugin is named 'pulp_test', then this is 'test'
 
-  plugin_camel          Suppose our plugin is named 'pulp_test', then this is 'PulpTest'
-
-  plugin_camel_short    Suppose our plugin is named 'pulp_test', then this is 'Test'
-
-  plugin_caps           Suppose our plugin is named 'pulp_test', then this is 'PULP_TEST'
-
-  plugin_caps_short     Suppose our plugin is named 'pulp_test', then this is 'TEST'
-
-  plugin_dash           Suppose our plugin is named 'pulp_test', then this is 'pulp-test'
-
-  plugin_dash_short     Suppose our plugin is named 'pulp_test', then this is 'test'
-
   plugin_default_branch The default branch in your plugin repo, defaults to 'main'.
 
   plugin_name           Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
-
-  plugin_snake          Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
 
   publish_docs_to_pulpprojectdotorg
                         Include a job for publishing documentation to
@@ -301,15 +287,15 @@ After bootstrapping, your plugin should be installable and discoverable by Pulp.
 
 3. Check that everything worked and you have a remote endpoint
 
-    `$ http GET http://localhost:24817/pulp/api/v3/remotes/{{ plugin_app_label }}/{{ plugin_dash_short }}/`
+    `$ http GET http://localhost:24817/pulp/api/v3/remotes/{{ plugin_app_label }}/{{ plugin_app_label | dash }}/`
 
 
-The plugin specific `/pulp/api/v3/content/{{ plugin_dash_short }}/` endpoints
+The plugin specific `/pulp/api/v3/content/{{ plugin_app_label | dash }}/` endpoints
 should now also be available, and you can validate this by checking the hosted docs
 http://localhost:24817/pulp/api/v3/docs
 
 Your plugin is discoverable by Pulp because it is [a Django application that subclasses
-pulpcore.plugin.PulpPluginAppConfig]({{ plugin_snake }}/app/__init__.py)
+pulpcore.plugin.PulpPluginAppConfig]({{ plugin_name | snake }}/app/__init__.py)
 
 For more information about plugin discoverability, including how it works and plugin
 entrypoints see [the discoverability documentation](meta_docs/discoverability.md)
@@ -355,15 +341,15 @@ Keep [namespacing](meta_docs/subclassing/namespacing.md) in mind when writing yo
 
 ### Model
 
-First model your content type. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
+First model your content type. This file is located at [{{ plugin_name | snake }}/app/models.py]({{ plugin_name | snake }}/app/models.py).
 Add any fields that correspond to the metadata of your content, the could be the project name, the author name, or any other type of metadata.
 
 The ``TYPE`` class attribute is used for filtering purposes.
 If a uniqueness constraint is needed, add a ``Meta`` class to the model like so:
 
 ```
-class {{ plugin_camel_short }}Content(Content):
-    TYPE = '{{ plugin_dash_short }}'
+class {{ plugin_app_label | camel }}Content(Content):
+    TYPE = '{{ plugin_app_label | dash }}'
     filename = models.TextField(unique=True, db_index=True, blank=False)
 
     class Meta:
@@ -378,13 +364,13 @@ And make sure all your fields are on the {{ plugin_app_label }} database table.
 
 ### Serializer
 
-Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
+Next, add a corresponding serializer field on the in [{{ plugin_name | snake }}/app/serializers.py]({{ plugin_name | snake }}/app/serializers.py).
 See the [DRF documentation on serializer fields to see what's available](http://www.django-rest-framework.org/api-guide/fields/)
 
 
 ### Viewset
 
-Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
+Last, add any additional routes to your [{{ plugin_name | snake }}/app/viewsets.py]({{ plugin_name | snake }}/app/viewsets.py).
 The content viewset usually doesn't require any additional routes, so you can leave this alone for now.
 
 
@@ -394,18 +380,18 @@ Remotes provide metadata about how content should be downloaded into Pulp, such 
 
 ### Model
 
-First model your remote. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py).
+First model your remote. This file is located at [{{ plugin_name | snake }}/app/models.py]({{ plugin_name | snake }}/app/models.py).
 Add any fields that correspond to the remote source.
 
 Remember to define the ``TYPE`` class attribute which is used for filtering purposes.
 
 ### Serializer
 
-Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
+Next, add a corresponding serializer field on the in [{{ plugin_name | snake }}/app/serializers.py]({{ plugin_name | snake }}/app/serializers.py).
 
 ### Viewset
 
-Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
+Last, add any additional routes to your [{{ plugin_name | snake }}/app/viewsets.py]({{ plugin_name | snake }}/app/viewsets.py).
 The remote viewset usually doesn't require any additinal routes, so you can leave this alone for now.
 
 ## Repository
@@ -415,11 +401,11 @@ It is also responsible for validating that those RepositoryVersions are valid.
 
 ### Model
 
-First model your repository. This file is located at [{{ plugin_snake }}/app/models.py]({{ plugin_snake }}/app/models.py). Add any fields as necessary for your specific content type.
+First model your repository. This file is located at [{{ plugin_name | snake }}/app/models.py]({{ plugin_name | snake }}/app/models.py). Add any fields as necessary for your specific content type.
 
 Remember to define the ``TYPE`` class attribute which is used for filtering purposes, and ``CONTENT_TYPES`` which
 defines which types of content are supported by the Repository. This is a list of classes such as
-{{ plugin_camel_short }}Content representing the various content types your plugin supports (that you want
+{{ plugin_app_label | camel }}Content representing the various content types your plugin supports (that you want
 this repository type to support, if there is more than one repository type in your plugin).
 
 Also, if you want to provide validation that the whole collection of the content in your RepositoryVersion makes sense
@@ -427,12 +413,12 @@ together, you do that by defining ``finalize_new_version`` on your repository mo
 
 ### Serializer
 
-Next, add a corresponding serializer field on the in [{{ plugin_snake }}/app/serializers.py]({{ plugin_snake }}/app/serializers.py).
+Next, add a corresponding serializer field on the in [{{ plugin_name | snake }}/app/serializers.py]({{ plugin_name | snake }}/app/serializers.py).
 
 ### Viewset
 
-Last, add any additional routes to your [{{ plugin_snake }}/app/viewsets.py]({{ plugin_snake }}/app/viewsets.py).
-Note the sync route is predefined for you. This route kicks off a task [{{ plugin_snake }}.app.tasks.synchronizing.py]({{ plugin_snake }}.app.tasks.synchronizing.py).
+Last, add any additional routes to your [{{ plugin_name | snake }}/app/viewsets.py]({{ plugin_name | snake }}/app/viewsets.py).
+Note the sync route is predefined for you. This route kicks off a task [{{ plugin_name | snake }}.app.tasks.synchronizing.py]({{ plugin_name | snake }}.app.tasks.synchronizing.py).
 
 If you have more than one Repository type in your plugin, or you change the name of your existing one, you will also
 need to have a RepositoryVersionViewSet defined for it (just a viewset, no other objects needed). This hasfield, ``parent_viewset``, which should be set to the accompanying Repository class defined in your plugin.

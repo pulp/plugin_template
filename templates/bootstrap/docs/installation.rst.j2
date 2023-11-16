@@ -38,7 +38,7 @@ From Source
 
    sudo -u pulp -i
    source ~/pulpvenv/bin/activate
-   cd {{ plugin_snake }}
+   cd {{ plugin_name | snake }}
    pip install -e .
    django-admin runserver 24817
 
@@ -47,8 +47,8 @@ Make and Run Migrations
 
 .. code-block:: bash
 
-   pulp-manager makemigrations {{ plugin_snake }}
-   pulp-manager migrate {{ plugin_snake }}
+   pulp-manager makemigrations {{ plugin_name | snake }}
+   pulp-manager migrate {{ plugin_name | snake }}
 
 
 Run Services

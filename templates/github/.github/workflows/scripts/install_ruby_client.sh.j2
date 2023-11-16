@@ -9,7 +9,7 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 export PULP_URL="${PULP_URL:-{{ pulp_scheme }}://pulp}"
 
-export REPORTED_VERSION=$(http $PULP_URL/pulp/api/v3/status/ | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')
+export REPORTED_VERSION=$(http $PULP_URL/pulp/api/v3/status/ | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_name | snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')
 export DESCRIPTION="$(git describe --all --exact-match `git rev-parse HEAD`)"
 if [[ $DESCRIPTION == 'tags/'$REPORTED_VERSION ]]; then
   export VERSION=${REPORTED_VERSION}
@@ -18,21 +18,21 @@ else
   export VERSION=${REPORTED_VERSION}${EPOCH}
 fi
 
-export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_snake }}_client/versions/$VERSION)
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_name | snake }}_client/versions/$VERSION)
 
 if [ "$response" == "200" ];
 then
   echo "{{ plugin_name }} client $VERSION has already been released. Installing from RubyGems.org."
-  gem install {{ plugin_snake }}_client -v $VERSION
-  touch {{ plugin_snake }}_client-$VERSION.gem
-  tar cvf ruby-client.tar ./{{ plugin_snake }}_client-$VERSION.gem
+  gem install {{ plugin_name | snake }}_client -v $VERSION
+  touch {{ plugin_name | snake }}_client-$VERSION.gem
+  tar cvf ruby-client.tar ./{{ plugin_name | snake }}_client-$VERSION.gem
   exit
 fi
 
 cd ../pulp-openapi-generator
-rm -rf {{ plugin_snake }}-client
-./generate.sh {{ plugin_snake }} ruby $VERSION
-cd {{ plugin_snake }}-client
-gem build {{ plugin_snake }}_client
-gem install --both ./{{ plugin_snake }}_client-$VERSION.gem
-tar cvf ../../{{ plugin_name }}/ruby-client.tar ./{{ plugin_snake }}_client-$VERSION.gem
+rm -rf {{ plugin_name | snake }}-client
+./generate.sh {{ plugin_name | snake }} ruby $VERSION
+cd {{ plugin_name | snake }}-client
+gem build {{ plugin_name | snake }}_client
+gem install --both ./{{ plugin_name | snake }}_client-$VERSION.gem
+tar cvf ../../{{ plugin_name }}/ruby-client.tar ./{{ plugin_name | snake }}_client-$VERSION.gem

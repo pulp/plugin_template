@@ -7,7 +7,7 @@
 with context %}
 
 ---
-name: {{ plugin_camel_short }} CI Update
+name: {{ plugin_app_label | camel }} CI Update
 on:
   {%- if sync_ci %}
   schedule:

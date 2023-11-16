@@ -24,33 +24,33 @@ from pulpcore.plugin.models import ContentArtifact
 from . import models, serializers, tasks
 
 
-class {{ plugin_camel_short }}ContentFilter(core.ContentFilter):
+class {{ plugin_app_label | camel }}ContentFilter(core.ContentFilter):
     """
-    FilterSet for {{ plugin_camel_short }}Content.
+    FilterSet for {{ plugin_app_label | camel }}Content.
     """
 
     class Meta:
-        model = models.{{ plugin_camel_short }}Content
+        model = models.{{ plugin_app_label | camel }}Content
         fields = [
             # ...
         ]
 
 
-class {{ plugin_camel_short }}ContentViewSet(core.ContentViewSet):
+class {{ plugin_app_label | camel }}ContentViewSet(core.ContentViewSet):
     """
-    A ViewSet for {{ plugin_camel_short }}Content.
+    A ViewSet for {{ plugin_app_label | camel }}Content.
 
     Define endpoint name which will appear in the API endpoint for this content type.
     For example::
-        https://pulp.example.com/pulp/api/v3/content/{{ plugin_dash_short }}/units/
+        https://pulp.example.com/pulp/api/v3/content/{{ plugin_app_label | dash }}/units/
 
-    Also specify queryset and serializer for {{ plugin_camel_short }}Content.
+    Also specify queryset and serializer for {{ plugin_app_label | camel }}Content.
     """
 
-    endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Content.objects.all()
-    serializer_class = serializers.{{ plugin_camel_short }}ContentSerializer
-    filterset_class = {{ plugin_camel_short }}ContentFilter
+    endpoint_name = "{{ plugin_app_label | dash }}"
+    queryset = models.{{ plugin_app_label | camel }}Content.objects.all()
+    serializer_class = serializers.{{ plugin_app_label | camel }}ContentSerializer
+    filterset_class = {{ plugin_app_label | camel }}ContentFilter
 
     @transaction.atomic
     def create(self, request):
@@ -107,42 +107,42 @@ class {{ plugin_camel_short }}ContentViewSet(core.ContentViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class {{ plugin_camel_short }}RemoteFilter(RemoteFilter):
+class {{ plugin_app_label | camel }}RemoteFilter(RemoteFilter):
     """
-    A FilterSet for {{ plugin_camel_short }}Remote.
+    A FilterSet for {{ plugin_app_label | camel }}Remote.
     """
 
     class Meta:
-        model = models.{{ plugin_camel_short }}Remote
+        model = models.{{ plugin_app_label | camel }}Remote
         fields = [
             # ...
         ]
 
 
-class {{ plugin_camel_short }}RemoteViewSet(core.RemoteViewSet):
+class {{ plugin_app_label | camel }}RemoteViewSet(core.RemoteViewSet):
     """
-    A ViewSet for {{ plugin_camel_short }}Remote.
+    A ViewSet for {{ plugin_app_label | camel }}Remote.
 
-    Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
+    Similar to the {{ plugin_app_label | camel }}ContentViewSet above, define endpoint_name,
     queryset and serializer, at a minimum.
     """
 
-    endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Remote.objects.all()
-    serializer_class = serializers.{{ plugin_camel_short }}RemoteSerializer
+    endpoint_name = "{{ plugin_app_label | dash }}"
+    queryset = models.{{ plugin_app_label | camel }}Remote.objects.all()
+    serializer_class = serializers.{{ plugin_app_label | camel }}RemoteSerializer
 
 
-class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet, ModifyRepositoryActionMixin):
+class {{ plugin_app_label | camel }}RepositoryViewSet(core.RepositoryViewSet, ModifyRepositoryActionMixin):
     """
-    A ViewSet for {{ plugin_camel_short }}Repository.
+    A ViewSet for {{ plugin_app_label | camel }}Repository.
 
-    Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
+    Similar to the {{ plugin_app_label | camel }}ContentViewSet above, define endpoint_name,
     queryset and serializer, at a minimum.
     """
 
-    endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Repository.objects.all()
-    serializer_class = serializers.{{ plugin_camel_short }}RepositorySerializer
+    endpoint_name = "{{ plugin_app_label | dash }}"
+    queryset = models.{{ plugin_app_label | camel }}Repository.objects.all()
+    serializer_class = serializers.{{ plugin_app_label | camel }}RepositorySerializer
 
     # This decorator is necessary since a sync operation is asyncrounous and returns
     # the id and href of the sync task.
@@ -174,26 +174,26 @@ class {{ plugin_camel_short }}RepositoryViewSet(core.RepositoryViewSet, ModifyRe
         return core.OperationPostponedResponse(result, request)
 
 
-class {{ plugin_camel_short }}RepositoryVersionViewSet(core.RepositoryVersionViewSet):
+class {{ plugin_app_label | camel }}RepositoryVersionViewSet(core.RepositoryVersionViewSet):
     """
-    A ViewSet for a {{ plugin_camel_short }}RepositoryVersion represents a single
-    {{ plugin_camel_short }} repository version.
+    A ViewSet for a {{ plugin_app_label | camel }}RepositoryVersion represents a single
+    {{ plugin_app_label | camel }} repository version.
     """
 
-    parent_viewset = {{ plugin_camel_short }}RepositoryViewSet
+    parent_viewset = {{ plugin_app_label | camel }}RepositoryViewSet
 
 
-class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
+class {{ plugin_app_label | camel }}PublicationViewSet(core.PublicationViewSet):
     """
-    A ViewSet for {{ plugin_camel_short }}Publication.
+    A ViewSet for {{ plugin_app_label | camel }}Publication.
 
-    Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
+    Similar to the {{ plugin_app_label | camel }}ContentViewSet above, define endpoint_name,
     queryset and serializer, at a minimum.
     """
 
-    endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Publication.objects.exclude(complete=False)
-    serializer_class = serializers.{{ plugin_camel_short }}PublicationSerializer
+    endpoint_name = "{{ plugin_app_label | dash }}"
+    queryset = models.{{ plugin_app_label | camel }}Publication.objects.exclude(complete=False)
+    serializer_class = serializers.{{ plugin_app_label | camel }}PublicationSerializer
 
     # This decorator is necessary since a publish operation is asyncrounous and returns
     # the id and href of the publish task.
@@ -220,14 +220,14 @@ class {{ plugin_camel_short }}PublicationViewSet(core.PublicationViewSet):
         return core.OperationPostponedResponse(result, request)
 
 
-class {{ plugin_camel_short }}DistributionViewSet(core.DistributionViewSet):
+class {{ plugin_app_label | camel }}DistributionViewSet(core.DistributionViewSet):
     """
-    A ViewSet for {{ plugin_camel_short }}Distribution.
+    A ViewSet for {{ plugin_app_label | camel }}Distribution.
 
-    Similar to the {{ plugin_camel_short }}ContentViewSet above, define endpoint_name,
+    Similar to the {{ plugin_app_label | camel }}ContentViewSet above, define endpoint_name,
     queryset and serializer, at a minimum.
     """
 
-    endpoint_name = "{{ plugin_dash_short }}"
-    queryset = models.{{ plugin_camel_short }}Distribution.objects.all()
-    serializer_class = serializers.{{ plugin_camel_short }}DistributionSerializer
+    endpoint_name = "{{ plugin_app_label | dash }}"
+    queryset = models.{{ plugin_app_label | camel }}Distribution.objects.all()
+    serializer_class = serializers.{{ plugin_app_label | camel }}DistributionSerializer

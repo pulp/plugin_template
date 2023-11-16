@@ -35,7 +35,7 @@ new_labels = set(["backport-" + x for x in plugin_template["ci_update_branches"]
 # delete old labels that are not in new labels
 for label in old_labels.difference(new_labels):
     response = session.delete(
-        f"https://api.github.com/repos/pulp/{{ plugin_snake }}/labels/{label}", headers=headers
+        f"https://api.github.com/repos/pulp/{{ plugin_name | snake }}/labels/{label}", headers=headers
     )
     assert response.status_code == 204
 
@@ -43,7 +43,7 @@ for label in old_labels.difference(new_labels):
 for label in new_labels.difference(old_labels):
     color = random_color()
     response = session.post(
-        "https://api.github.com/repos/pulp/{{ plugin_snake }}/labels",
+        "https://api.github.com/repos/pulp/{{ plugin_name | snake }}/labels",
         headers=headers,
         json={"name": label, "color": color},
     )

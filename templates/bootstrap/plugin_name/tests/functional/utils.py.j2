@@ -14,14 +14,14 @@ from pulp_smash.pulp3.utils import (
     sync,
 )
 
-from {{ plugin_snake }}.tests.functional.constants import (
-    {{ plugin_caps_short }}_CONTENT_NAME,
-    {{ plugin_caps_short }}_CONTENT_PATH,
-    {{ plugin_caps_short }}_FIXTURE_URL,
-    {{ plugin_caps_short }}_PUBLICATION_PATH,
-    {{ plugin_caps_short }}_REMOTE_PATH,
-    {{ plugin_caps_short }}_REPO_PATH,
-    {{ plugin_caps_short }}_URL,
+from {{ plugin_name | snake }}.tests.functional.constants import (
+    {{ plugin_app_label | caps }}_CONTENT_NAME,
+    {{ plugin_app_label | caps }}_CONTENT_PATH,
+    {{ plugin_app_label | caps }}_FIXTURE_URL,
+    {{ plugin_app_label | caps }}_PUBLICATION_PATH,
+    {{ plugin_app_label | caps }}_REMOTE_PATH,
+    {{ plugin_app_label | caps }}_REPO_PATH,
+    {{ plugin_app_label | caps }}_URL,
 )
 
 from pulpcore.client.pulpcore import (
@@ -29,7 +29,7 @@ from pulpcore.client.pulpcore import (
     ArtifactsApi,
     TasksApi,
 )
-from pulpcore.client.{{ plugin_snake }} import ApiClient as {{ plugin_camel_short }}ApiClient
+from pulpcore.client.{{ plugin_name | snake }} import ApiClient as {{ plugin_app_label | camel }}ApiClient
 
 
 cfg = config.get_config()
@@ -37,17 +37,17 @@ configuration = cfg.get_bindings_config()
 
 
 def set_up_module():
-    """Skip tests Pulp 3 isn't under test or if {{ plugin_snake }} isn't installed."""
+    """Skip tests Pulp 3 isn't under test or if {{ plugin_name | snake }} isn't installed."""
     require_pulp_3(SkipTest)
     require_pulp_plugins({"{{ plugin_app_label }}"}, SkipTest)
 
 
 def gen_{{ plugin_app_label }}_client():
     """Return an OBJECT for {{ plugin_app_label }} client."""
-    return {{ plugin_camel_short }}ApiClient(configuration)
+    return {{ plugin_app_label | camel }}ApiClient(configuration)
 
 
-def gen_{{ plugin_app_label }}_remote(url={{ plugin_caps_short }}_FIXTURE_URL, **kwargs):
+def gen_{{ plugin_app_label }}_remote(url={{ plugin_app_label | caps }}_FIXTURE_URL, **kwargs):
     """Return a semi-random dict for use in creating a {{ plugin_app_label }} Remote.
 
     :param url: The URL of an external content source.
@@ -68,9 +68,9 @@ def get_{{ plugin_app_label }}_content_paths(repo, version_href=None):
     # It's just an example -- this needs to be replaced with an implementation that works
     # for repositories of this content type.
     return {
-        {{ plugin_caps_short }}_CONTENT_NAME: [
+        {{ plugin_app_label | caps }}_CONTENT_NAME: [
             (content_unit["relative_path"], content_unit["relative_path"])
-            for content_unit in get_content(repo, version_href)[{{ plugin_caps_short }}_CONTENT_NAME]
+            for content_unit in get_content(repo, version_href)[{{ plugin_app_label | caps }}_CONTENT_NAME]
         ],
     }
 
@@ -85,27 +85,27 @@ def gen_{{ plugin_app_label }}_content_attrs(artifact):
     return {"_artifact": artifact["pulp_href"]}
 
 
-def populate_pulp(cfg, url={{ plugin_caps_short }}_FIXTURE_URL):
+def populate_pulp(cfg, url={{ plugin_app_label | caps }}_FIXTURE_URL):
     """Add {{ plugin_app_label }} contents to Pulp.
 
     :param pulp_smash.config.PulpSmashConfig: Information about a Pulp application.
     :param url: The {{ plugin_app_label }} repository URL. Defaults to
-        :data:`pulp_smash.constants.{{ plugin_caps_short }}_FIXTURE_URL`
+        :data:`pulp_smash.constants.{{ plugin_app_label | caps }}_FIXTURE_URL`
     :returns: A list of dicts, where each dict describes one {{ plugin_app_label }} content in Pulp.
     """
     client = api.Client(cfg, api.json_handler)
     remote = {}
     repo = {}
     try:
-        remote.update(client.post({{ plugin_caps_short }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote(url)))
-        repo.update(client.post({{ plugin_caps_short }}_REPO_PATH, gen_repo()))
+        remote.update(client.post({{ plugin_app_label | caps }}_REMOTE_PATH, gen_{{ plugin_app_label }}_remote(url)))
+        repo.update(client.post({{ plugin_app_label | caps }}_REPO_PATH, gen_repo()))
         sync(cfg, remote, repo)
     finally:
         if remote:
             client.delete(remote["pulp_href"])
         if repo:
             client.delete(repo["pulp_href"])
-    return client.get({{ plugin_caps_short }}_CONTENT_PATH)["results"]
+    return client.get({{ plugin_app_label | caps }}_CONTENT_PATH)["results"]
 
 
 def publish(cfg, repo, version_href=None):
@@ -123,7 +123,7 @@ def publish(cfg, repo, version_href=None):
         body = {"repository": repo["pulp_href"]}
 
     client = api.Client(cfg, api.json_handler)
-    call_report = client.post({{ plugin_caps_short }}_PUBLICATION_PATH, body)
+    call_report = client.post({{ plugin_app_label | caps }}_PUBLICATION_PATH, body)
     tasks = tuple(api.poll_spawned_tasks(cfg, call_report))
     return client.get(tasks[-1]["created_resources"][0])
 
@@ -139,7 +139,7 @@ core_client = CoreApiClient(configuration)
 tasks = TasksApi(core_client)
 
 
-def gen_artifact(url={{ plugin_caps_short }}_URL):
+def gen_artifact(url={{ plugin_app_label | caps }}_URL):
     """Creates an artifact."""
     response = requests.get(url)
     with NamedTemporaryFile() as temp_file:

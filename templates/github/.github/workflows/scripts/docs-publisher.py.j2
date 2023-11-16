@@ -17,10 +17,10 @@ WORKING_DIR = os.environ["WORKSPACE"]
 VERSION_REGEX = r"(\s*)(version)(\s*)(=)(\s*)(['\"])(.*)(['\"])(.*)"
 RELEASE_REGEX = r"(\s*)(release)(\s*)(=)(\s*)(['\"])(.*)(['\"])(.*)"
 
-USERNAME = "doc_builder_{{ plugin_snake }}"
+USERNAME = "doc_builder_{{ plugin_name | snake }}"
 HOSTNAME = "8.43.85.236"
 
-SITE_ROOT = "/var/www/docs.pulpproject.org/{{ plugin_snake }}/"
+SITE_ROOT = "/var/www/docs.pulpproject.org/{{ plugin_name | snake }}/"
 
 
 def make_directory_with_rsync(remote_paths_list):
@@ -109,7 +109,7 @@ def main():
     elif build_type == "tag":
         if (not re.search("[a-zA-Z]", branch) or "post" in branch) and len(branch.split(".")) > 2:
             # Only publish docs at the root if this is the latest version
-            r = requests.get("https://pypi.org/pypi/{{ plugin_dash }}/json")
+            r = requests.get("https://pypi.org/pypi/{{ plugin_name | dash }}/json")
             latest_version = version.parse(json.loads(r.text)["info"]["version"])
             docs_version = version.parse(branch)
             # This is to mitigate delays on PyPI which doesn't update metadata in timely manner.

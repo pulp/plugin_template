@@ -49,15 +49,8 @@ DEFAULT_SETTINGS = {
     "noissue_marker": "[noissue]",
     "parallel_test_workers": 8,
     "plugin_app_label": None,
-    "plugin_camel": None,
-    "plugin_camel_short": None,
-    "plugin_caps": None,
-    "plugin_caps_short": None,
-    "plugin_dash": None,
-    "plugin_dash_short": None,
     "plugin_default_branch": "main",
     "plugin_name": None,
-    "plugin_snake": None,
     "post_job_template": None,
     "pre_job_template": None,
     "publish_docs_to_pulpprojectdotorg": False,
@@ -367,6 +360,11 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             ]
         )
     )
+    env.filters["camel"] = utils.to_camel
+    env.filters["caps"] = utils.to_caps
+    env.filters["dash"] = utils.to_dash
+    env.filters["snake"] = utils.to_snake
+    env.filters["to_yaml"] = to_nice_yaml
 
     files_templated = 0
     files_copied = 0
@@ -380,7 +378,9 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             continue
         if config["kanban"] is False and "kanban" in relative_path:
             continue
-        destination_relative_path = relative_path.replace("plugin_name", config["plugin_snake"])
+        destination_relative_path = relative_path.replace(
+            "plugin_name", utils.to_snake(config["plugin_name"])
+        )
         necessary_dir_structure = os.path.dirname(
             os.path.join(plugin_root_dir, destination_relative_path)
         )
@@ -389,7 +389,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             os.makedirs(necessary_dir_structure)
 
         if relative_path.endswith(".j2"):
-            env.filters["to_yaml"] = to_nice_yaml
             template = env.get_template(relative_path)
             destination = destination_relative_path[: -len(".j2")]
             write_template_to_file(
@@ -470,20 +469,9 @@ def generate_config(plugin_name, plugin_app_label):
     Returns:
         config (dict): a dictionary containing a default template configuration for the plugin
     """
-    config = {}
+    config = DEFAULT_SETTINGS.copy()
     config["plugin_name"] = plugin_name
     config["plugin_app_label"] = plugin_app_label
-    config["plugin_snake"] = utils.to_snake(plugin_name)
-    config["plugin_caps"] = utils.to_caps(plugin_name)
-    config["plugin_caps_short"] = utils.to_caps(plugin_app_label)
-    config["plugin_camel"] = utils.to_camel(plugin_name)
-    config["plugin_camel_short"] = utils.to_camel(plugin_app_label)
-    config["plugin_dash"] = utils.to_dash(plugin_name)
-    config["plugin_dash_short"] = utils.to_dash(plugin_app_label)
-    # Add any missing value from the list of defaults
-    for key, value in DEFAULT_SETTINGS.items():
-        if key not in config:
-            config[key] = value
     return config
 
 

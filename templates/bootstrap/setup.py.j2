@@ -6,9 +6,9 @@ with open("requirements.txt") as requirements:
     requirements = requirements.readlines()
 
 setup(
-    name="{{ plugin_dash }}",
+    name="{{ plugin_name | dash }}",
     version="0.1.0a1.dev",
-    description="{{ plugin_dash }} plugin for the Pulp Project",
+    description="{{ plugin_name | dash }} plugin for the Pulp Project",
     license="GPLv2+",
     author="AUTHOR",
     author_email="author@email.here",
@@ -27,5 +27,5 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
-    entry_points={"pulpcore.plugin": ["{{ plugin_snake }} = {{ plugin_snake }}:default_app_config"]},
+    entry_points={"pulpcore.plugin": ["{{ plugin_name | snake }} = {{ plugin_name | snake }}:default_app_config"]},
 )

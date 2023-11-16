@@ -12,7 +12,7 @@
   configure_git,
 with context %}
 ---
-name: {{ plugin_camel_short }} Release Pipeline
+name: {{ plugin_app_label | camel }} Release Pipeline
 on:
   workflow_dispatch:
     inputs:

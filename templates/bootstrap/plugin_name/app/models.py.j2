@@ -21,9 +21,9 @@ from pulpcore.plugin.models import (
 logger = getLogger(__name__)
 
 
-class {{ plugin_camel_short }}Content(Content):
+class {{ plugin_app_label | camel }}Content(Content):
     """
-    The "{{ plugin_dash_short }}" content type.
+    The "{{ plugin_app_label | dash }}" content type.
 
     Define fields you need for your new content type and
     specify uniqueness constraint to identify unit of this type.
@@ -39,61 +39,61 @@ class {{ plugin_camel_short }}Content(Content):
             unique_together = (field1, field2)
     """
 
-    TYPE = "{{ plugin_dash_short }}"
+    TYPE = "{{ plugin_app_label | dash }}"
 
     class Meta:
         default_related_name = "%(app_label)s_%(model_name)s"
 
 
-class {{ plugin_camel_short }}Publication(Publication):
+class {{ plugin_app_label | camel }}Publication(Publication):
     """
-    A Publication for {{ plugin_camel_short }}Content.
+    A Publication for {{ plugin_app_label | camel }}Content.
 
     Define any additional fields for your new publication if needed.
     """
 
-    TYPE = "{{ plugin_dash_short }}"
+    TYPE = "{{ plugin_app_label | dash }}"
 
     class Meta:
         default_related_name = "%(app_label)s_%(model_name)s"
 
 
-class {{ plugin_camel_short }}Remote(Remote):
+class {{ plugin_app_label | camel }}Remote(Remote):
     """
-    A Remote for {{ plugin_camel_short }}Content.
+    A Remote for {{ plugin_app_label | camel }}Content.
 
     Define any additional fields for your new remote if needed.
     """
 
-    TYPE = "{{ plugin_dash_short }}"
+    TYPE = "{{ plugin_app_label | dash }}"
 
     class Meta:
         default_related_name = "%(app_label)s_%(model_name)s"
 
 
-class {{ plugin_camel_short }}Repository(Repository):
+class {{ plugin_app_label | camel }}Repository(Repository):
     """
-    A Repository for {{ plugin_camel_short }}Content.
+    A Repository for {{ plugin_app_label | camel }}Content.
 
     Define any additional fields for your new repository if needed.
     """
 
-    TYPE = "{{ plugin_dash_short }}"
+    TYPE = "{{ plugin_app_label | dash }}"
 
-    CONTENT_TYPES = [{{ plugin_camel_short }}Content]
+    CONTENT_TYPES = [{{ plugin_app_label | camel }}Content]
 
     class Meta:
         default_related_name = "%(app_label)s_%(model_name)s"
 
 
-class {{ plugin_camel_short }}Distribution(Distribution):
+class {{ plugin_app_label | camel }}Distribution(Distribution):
     """
-    A Distribution for {{ plugin_camel_short }}Content.
+    A Distribution for {{ plugin_app_label | camel }}Content.
 
     Define any additional fields for your new distribution if needed.
     """
 
-    TYPE = "{{ plugin_dash_short }}"
+    TYPE = "{{ plugin_app_label | dash }}"
 
     class Meta:
         default_related_name = "%(app_label)s_%(model_name)s"

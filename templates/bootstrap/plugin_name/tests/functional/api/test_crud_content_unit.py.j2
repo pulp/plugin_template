@@ -4,15 +4,15 @@ import unittest
 from pulp_smash.pulp3.utils import delete_orphans
 from pulp_smash.pulp3.bindings import monitor_task
 
-from {{ plugin_snake }}.tests.functional.utils import (
+from {{ plugin_name | snake }}.tests.functional.utils import (
     gen_artifact,
     gen_{{ plugin_app_label }}_client,
     gen_{{ plugin_app_label }}_content_attrs,
     skip_if,
 )
-from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+from {{ plugin_name | snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
-from pulpcore.client.{{ plugin_snake }} import Content{{ plugin_camel_short }}Api
+from pulpcore.client.{{ plugin_name | snake }} import Content{{ plugin_app_label | camel }}Api
 
 
 # Read the instructions provided below for the steps needed to enable this test (see: FIXME's).
@@ -32,7 +32,7 @@ class ContentUnitTestCase(unittest.TestCase):
         """Create class-wide variable."""
         delete_orphans()
         cls.content_unit = {}
-        cls.{{ plugin_app_label }}_content_api = Content{{ plugin_camel_short }}Api(gen_{{ plugin_app_label }}_client())
+        cls.{{ plugin_app_label }}_content_api = Content{{ plugin_app_label | camel }}Api(gen_{{ plugin_app_label }}_client())
         cls.artifact = gen_artifact()
 
     @classmethod

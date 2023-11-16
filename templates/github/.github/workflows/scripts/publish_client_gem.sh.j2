@@ -14,14 +14,14 @@ echo "---
 :rubygems_api_key: $RUBYGEMS_API_KEY" > ~/.gem/credentials
 sudo chmod 600 ~/.gem/credentials
 
-export VERSION=$(ls {{ plugin_snake }}_client* | sed -rn 's/{{ plugin_snake }}_client-(.*)\.gem/\1/p')
+export VERSION=$(ls {{ plugin_name | snake }}_client* | sed -rn 's/{{ plugin_name | snake }}_client-(.*)\.gem/\1/p')
 
 if [[ -z "$VERSION" ]]; then
   echo "No client package found."
   exit
 fi
 
-export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_snake }}_client/versions/$VERSION)
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://rubygems.org/gems/{{ plugin_name | snake }}_client/versions/$VERSION)
 
 if [ "$response" == "200" ];
 then
@@ -29,5 +29,5 @@ then
   exit
 fi
 
-GEM_FILE="$(ls {{ plugin_snake }}_client-*)"
+GEM_FILE="$(ls {{ plugin_name | snake }}_client-*)"
 gem push ${GEM_FILE}

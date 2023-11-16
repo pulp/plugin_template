@@ -1,4 +1,4 @@
-"""Constants for Pulp {{ plugin_camel_short }} plugin tests."""
+"""Constants for Pulp {{ plugin_app_label | camel }} plugin tests."""
 from urllib.parse import urljoin
 
 from pulp_smash.constants import PULP_FIXTURES_BASE_URL
@@ -17,42 +17,42 @@ from pulp_smash.pulp3.constants import (
 DOWNLOAD_POLICIES = ["immediate"]
 
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
-{{ plugin_caps_short }}_CONTENT_NAME = "{{ plugin_app_label }}.unit"
+{{ plugin_app_label | caps }}_CONTENT_NAME = "{{ plugin_app_label }}.unit"
 
 # FIXME: replace 'unit' with your own content type names, and duplicate as necessary for each type
-{{ plugin_caps_short }}_CONTENT_PATH = urljoin(BASE_CONTENT_PATH, "{{ plugin_app_label }}/units/")
+{{ plugin_app_label | caps }}_CONTENT_PATH = urljoin(BASE_CONTENT_PATH, "{{ plugin_app_label }}/units/")
 
-{{ plugin_caps_short }}_REMOTE_PATH = urljoin(BASE_REMOTE_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+{{ plugin_app_label | caps }}_REMOTE_PATH = urljoin(BASE_REMOTE_PATH, "{{ plugin_app_label }}/{{ plugin_app_label | dash }}/")
 
-{{ plugin_caps_short }}_REPO_PATH = urljoin(BASE_REPO_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+{{ plugin_app_label | caps }}_REPO_PATH = urljoin(BASE_REPO_PATH, "{{ plugin_app_label }}/{{ plugin_app_label | dash }}/")
 
-{{ plugin_caps_short }}_PUBLICATION_PATH = urljoin(BASE_PUBLICATION_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+{{ plugin_app_label | caps }}_PUBLICATION_PATH = urljoin(BASE_PUBLICATION_PATH, "{{ plugin_app_label }}/{{ plugin_app_label | dash }}/")
 
-{{ plugin_caps_short }}_DISTRIBUTION_PATH = urljoin(BASE_DISTRIBUTION_PATH, "{{ plugin_app_label }}/{{ plugin_dash_short }}/")
+{{ plugin_app_label | caps }}_DISTRIBUTION_PATH = urljoin(BASE_DISTRIBUTION_PATH, "{{ plugin_app_label }}/{{ plugin_app_label | dash }}/")
 
 # FIXME: replace this with your own fixture repository URL and metadata
-{{ plugin_caps_short }}_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}/")
+{{ plugin_app_label | caps }}_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}/")
 """The URL to a {{ plugin_app_label }} repository."""
 
 # FIXME: replace this with the actual number of content units in your test fixture
-{{ plugin_caps_short }}_FIXTURE_COUNT = 3
-"""The number of content units available at :data:`{{ plugin_caps_short }}_FIXTURE_URL`."""
+{{ plugin_app_label | caps }}_FIXTURE_COUNT = 3
+"""The number of content units available at :data:`{{ plugin_app_label | caps }}_FIXTURE_URL`."""
 
-{{ plugin_caps_short }}_FIXTURE_SUMMARY = {{ '{' }}{{ plugin_caps_short }}_CONTENT_NAME: {{ plugin_caps_short }}_FIXTURE_COUNT}
-"""The desired content summary after syncing :data:`{{ plugin_caps_short }}_FIXTURE_URL`."""
+{{ plugin_app_label | caps }}_FIXTURE_SUMMARY = {{ '{' }}{{ plugin_app_label | caps }}_CONTENT_NAME: {{ plugin_app_label | caps }}_FIXTURE_COUNT}
+"""The desired content summary after syncing :data:`{{ plugin_app_label | caps }}_FIXTURE_URL`."""
 
 # FIXME: replace this with the location of one specific content unit of your choosing
-{{ plugin_caps_short }}_URL = urljoin({{ plugin_caps_short }}_FIXTURE_URL, "")
-"""The URL to an {{ plugin_app_label }} file at :data:`{{ plugin_caps_short }}_FIXTURE_URL`."""
+{{ plugin_app_label | caps }}_URL = urljoin({{ plugin_app_label | caps }}_FIXTURE_URL, "")
+"""The URL to an {{ plugin_app_label }} file at :data:`{{ plugin_app_label | caps }}_FIXTURE_URL`."""
 
 # FIXME: replace this with your own fixture repository URL and metadata
-{{ plugin_caps_short }}_INVALID_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}-invalid/")
+{{ plugin_app_label | caps }}_INVALID_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}-invalid/")
 """The URL to an invalid {{ plugin_app_label }} repository."""
 
 # FIXME: replace this with your own fixture repository URL and metadata
-{{ plugin_caps_short }}_LARGE_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}_large/")
+{{ plugin_app_label | caps }}_LARGE_FIXTURE_URL = urljoin(PULP_FIXTURES_BASE_URL, "{{ plugin_app_label }}_large/")
 """The URL to a {{ plugin_app_label }} repository containing a large number of content units."""
 
 # FIXME: replace this with the actual number of content units in your test fixture
-{{ plugin_caps_short }}_LARGE_FIXTURE_COUNT = 25
-"""The number of content units available at :data:`{{ plugin_caps_short }}_LARGE_FIXTURE_URL`."""
+{{ plugin_app_label | caps }}_LARGE_FIXTURE_COUNT = 25
+"""The number of content units available at :data:`{{ plugin_app_label | caps }}_LARGE_FIXTURE_URL`."""

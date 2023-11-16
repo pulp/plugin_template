@@ -24,7 +24,7 @@ export PULP_SETTINGS=$PWD/.ci/ansible/settings/settings.py
 export PULP_URL="{{ pulp_scheme }}://pulp"
 
 if [[ "$TEST" = "docs" ]]; then
-  if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} CI" ]]; then
+  if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} CI" ]]; then
     pip install towncrier==19.9.0
     towncrier --yes --version 4.0.0.ci
   fi
@@ -42,8 +42,8 @@ fi
 REPORTED_STATUS="$(pulp status)"
 
 if [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
-  REPORTED_VERSION="$(echo $REPORTED_STATUS | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')"
-  response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_dash }}/$REPORTED_VERSION/)
+  REPORTED_VERSION="$(echo $REPORTED_STATUS | jq --arg plugin {{ plugin_app_label }} --arg legacy_plugin {{ plugin_name | snake }} -r '.versions[] | select(.component == $plugin or .component == $legacy_plugin) | .version')"
+  response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_name | dash }}/$REPORTED_VERSION/)
   if [ "$response" == "200" ];
   then
     echo "{{ plugin_name }} $REPORTED_VERSION has already been released. Skipping running tests."
@@ -97,14 +97,14 @@ echo "Checking for uncommitted migrations..."
 cmd_user_prefix bash -c "django-admin makemigrations {{ plugin_app_label }} --check --dry-run"
 
 # Run unit tests.
-cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes -p no:pulpcore --pyargs {{ plugin_snake }}.tests.unit"
+cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes -p no:pulpcore --pyargs {{ plugin_name | snake }}.tests.unit"
 
 # Run functional tests
 if [[ "$TEST" == "performance" ]]; then
   if [[ -z ${PERFORMANCE_TEST+x} ]]; then
-    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance"
+    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_name | snake }}.tests.performance"
   else
-    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_snake }}.tests.performance.test_$PERFORMANCE_TEST"
+    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_name | snake }}.tests.performance.test_$PERFORMANCE_TEST"
   fi
   exit
 fi
@@ -113,8 +113,8 @@ if [ -f $FUNC_TEST_SCRIPT ]; then
   source $FUNC_TEST_SCRIPT
 else
 {% if parallel_test_workers == 0 %}
-    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]] || [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional --nightly"
+    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} Nightly CI/CD" ]] || [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
+        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional --nightly"
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} --nightly"
@@ -124,7 +124,7 @@ else
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m 'from_pulpcore_for_all_plugins' --nightly"
     {% endif %}
     else
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional"
+        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional"
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }}"
@@ -135,9 +135,9 @@ else
     {% endif %}
     fi
 {% else %}
-    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} Nightly CI/CD" ]] || [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m 'not parallel' --nightly"
+    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} Nightly CI/CD" ]] || [[ "${RELEASE_WORKFLOW:-false}" == "true" ]]; then
+        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
+        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional -m 'not parallel' --nightly"
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }} --nightly"
@@ -149,8 +149,8 @@ else
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs pulpcore.tests.functional -m 'from_pulpcore_for_all_plugins and not parallel'  --nightly"
     {% endif %}
     else
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_snake }}.tests.functional -m 'not parallel'"
+        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
+        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional -m 'not parallel'"
 
     {%- for item in additional_repos if item.pytest_args | default(false) %}
         cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }}"
@@ -171,7 +171,7 @@ export PULP_FIXTURES_URL="http://pulp-fixtures:8080"
 {%- endif %}
 pushd ../{{ cli_package }}
 pip install -r test_requirements.txt
-pytest -v -m {{ plugin_snake }}
+pytest -v -m {{ plugin_name | snake }}
 popd
 {%- endif %}
 
