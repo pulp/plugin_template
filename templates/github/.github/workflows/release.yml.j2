@@ -19,18 +19,19 @@ on:
       release:
         description: "Release tag (e.g. 3.2.1)"
 
-env:
-  RELEASE_WORKFLOW: true
+defaults:
+  run:
+    working-directory: "{{ plugin_name }}"
 
 jobs:
   build-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
 
     strategy:
       fail-fast: false
 
     steps:
-      {{ checkout(depth=0) | indent(6) }}
+      {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
@@ -43,14 +44,15 @@ jobs:
       - name: Create the release commit, tag it, create a post-release commit, and build plugin package
         run: python .github/workflows/scripts/release.py {{ "${{ github.event.inputs.release }}" }}
 
-      - name: 'Tar files'
-        run: tar -cvf {{ plugin_name }}.tar .
+      - name: "Tar files"
+        run: |
+          tar -cvf {{ plugin_name }}.tar .
 
-      - name: 'Upload Artifact'
+      - name: "Upload Artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: {{ plugin_name }}.tar
-          path: {{ plugin_name }}.tar
+          name: "{{ plugin_name }}.tar"
+          path: "{{ plugin_name }}/{{ plugin_name }}.tar"
 
 
   build-bindings-docs:
@@ -63,7 +65,10 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: {{ plugin_name }}.tar
+          name: "{{ plugin_name }}.tar"
+          path: "{{ plugin_name }}/"
+
+      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
 
       {{ setup_python() | indent(6) }}
 
@@ -71,7 +76,7 @@ jobs:
       {{ setup_ruby() | indent(6) }}
       {%- endif %}
 
-      - name: Untar repository
+      - name: "Untar repository"
         run: |
           tar -xf {{ plugin_name }}.tar
 
@@ -103,24 +108,24 @@ jobs:
       {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False) | indent(6) }}
       {%- endif %}
 
-      - name: Upload python client packages
+      - name: "Upload python client packages"
         uses: actions/upload-artifact@v3
         with:
-          name: python-client.tar
-          path: python-client.tar
+          name: "python-client.tar"
+          path: "{{ plugin_name }}/python-client.tar"
 
-      - name: Upload python client docs
+      - name: "Upload python client docs"
         uses: actions/upload-artifact@v3
         with:
-          name: python-client-docs.tar
-          path: python-client-docs.tar
+          name: "python-client-docs.tar"
+          path: "{{ plugin_name }}/python-client-docs.tar"
 
       {%- if deploy_client_to_rubygems %}
-      - name: Upload ruby client packages
+      - name: "Upload ruby client packages"
         uses: actions/upload-artifact@v3
         with:
-          name: ruby-client.tar
-          path: ruby-client.tar
+          name: "ruby-client.tar"
+          path: "{{ plugin_name }}/ruby-client.tar"
       {%- endif %}
 
       {%- if publish_docs_to_pulpprojectdotorg and docs_test %}
@@ -131,11 +136,11 @@ jobs:
           make -C docs/ PULP_URL="{{ pulp_scheme }}://pulp" diagrams html
           tar -cvf docs/docs.tar docs/_build
 
-      - name: Upload built docs
+      - name: "Upload built docs"
         uses: actions/upload-artifact@v3
         with:
-          name: docs.tar
-          path: docs/docs.tar
+          name: "docs.tar"
+          path: "{{ plugin_name }}/docs/docs.tar"
       {%- endif %}
 
       {{ display_logs() | indent(6) }}
@@ -152,7 +157,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: {{ plugin_name }}.tar
+          name: "{{ plugin_name }}.tar"
+          path: "{{ plugin_name }}/"
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
@@ -180,15 +186,17 @@ jobs:
         run: bash .github/workflows/scripts/push_branch_and_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }}
 
       {%- if publish_docs_to_pulpprojectdotorg and docs_test %}
-      - name: Download built docs
+      - name: "Download built docs"
         uses: actions/download-artifact@v3
         with:
-          name: docs.tar
+          name: "docs.tar"
+          path: "{{ plugin_name }}/"
 
-      - name: Download Python client docs
+      - name: "Download Python client docs"
         uses: actions/download-artifact@v3
         with:
-          name: python-client-docs.tar
+          name: "python-client-docs.tar"
+          path: "{{ plugin_name }}/"
 
       - name: Publish docs to pulpproject.org
         run: |
@@ -202,10 +210,11 @@ jobs:
       {%- endif %}
 
       {%- if deploy_client_to_pypi %}
-      - name: Download Python client
+      - name: "Download Python client"
         uses: actions/download-artifact@v3
         with:
-          name: python-client.tar
+          name: "python-client.tar"
+          path: "{{ plugin_name }}/"
 
       - name: Untar python client packages
         run: tar -xvf python-client.tar
@@ -215,10 +224,11 @@ jobs:
       {%- endif %}
 
       {%- if deploy_client_to_rubygems %}
-      - name: Download Ruby client
+      - name: "Download Ruby client"
         uses: actions/download-artifact@v3
         with:
-          name: ruby-client.tar
+          name: "ruby-client.tar"
+          path: "{{ plugin_name }}/"
 
       - name: Untar Ruby client packages
         run: tar -xvf ruby-client.tar
