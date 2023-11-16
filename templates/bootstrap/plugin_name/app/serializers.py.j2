@@ -19,11 +19,11 @@ from . import models
 # If you want create content through upload, use "SingleArtifactContentUploadSerializer"
 # If you change this, make sure to do so on "fields" below, also.
 # Make sure your choice here matches up with the create() method of your viewset.
-class {{ plugin_camel_short }}ContentSerializer(platform.SingleArtifactContentSerializer):
+class {{ plugin_app_label | camel }}ContentSerializer(platform.SingleArtifactContentSerializer):
     """
-    A Serializer for {{ plugin_camel_short }}Content.
+    A Serializer for {{ plugin_app_label | camel }}Content.
 
-    Add serializers for the new fields defined in {{ plugin_camel_short }}Content and
+    Add serializers for the new fields defined in {{ plugin_app_label | camel }}Content and
     add those fields to the Meta class keeping fields from the parent class as well.
 
     For example::
@@ -36,20 +36,20 @@ class {{ plugin_camel_short }}ContentSerializer(platform.SingleArtifactContentSe
         fields = platform.SingleArtifactContentSerializer.Meta.fields + (
             'field1', 'field2', 'field3'
         )
-        model = models.{{ plugin_camel_short }}Content
+        model = models.{{ plugin_app_label | camel }}Content
     """
 
     class Meta:
         fields = platform.SingleArtifactContentSerializer.Meta.fields
-        model = models.{{ plugin_camel_short }}Content
+        model = models.{{ plugin_app_label | camel }}Content
 
 
-class {{ plugin_camel_short }}RemoteSerializer(platform.RemoteSerializer):
+class {{ plugin_app_label | camel }}RemoteSerializer(platform.RemoteSerializer):
     """
-    A Serializer for {{ plugin_camel_short }}Remote.
+    A Serializer for {{ plugin_app_label | camel }}Remote.
 
-    Add any new fields if defined on {{ plugin_camel_short }}Remote.
-    Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
+    Add any new fields if defined on {{ plugin_app_label | camel }}Remote.
+    Similar to the example above, in {{ plugin_app_label | camel }}ContentSerializer.
     Additional validators can be added to the parent validators list
 
     For example::
@@ -71,15 +71,15 @@ class {{ plugin_camel_short }}RemoteSerializer(platform.RemoteSerializer):
 
     class Meta:
         fields = platform.RemoteSerializer.Meta.fields
-        model = models.{{ plugin_camel_short }}Remote
+        model = models.{{ plugin_app_label | camel }}Remote
 
 
-class {{ plugin_camel_short }}RepositorySerializer(platform.RepositorySerializer):
+class {{ plugin_app_label | camel }}RepositorySerializer(platform.RepositorySerializer):
     """
-    A Serializer for {{ plugin_camel_short }}Repository.
+    A Serializer for {{ plugin_app_label | camel }}Repository.
 
-    Add any new fields if defined on {{ plugin_camel_short }}Repository.
-    Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
+    Add any new fields if defined on {{ plugin_app_label | camel }}Repository.
+    Similar to the example above, in {{ plugin_app_label | camel }}ContentSerializer.
     Additional validators can be added to the parent validators list
 
     For example::
@@ -90,15 +90,15 @@ class {{ plugin_camel_short }}RepositorySerializer(platform.RepositorySerializer
 
     class Meta:
         fields = platform.RepositorySerializer.Meta.fields
-        model = models.{{ plugin_camel_short }}Repository
+        model = models.{{ plugin_app_label | camel }}Repository
 
 
-class {{ plugin_camel_short }}PublicationSerializer(platform.PublicationSerializer):
+class {{ plugin_app_label | camel }}PublicationSerializer(platform.PublicationSerializer):
     """
-    A Serializer for {{ plugin_camel_short }}Publication.
+    A Serializer for {{ plugin_app_label | camel }}Publication.
 
-    Add any new fields if defined on {{ plugin_camel_short }}Publication.
-    Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
+    Add any new fields if defined on {{ plugin_app_label | camel }}Publication.
+    Similar to the example above, in {{ plugin_app_label | camel }}ContentSerializer.
     Additional validators can be added to the parent validators list
 
     For example::
@@ -109,15 +109,15 @@ class {{ plugin_camel_short }}PublicationSerializer(platform.PublicationSerializ
 
     class Meta:
         fields = platform.PublicationSerializer.Meta.fields
-        model = models.{{ plugin_camel_short }}Publication
+        model = models.{{ plugin_app_label | camel }}Publication
 
 
-class {{ plugin_camel_short }}DistributionSerializer(platform.DistributionSerializer):
+class {{ plugin_app_label | camel }}DistributionSerializer(platform.DistributionSerializer):
     """
-    A Serializer for {{ plugin_camel_short }}Distribution.
+    A Serializer for {{ plugin_app_label | camel }}Distribution.
 
-    Add any new fields if defined on {{ plugin_camel_short }}Distribution.
-    Similar to the example above, in {{ plugin_camel_short }}ContentSerializer.
+    Add any new fields if defined on {{ plugin_app_label | camel }}Distribution.
+    Similar to the example above, in {{ plugin_app_label | camel }}ContentSerializer.
     Additional validators can be added to the parent validators list
 
     For example::
@@ -142,4 +142,4 @@ class {{ plugin_camel_short }}DistributionSerializer(platform.DistributionSerial
 
     class Meta:
         fields = platform.DistributionSerializer.Meta.fields + ("publication",)
-        model = models.{{ plugin_camel_short }}Distribution
+        model = models.{{ plugin_app_label | camel }}Distribution

@@ -4,7 +4,7 @@
 with context %}
 ---
 {%- if single_commit_check %}
-name: {{ plugin_camel_short }} PR static checks
+name: {{ plugin_app_label | camel }} PR static checks
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]

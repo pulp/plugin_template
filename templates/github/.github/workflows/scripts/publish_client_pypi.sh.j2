@@ -9,14 +9,14 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 pip install twine
 
-export VERSION=$(ls dist | sed -rn 's/{{ plugin_snake }}-client-(.*)\.tar.gz/\1/p')
+export VERSION=$(ls dist | sed -rn 's/{{ plugin_name | snake }}-client-(.*)\.tar.gz/\1/p')
 
 if [[ -z "$VERSION" ]]; then
   echo "No client package found."
   exit
 fi
 
-export response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_dash }}-client/$VERSION/)
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_name | dash }}-client/$VERSION/)
 
 if [ "$response" == "200" ];
 then
@@ -24,9 +24,9 @@ then
   exit
 fi
 
-twine check dist/{{ plugin_snake }}_client-$VERSION-py3-none-any.whl || exit 1
-twine check dist/{{ plugin_snake }}-client-$VERSION.tar.gz || exit 1
-twine upload dist/{{ plugin_snake }}_client-$VERSION-py3-none-any.whl -u pulp -p $PYPI_PASSWORD
-twine upload dist/{{ plugin_snake }}-client-$VERSION.tar.gz -u pulp -p $PYPI_PASSWORD
+twine check dist/{{ plugin_name | snake }}_client-$VERSION-py3-none-any.whl || exit 1
+twine check dist/{{ plugin_name | snake }}-client-$VERSION.tar.gz || exit 1
+twine upload dist/{{ plugin_name | snake }}_client-$VERSION-py3-none-any.whl -u pulp -p $PYPI_PASSWORD
+twine upload dist/{{ plugin_name | snake }}-client-$VERSION.tar.gz -u pulp -p $PYPI_PASSWORD
 
 exit $?

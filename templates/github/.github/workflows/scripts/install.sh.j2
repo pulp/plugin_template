@@ -11,7 +11,7 @@ set -euv
 source .github/workflows/scripts/utils.sh
 
 PLUGIN_VERSION="$(sed -n -e 's/^\s*current_version\s*=\s*//p' .bumpversion.cfg | python -c 'from packaging.version import Version; print(Version(input()))')"
-PLUGIN_NAME="./{{ plugin_name }}/dist/{{ plugin_snake }}-${PLUGIN_VERSION}-py3-none-any.whl"
+PLUGIN_NAME="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${PLUGIN_VERSION}-py3-none-any.whl"
 
 export PULP_API_ROOT="{{ api_root }}"
 

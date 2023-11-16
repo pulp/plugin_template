@@ -9,7 +9,7 @@ from pulpcore.plugin.stages import (
     Stage,
 )
 
-from {{ plugin_snake }}.app.models import {{ plugin_camel_short }}Content, {{ plugin_camel_short }}Remote
+from {{ plugin_name | snake }}.app.models import {{ plugin_app_label | camel }}Content, {{ plugin_app_label | camel }}Remote
 
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ def synchronize(remote_pk, repository_pk, mirror):
         ValueError: If the remote does not specify a URL to sync
 
     """
-    remote = {{ plugin_camel_short }}Remote.objects.get(pk=remote_pk)
+    remote = {{ plugin_app_label | camel }}Remote.objects.get(pk=remote_pk)
     repository = Repository.objects.get(pk=repository_pk)
 
     if not remote.url:
@@ -38,18 +38,18 @@ def synchronize(remote_pk, repository_pk, mirror):
 
     # Interpret policy to download Artifacts or not
     deferred_download = remote.policy != Remote.IMMEDIATE
-    first_stage = {{ plugin_camel_short }}FirstStage(remote, deferred_download)
+    first_stage = {{ plugin_app_label | camel }}FirstStage(remote, deferred_download)
     DeclarativeVersion(first_stage, repository, mirror=mirror).create()
 
 
-class {{ plugin_camel_short }}FirstStage(Stage):
+class {{ plugin_app_label | camel }}FirstStage(Stage):
     """
-    The first stage of a {{ plugin_snake }} sync pipeline.
+    The first stage of a {{ plugin_name | snake }} sync pipeline.
     """
 
     def __init__(self, remote, deferred_download):
         """
-        The first stage of a {{ plugin_snake }} sync pipeline.
+        The first stage of a {{ plugin_name | snake }} sync pipeline.
 
         Args:
             remote (FileRemote): The remote data to be used when syncing
@@ -74,7 +74,7 @@ class {{ plugin_camel_short }}FirstStage(Stage):
         result = await downloader.run()
         # Use ProgressReport to report progress
         for entry in self.read_my_metadata_file_somehow(result.path):
-            unit = {{ plugin_camel_short }}Content(entry)  # make the content unit in memory-only
+            unit = {{ plugin_app_label | camel }}Content(entry)  # make the content unit in memory-only
             artifact = Artifact(entry)  # make Artifact in memory-only
             da = DeclarativeArtifact(
                 artifact,

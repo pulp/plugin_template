@@ -5,20 +5,20 @@ from pulp_smash import config
 from pulp_smash.pulp3.bindings import monitor_task, PulpTaskError
 from pulp_smash.pulp3.utils import gen_repo, get_added_content_summary, get_content_summary
 
-from {{ plugin_snake }}.tests.functional.constants import (
-    {{ plugin_caps_short }}_FIXTURE_SUMMARY,
-    {{ plugin_caps_short }}_INVALID_FIXTURE_URL,
+from {{ plugin_name | snake }}.tests.functional.constants import (
+    {{ plugin_app_label | caps }}_FIXTURE_SUMMARY,
+    {{ plugin_app_label | caps }}_INVALID_FIXTURE_URL,
 )
-from {{ plugin_snake }}.tests.functional.utils import (
+from {{ plugin_name | snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_client,
     gen_{{ plugin_app_label }}_remote,
 )
-from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+from {{ plugin_name | snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
-from pulpcore.client.{{ plugin_snake }} import (
-    Repositories{{ plugin_camel_short }}Api,
+from pulpcore.client.{{ plugin_name | snake }} import (
+    Repositories{{ plugin_app_label | camel }}Api,
     RepositorySyncURL,
-    Remotes{{ plugin_camel_short }}Api,
+    Remotes{{ plugin_app_label | camel }}Api,
 )
 
 
@@ -53,8 +53,8 @@ class BasicSyncTestCase(unittest.TestCase):
         8. Assert that the same number of are present and that no units were
            added.
         """
-        repo_api = Repositories{{ plugin_camel_short }}Api(self.client)
-        remote_api = Remotes{{ plugin_camel_short }}Api(self.client)
+        repo_api = Repositories{{ plugin_app_label | camel }}Api(self.client)
+        remote_api = Remotes{{ plugin_app_label | camel }}Api(self.client)
 
         repo = repo_api.create(gen_repo())
         self.addCleanup(repo_api.delete, repo.pulp_href)
@@ -71,8 +71,8 @@ class BasicSyncTestCase(unittest.TestCase):
         repo = repo_api.read(repo.pulp_href)
 
         self.assertIsNotNone(repo.latest_version_href)
-        self.assertDictEqual(get_content_summary(repo.to_dict()), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
-        self.assertDictEqual(get_added_content_summary(repo.to_dict()), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
+        self.assertDictEqual(get_content_summary(repo.to_dict()), {{ plugin_app_label | caps }}_FIXTURE_SUMMARY)
+        self.assertDictEqual(get_added_content_summary(repo.to_dict()), {{ plugin_app_label | caps }}_FIXTURE_SUMMARY)
 
         # Sync the repository again.
         latest_version_href = repo.latest_version_href
@@ -82,7 +82,7 @@ class BasicSyncTestCase(unittest.TestCase):
         repo = repo_api.read(repo.pulp_href)
 
         self.assertEqual(latest_version_href, repo.latest_version_href)
-        self.assertDictEqual(get_content_summary(repo.to_dict()), {{ plugin_caps_short }}_FIXTURE_SUMMARY)
+        self.assertDictEqual(get_content_summary(repo.to_dict()), {{ plugin_app_label | caps }}_FIXTURE_SUMMARY)
 
 
 # Implement sync support before enabling this test.
@@ -114,15 +114,15 @@ class SyncInvalidTestCase(unittest.TestCase):
         keywords related to the reason of the failure. See :meth:`do_test`.
         """
         with self.assertRaises(PulpTaskError) as cm:
-            task = self.do_test({{ plugin_caps_short }}_INVALID_FIXTURE_URL)
+            task = self.do_test({{ plugin_app_label | caps }}_INVALID_FIXTURE_URL)
         task = cm.exception.task.to_dict()
         for key in ("mismached", "empty"):
             self.assertIn(key, task["error"]["description"])
 
     def do_test(self, url):
         """Sync a repository given ``url`` on the remote."""
-        repo_api = Repositories{{ plugin_camel_short }}Api(self.client)
-        remote_api = Remotes{{ plugin_camel_short }}Api(self.client)
+        repo_api = Repositories{{ plugin_app_label | camel }}Api(self.client)
+        remote_api = Remotes{{ plugin_app_label | camel }}Api(self.client)
 
         repo = repo_api.create(gen_repo())
         self.addCleanup(repo_api.delete, repo.pulp_href)

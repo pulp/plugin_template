@@ -65,7 +65,7 @@ master_doc = 'index'
 {% if plugin_name == "pulpcore" -%}
 project = u'Pulp Project'
 {%- else -%}
-project = u'Pulp {{ plugin_dash_short }} Support'
+project = u'Pulp {{ plugin_app_label | dash }} Support'
 {%- endif %}
 
 # Set copyright to current year

@@ -19,7 +19,7 @@ def get_package_from_pypi(version, plugin_path):
     :return: True/False if download was successful
     """
     os.makedirs(os.path.join(plugin_path, "dist"), exist_ok=True)
-    r = requests.get(f"https://pypi.org/pypi/{{ plugin_dash }}/{version}/json")
+    r = requests.get(f"https://pypi.org/pypi/{{ plugin_name | dash }}/{version}/json")
     if r.status_code == 200:
         metadata = r.json()
         for url_data in metadata["urls"]:

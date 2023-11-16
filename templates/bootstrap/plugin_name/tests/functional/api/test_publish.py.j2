@@ -6,21 +6,21 @@ from pulp_smash import config
 from pulp_smash.pulp3.bindings import monitor_task
 from pulp_smash.pulp3.utils import gen_repo, get_content, get_versions, modify_repo
 
-from {{ plugin_snake }}.tests.functional.constants import {{ plugin_caps_short }}_CONTENT_NAME
-from {{ plugin_snake }}.tests.functional.utils import (
+from {{ plugin_name | snake }}.tests.functional.constants import {{ plugin_app_label | caps }}_CONTENT_NAME
+from {{ plugin_name | snake }}.tests.functional.utils import (
     gen_{{ plugin_app_label }}_client,
     gen_{{ plugin_app_label }}_remote,
 )
-from {{ plugin_snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
+from {{ plugin_name | snake }}.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
-from pulpcore.client.{{ plugin_snake }} import (
-    Publications{{ plugin_camel_short }}Api,
-    Repositories{{ plugin_camel_short }}Api,
+from pulpcore.client.{{ plugin_name | snake }} import (
+    Publications{{ plugin_app_label | camel }}Api,
+    Repositories{{ plugin_app_label | camel }}Api,
     RepositorySyncURL,
-    Remotes{{ plugin_camel_short }}Api,
-    {{ plugin_camel_short }}{{ plugin_camel_short }}Publication,
+    Remotes{{ plugin_app_label | camel }}Api,
+    {{ plugin_app_label | camel }}{{ plugin_app_label | camel }}Publication,
 )
-from pulpcore.client.{{ plugin_snake }}.exceptions import ApiException
+from pulpcore.client.{{ plugin_name | snake }}.exceptions import ApiException
 
 
 # Implement sync and publish support before enabling this test.
@@ -49,9 +49,9 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
         """
         cfg = config.get_config()
         client = gen_{{ plugin_app_label }}_client()
-        repo_api = Repositories{{ plugin_camel_short }}Api(client)
-        remote_api = Remotes{{ plugin_camel_short }}Api(client)
-        publications = Publications{{ plugin_camel_short }}Api(client)
+        repo_api = Repositories{{ plugin_app_label | camel }}Api(client)
+        remote_api = Remotes{{ plugin_app_label | camel }}Api(client)
+        publications = Publications{{ plugin_app_label | camel }}Api(client)
 
         body = gen_{{ plugin_app_label }}_remote()
         remote = remote_api.create(body)
@@ -66,13 +66,13 @@ class PublishAnyRepoVersionTestCase(unittest.TestCase):
 
         # Step 1
         repo = repo_api.read(repo.pulp_href)
-        for {{ plugin_app_label }}_content in get_content(repo.to_dict())[{{ plugin_caps_short }}_CONTENT_NAME]:
+        for {{ plugin_app_label }}_content in get_content(repo.to_dict())[{{ plugin_app_label | caps }}_CONTENT_NAME]:
             modify_repo(cfg, repo.to_dict(), add_units=[{{ plugin_app_label }}_content])
         version_hrefs = tuple(ver["pulp_href"] for ver in get_versions(repo.to_dict()))
         non_latest = choice(version_hrefs[:-1])
 
         # Step 2
-        publish_data = {{ plugin_camel_short }}{{ plugin_camel_short }}Publication(repository=repo.pulp_href)
+        publish_data = {{ plugin_app_label | camel }}{{ plugin_app_label | camel }}Publication(repository=repo.pulp_href)
         publish_response = publications.create(publish_data)
         created_resources = monitor_task(publish_response.task).created_resources
         publication_href = created_resources[0]

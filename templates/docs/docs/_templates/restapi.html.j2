@@ -4,7 +4,7 @@
     {% if plugin_name == "pulpcore" -%}
     <title>Pulp 3 REST API documentation</title>
     {%- else -%}
-    <title>REST API for Pulp 3 {{ plugin_dash_short }} Plugin</title>
+    <title>REST API for Pulp 3 {{ plugin_app_label | dash }} Plugin</title>
     {%- endif %}
     <!-- needed for adaptive design -->
     <meta charset="utf-8"/>

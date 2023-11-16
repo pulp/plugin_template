@@ -27,7 +27,7 @@ ssh-add ~/.ssh/pulp-infra
 
 python3 .github/workflows/scripts/docs-publisher.py --build-type $1 --branch $2
 
-if [[ "$GITHUB_WORKFLOW" == "{{ plugin_camel_short | default("Pulp") }} changelog update" ]]; then
+if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} changelog update" ]]; then
   # Do not build bindings docs on changelog update
   exit
 fi
@@ -39,20 +39,20 @@ tar -xvf python-client-docs.tar --directory ../bindings
 cd ../bindings
 cat >> mkdocs.yml << DOCSYAML
 ---
-site_name: {{ plugin_camel }} Client
-site_description: {{ plugin_camel_short }} bindings
+site_name: {{ plugin_name | camel }} Client
+site_description: {{ plugin_app_label | camel }} bindings
 site_author: Pulp Team
-site_url: https://docs.pulpproject.org/{{ plugin_snake }}_client/
-repo_name: pulp/{{ plugin_snake }}
-repo_url: https://github.com/pulp/{{ plugin_snake }}
+site_url: https://docs.pulpproject.org/{{ plugin_name | snake }}_client/
+repo_name: pulp/{{ plugin_name | snake }}
+repo_url: https://github.com/pulp/{{ plugin_name | snake }}
 theme: readthedocs
 DOCSYAML
 
 # Building the bindings docs
 mkdocs build
 
-# publish to docs.pulpproject.org/{{ plugin_snake }}_client
-rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/
+# publish to docs.pulpproject.org/{{ plugin_name | snake }}_client
+rsync -avzh site/ doc_builder_{{ plugin_name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_name | snake }}_client/
 
-# publish to docs.pulpproject.org/{{ plugin_snake }}_client/en/{release}
-rsync -avzh site/ doc_builder_{{ plugin_snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_snake }}_client/en/"$2"
+# publish to docs.pulpproject.org/{{ plugin_name | snake }}_client/en/{release}
+rsync -avzh site/ doc_builder_{{ plugin_name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_name | snake }}_client/en/"$2"

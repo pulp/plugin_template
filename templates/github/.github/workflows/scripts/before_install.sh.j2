@@ -29,7 +29,7 @@ COMPONENT_VERSION=$(sed -ne "s/\s*version.*=.*['\"]\(.*\)['\"][\s,]*/\1/p" setup
 
 mkdir .ci/ansible/vars || true
 echo "---" > .ci/ansible/vars/main.yaml
-echo "legacy_component_name: {{ plugin_snake }}" >> .ci/ansible/vars/main.yaml
+echo "legacy_component_name: {{ plugin_name | snake }}" >> .ci/ansible/vars/main.yaml
 echo "component_name: {{ plugin_app_label }}" >> .ci/ansible/vars/main.yaml
 echo "component_version: '${COMPONENT_VERSION}'" >> .ci/ansible/vars/main.yaml
 

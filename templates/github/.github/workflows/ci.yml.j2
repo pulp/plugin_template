@@ -11,7 +11,7 @@
   install_python_deps,
 with context %}
 ---
-name: {{ plugin_camel_short }} CI
+name: {{ plugin_app_label | camel }} CI
 on: {{ ci_trigger | default("{pull_request: {branches: ['*']}}") }}
 
 concurrency:

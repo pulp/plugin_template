@@ -1,10 +1,10 @@
 from pulpcore.plugin import PulpPluginAppConfig
 
 
-class {{ plugin_camel }}PluginAppConfig(PulpPluginAppConfig):
+class {{ plugin_name | camel }}PluginAppConfig(PulpPluginAppConfig):
     """Entry point for the {{ plugin_app_label }} plugin."""
 
-    name = "{{ plugin_snake }}.app"
+    name = "{{ plugin_name | snake }}.app"
     label = "{{ plugin_app_label }}"
     version = "0.1.0a1.dev"
     python_package_name = "{{ plugin_name }}"

@@ -7,7 +7,7 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 set -euv
 
-export response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_dash }}/$1/)
+export response=$(curl --write-out %{http_code} --silent --output /dev/null https://pypi.org/project/{{ plugin_name | dash }}/$1/)
 if [ "$response" == "200" ];
 then
   echo "{{ plugin_name }} $1 has already been released. Skipping."
@@ -16,9 +16,9 @@ fi
 
 pip install twine
 
-twine check dist/{{ plugin_snake }}-$1-py3-none-any.whl || exit 1
-twine check dist/{{ plugin_dash }}-$1.tar.gz || exit 1
-twine upload dist/{{ plugin_snake }}-$1-py3-none-any.whl -u pulp -p $PYPI_PASSWORD
-twine upload dist/{{ plugin_dash }}-$1.tar.gz -u pulp -p $PYPI_PASSWORD
+twine check dist/{{ plugin_name | snake }}-$1-py3-none-any.whl || exit 1
+twine check dist/{{ plugin_name | dash }}-$1.tar.gz || exit 1
+twine upload dist/{{ plugin_name | snake }}-$1-py3-none-any.whl -u pulp -p $PYPI_PASSWORD
+twine upload dist/{{ plugin_name | dash }}-$1.tar.gz -u pulp -p $PYPI_PASSWORD
 
 exit $?
