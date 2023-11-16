@@ -1,19 +1,16 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
-  set_env_vars,
   checkout,
   setup_python,
-  install_httpie,
-  setup_env,
-  display_logs,
-  run_script,
-  set_secrets,
-  install_python_deps,
 with context %}
 ---
-name: Lint
+name: "Lint"
 on:
   workflow_call:
+
+defaults:
+  run:
+    working-directory: "{{ plugin_name }}"
 
 jobs:
   lint:
@@ -23,8 +20,10 @@ jobs:
     {%- endif %}
 
     steps:
-      {{ checkout() | indent(6) }}
+      {{ checkout(path=plugin_name) | indent(6) }}
+
       {{ setup_python() | indent(6) }}
+
       # lint_requirements contains tools needed for flake8, etc.
       - name: Install requirements
         run: pip3 install -r lint_requirements.txt

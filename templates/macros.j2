@@ -1,10 +1,6 @@
 {%- macro set_env_vars(extra_env=None) -%}
 PY_COLORS: '1'
 ANSIBLE_FORCE_COLOR: '1'
-GITHUB_PULL_REQUEST: {{ "${{ github.event.number }}" }}
-GITHUB_PULL_REQUEST_BODY: {{ "${{ github.event.pull_request.body }}" }}
-GITHUB_BRANCH: {{ "${{ github.head_ref }}" }}
-GITHUB_REPO_SLUG: {{ "${{ github.repository }}" }}
 GITHUB_TOKEN: {{ "${{ secrets.GITHUB_TOKEN }}" }}
 GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- for key, value in ci_env.items() %}
@@ -18,12 +14,15 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro checkout(depth=1, path=None) -%}
+{%- macro checkout(depth=1, repository=None, path=None) -%}
 - uses: actions/checkout@v4
   with:
     fetch-depth: {{ depth }}
+    {%- if repository %}
+    repository: "{{ repository }}"
+    {%- endif %}
     {%- if path %}
-    path: {{ path }}
+    path: "{{ path }}"
     {%- endif %}
 {%- endmacro -%}
 
