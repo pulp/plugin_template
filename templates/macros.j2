@@ -50,7 +50,7 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
     echo ::group::HTTPIE
     pip install httpie
     echo ::endgroup::
-    echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/.ci/assets/httpie/" >> $GITHUB_ENV
+    echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/{{ plugin_name }}/.ci/assets/httpie/" >> $GITHUB_ENV
 {%- endmacro -%}
 
 
