@@ -69,7 +69,6 @@ DEFAULT_SETTINGS = {
     "python_version": "3.8",
     "release_email": "pulp-infra@redhat.com",
     "release_user": "pulpbot",
-    "single_commit_check": True,
     "stalebot_days_until_close": 30,
     "stalebot_days_until_stale": 90,
     "stalebot_limit_to_pulls": True,

@@ -3,7 +3,6 @@
   checkout,
 with context %}
 ---
-{%- if single_commit_check %}
 name: {{ plugin_app_label | camel }} PR static checks
 on:
   pull_request_target:
@@ -56,4 +55,3 @@ jobs:
                 labels: [labelName],
               });
             }
-{%- endif %}

@@ -173,8 +173,6 @@ The following settings are stored in `template_config.yml`.
 
   noissue_marker        A string that is used to mark a commit as not attached to an issue.
 
-  single_commit_check   Runs a job to check whether a PR contains a single commit or not.
-
   stalebot              A boolean that indicates whether to use stalebot or not.
 
   stalebot_days_until_stale
