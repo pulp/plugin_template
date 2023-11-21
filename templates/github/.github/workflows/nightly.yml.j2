@@ -84,13 +84,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: "docs.tar"
-          path: "{{ plugin_name }}/docs.tar"
+          path: "{{ plugin_name }}"
 
       - name: Download Python client docs
         uses: actions/download-artifact@v3
         with:
           name: "python-client-docs.tar"
-          path: "{{ plugin_name }}/python-client-docs.tar"
+          path: "{{ plugin_name }}"
 
       {{ set_secrets() | indent(6) }}
 

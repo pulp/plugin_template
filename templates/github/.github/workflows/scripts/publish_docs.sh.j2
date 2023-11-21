@@ -5,7 +5,7 @@
 set -euv
 
 # make sure this script runs at the repo root
-cd "$(dirname "$(realpath -e "$0")")"/../../..
+cd "$(dirname "$(realpath -e "$0")")/../../.."
 
 mkdir ~/.ssh
 touch ~/.ssh/pulp-infra
@@ -22,37 +22,42 @@ export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
 export PULP_SETTINGS=$PWD/.ci/ansible/settings/settings.py
 export WORKSPACE=$PWD
 
-eval "$(ssh-agent -s)" #start the ssh agent
+# start the ssh agent
+eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/pulp-infra
 
-python3 .github/workflows/scripts/docs-publisher.py --build-type $1 --branch $2
+python3 .github/workflows/scripts/docs-publisher.py --build-type "$1" --branch "$2"
 
-if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} changelog update" ]]; then
+if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel }} changelog update" ]]; then
   # Do not build bindings docs on changelog update
   exit
 fi
 
 pip install mkdocs pymdown-extensions "Jinja2<3.1"
 
-mkdir -p ../bindings
-tar -xvf python-client-docs.tar --directory ../bindings
-cd ../bindings
+{%- for plugin in plugins %}
+
+mkdir -p ../{{ plugin.app_label }}-bindings
+tar -xvf {{ plugin.app_label }}-python-client-docs.tar --directory ../{{ plugin.app_label }}-bindings
+pushd ../{{ plugin.app_label }}-bindings
 cat >> mkdocs.yml << DOCSYAML
 ---
-site_name: {{ plugin_name | camel }} Client
-site_description: {{ plugin_app_label | camel }} bindings
+site_name: {{ plugin.name | camel }} Client
+site_description: {{ plugin.app_label | camel }} bindings
 site_author: Pulp Team
-site_url: https://docs.pulpproject.org/{{ plugin_name | snake }}_client/
-repo_name: pulp/{{ plugin_name | snake }}
-repo_url: https://github.com/pulp/{{ plugin_name | snake }}
+site_url: https://docs.pulpproject.org/{{ plugin.name | snake }}_client/
+repo_name: pulp/{{ plugin.name | snake }}
+repo_url: https://github.com/pulp/{{ plugin.name | snake }}
 theme: readthedocs
 DOCSYAML
 
 # Building the bindings docs
 mkdocs build
 
-# publish to docs.pulpproject.org/{{ plugin_name | snake }}_client
-rsync -avzh site/ doc_builder_{{ plugin_name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_name | snake }}_client/
+# publish to docs.pulpproject.org/{{ plugin.name | snake }}_client
+rsync -avzh site/ doc_builder_{{ plugin.name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin.name | snake }}_client/
 
-# publish to docs.pulpproject.org/{{ plugin_name | snake }}_client/en/{release}
-rsync -avzh site/ doc_builder_{{ plugin_name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin_name | snake }}_client/en/"$2"
+# publish to docs.pulpproject.org/{{ plugin.name | snake }}_client/en/{release}
+rsync -avzh site/ doc_builder_{{ plugin.name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin.name | snake }}_client/en/"$2"
+popd
+{%- endfor %}
