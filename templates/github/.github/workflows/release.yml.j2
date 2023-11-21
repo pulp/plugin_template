@@ -169,7 +169,7 @@ jobs:
 
       {{ set_secrets() | indent(6) }}
 
-      {{ install_python_deps("gitpython requests packaging~=21.3 tweepy") | indent(6) }}
+      {{ install_python_deps("gitpython requests packaging~=21.3") | indent(6) }}
 
       - name: Push branch and tag to GitHub
         run: bash .github/workflows/scripts/push_branch_and_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }}
