@@ -60,10 +60,7 @@ then
   popd
   touch bindings_requirements.txt
 else
-  # TODO Workaround us not publishing pulp_file clients currently
-  echo "$REPORTED_STATUS" | jq -r '.versions[]|(.package|sub("_"; "-")) + "-client==" + .version' | grep -v pulp-file > bindings_requirements.txt
-  echo "pulp-file-client" >> bindings_requirements.txt
-  # echo "$REPORTED_STATUS" | jq -r '.versions[]|(.package|sub("_"; "-")) + "-client==" + .version' > bindings_requirements.txt
+  echo "$REPORTED_STATUS" | jq -r '.versions[]|(.package|sub("_"; "-")) + "-client==" + .version' > bindings_requirements.txt
 fi
 
 cmd_stdin_prefix bash -c "cat > /tmp/unittest_requirements.txt" < unittest_requirements.txt
