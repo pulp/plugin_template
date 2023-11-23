@@ -207,7 +207,9 @@ jobs:
 
       - name: "Untar python client packages"
         run: |
-          tar -xvf python-client.tar
+          {%- for plugin in plugins %}
+          tar -xvf {{ plugin.app_label }}-python-client.tar
+          {%- endfor %}
 
       - name: "Publish client to pypi"
         run: |
@@ -223,7 +225,9 @@ jobs:
 
       - name: "Untar Ruby client packages"
         run: |
-          tar -xvf ruby-client.tar
+          {%- for plugin in plugins %}
+          tar -xvf {{ plugin.app_label }}-ruby-client.tar
+          {%- endfor %}
 
       - name: "Publish client to rubygems"
         run: |
