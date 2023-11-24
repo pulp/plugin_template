@@ -106,6 +106,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/update_redmine.sh",
         ".ci/scripts/upper_bound.py",
         ".github/workflows/fips.yml",
+        ".github/workflows/scripts/create_release_from_tag.sh",
         ".github/workflows/scripts/stage-changelog-for-master.py",
         ".github/workflows/scripts/update_ci.sh",
         ".travis",
