@@ -67,8 +67,6 @@ jobs:
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}
 
-      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
-
       - uses: actions/download-artifact@v3
         with:
           name: "plugin_package"
@@ -76,9 +74,11 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ setup_env() | indent(6) }}
+      {{ install_python_deps("requests") | indent(6) }}
 
-      {% if publish_docs_to_pulpprojectdotorg and docs_test %}
+      {{ setup_env() | indent(6) }}
+      {%- if publish_docs_to_pulpprojectdotorg and docs_test %}
+
       - name: Download built docs
         uses: actions/download-artifact@v3
         with:
@@ -97,7 +97,7 @@ jobs:
         run: |
           tar -xvf docs.tar -C ./docs
           .github/workflows/scripts/publish_docs.sh nightly ${GITHUB_REF##*/}
-      {% endif %}
+      {%- endif %}
 
       {{ display_logs() | indent(6) }}
 

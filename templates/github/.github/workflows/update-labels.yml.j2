@@ -6,13 +6,13 @@
 with context %}
 
 ---
-name: {{ plugin_app_label | camel }} Update Labels
+name: "{{ plugin_app_label | camel }} Update Labels"
 on:
   push:
     branches:
-    - main
+      - "main"
     paths:
-    - 'template_config.yml'
+      - "template_config.yml"
 
 jobs:
   update_backport_labels:
@@ -21,8 +21,8 @@ jobs:
       {{ setup_python() | indent(6) }}
       {{ configure_git() | indent(6) }}
       {{ install_python_deps("requests pyyaml") | indent(6) }}
-      - uses: actions/checkout@v3
-      - name: Update labels
+      - uses: "actions/checkout@v3"
+      - name: "Update labels"
         run: |
           python3 .github/workflows/scripts/update_backport_labels.py
         env:
