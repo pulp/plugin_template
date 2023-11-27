@@ -4,7 +4,6 @@
   checkout,
   setup_python,
   setup_ruby,
-  install_httpie,
   display_logs,
   run_script,
   set_secrets,
@@ -35,7 +34,7 @@ jobs:
 
       {{ setup_python(pyversion="3.8") | indent(6) }}
 
-      {{ install_python_deps("packaging~=21.3 bump2version gitpython towncrier==19.9.0 wheel requests") | indent(6) }}
+      {{ install_python_deps(["packaging~=21.3", "bump2version", "gitpython", "towncrier", "wheel", "requests"]) | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
@@ -80,7 +79,7 @@ jobs:
         run: |
           tar -xf {{ plugin_name }}.tar
 
-      {{ install_httpie() | indent(6) }}
+      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible"]) | indent(6) }}
 
       # Building the bindings and docs requires accessing the OpenAPI specs endpoint, so we need to
       # setup the Pulp instance.
@@ -169,7 +168,7 @@ jobs:
 
       {{ set_secrets() | indent(6) }}
 
-      {{ install_python_deps("gitpython requests packaging~=21.3") | indent(6) }}
+      {{ install_python_deps(["twine", "gitpython", "requests", "packaging~=21.3", "mkdocs", "pymdown-extensions", "Jinja2<3.1"]) | indent(6) }}
 
       - name: Push branch and tag to GitHub
         run: bash .github/workflows/scripts/push_branch_and_tag_to_github.sh {{ "${{ github.event.inputs.release }}" }}

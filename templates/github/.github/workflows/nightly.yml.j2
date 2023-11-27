@@ -3,7 +3,6 @@
   checkout,
   setup_python,
   setup_ruby,
-  install_httpie,
   setup_env,
   display_logs,
   run_script,
@@ -43,7 +42,7 @@ jobs:
 
       {{ setup_python(pyversion="3.11") | indent(6) }}
 
-      {{ install_python_deps("gitpython toml") | indent(6) }}
+      {{ install_python_deps(["gitpython", "toml"]) | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
@@ -74,7 +73,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps("requests") | indent(6) }}
+      {{ install_python_deps(["requests", "packaging~=21.3", "mkdocs", "pymdown-extensions", "Jinja2<3.1"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
       {%- if publish_docs_to_pulpprojectdotorg and docs_test %}
@@ -129,11 +128,9 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_httpie() | indent(6) }}
-
       {{ setup_env(test="performance") | indent(6) }}
 
-      {{ install_python_deps("wheel") | indent(6) }}
+      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible"]) | indent(6) }}
 
       {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 

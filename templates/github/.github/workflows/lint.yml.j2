@@ -2,6 +2,7 @@
 {% from 'macros.j2' import
   checkout,
   setup_python,
+  install_python_deps,
 with context %}
 ---
 name: "Lint"
@@ -24,9 +25,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      # lint_requirements contains tools needed for flake8, etc.
-      - name: Install requirements
-        run: pip3 install -r lint_requirements.txt
+      {{ install_python_deps(["-r lint_requirements.txt"]) | indent(6) }}
 
       - name: Lint workflow files
         run: |
