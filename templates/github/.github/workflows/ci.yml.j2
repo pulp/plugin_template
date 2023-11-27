@@ -23,9 +23,11 @@ defaults:
     working-directory: "{{ plugin_name }}"
 
 jobs:
-{% if pre_job_template -%}{{ "  " | indent }}{% include pre_job_template.path %}{%- endif %}
-
+  {%- if pre_job_template %}
+  {% include pre_job_template.path %}
+  {%- endif %}
   {%- if check_commit_message or lint_requirements %}
+
   ready-to-ship:
     runs-on: ubuntu-latest
     steps:
@@ -56,8 +58,8 @@ jobs:
   test:
     needs: build
     uses: "./.github/workflows/test.yml"
-
 {%- if test_deprecations %}
+
   deprecations:
     defaults:
       run:
@@ -93,4 +95,6 @@ jobs:
           {%- endif %}
 {%- endif %}
 
-{% if post_job_template -%}{{ "  " | indent }}{% include post_job_template.path %}{%- endif %}
+{%- if post_job_template %}
+  {% include post_job_template.path %}
+{%- endif %}
