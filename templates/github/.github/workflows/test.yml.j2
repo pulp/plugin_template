@@ -3,7 +3,7 @@
   checkout,
   setup_python,
   setup_ruby,
-  install_httpie,
+  install_python_deps,
   setup_env,
   display_logs,
   run_script,
@@ -64,7 +64,7 @@ jobs:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
 
-      {{ install_httpie() | indent(6) }}
+      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
 

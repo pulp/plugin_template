@@ -1,21 +1,21 @@
 {%- macro set_env_vars(extra_env=None) -%}
-PY_COLORS: '1'
-ANSIBLE_FORCE_COLOR: '1'
-GITHUB_TOKEN: {{ "${{ secrets.GITHUB_TOKEN }}" }}
-GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
+PY_COLORS: "1"
+ANSIBLE_FORCE_COLOR: "1"
+GITHUB_TOKEN: "{{ '${{ secrets.GITHUB_TOKEN }}' }}"
+GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- for key, value in ci_env.items() %}
-{{ key }}: {{ value }}
+{{ key }}: "{{ value }}"
 {%- endfor %}
 {%- if extra_env is not none %}
 {%- for key, value in extra_env.items() %}
-{{ key }}: {{ value }}
+{{ key }}: "{{ value }}"
 {%- endfor %}
 {%- endif %}
 {%- endmacro -%}
 
 
-{%- macro checkout(depth=1, repository=None, path=None) -%}
-- uses: actions/checkout@v4
+{%- macro checkout(depth=1, repository=None, path=None, ref=None) -%}
+- uses: "actions/checkout@v4"
   with:
     fetch-depth: {{ depth }}
     {%- if repository %}
@@ -24,11 +24,14 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
     {%- if path %}
     path: "{{ path }}"
     {%- endif %}
+    {%- if ref %}
+    ref: "{{ ref }}"
+    {%- endif %}
 {%- endmacro -%}
 
 
 {%- macro setup_python(pyversion=python_version) -%}
-- uses: actions/setup-python@v4
+- uses: "actions/setup-python@v4"
   with:
     python-version: "{{ pyversion }}"
 {%- endmacro -%}
@@ -44,18 +47,20 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 {%- endmacro -%}
 
 
-{%- macro install_httpie() -%}
-- name: Install httpie
+{%- macro install_python_deps(deps=[]) -%}
+- name: "Install python dependencies"
   run: |
-    echo ::group::HTTPIE
-    pip install httpie
-    echo ::endgroup::
+    echo ::group::PYDEPS
+    pip install {{ deps | join(" ") }}
+    {%- if 'httpie' in deps %}
     echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/{{ plugin_name }}/.ci/assets/httpie/" >> $GITHUB_ENV
+    {%- endif %}
+    echo ::endgroup::
 {%- endmacro -%}
 
 
 {%- macro setup_env(test=None) -%}
-- name: Set environment variables
+- name: "Set environment variables"
   run: |
     echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
 
@@ -68,7 +73,7 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro display_logs() -%}
-- name: Logs
+- name: "Logs"
   if: always()
   run: |
     echo "Need to debug? Please check: https://github.com/marketplace/actions/debugging-with-tmate"
@@ -83,15 +88,16 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro run_script(name, file, withenv=True, condition=None, extra_env=None, path=None) -%}
-- name: {{ name }}
+- name: "{{ name }}"
   {%- if path %}
-  working-directory: {{ path }}
+  working-directory: "{{ path }}"
   {%- endif %}
   {%- if condition %}
-  if: {{ condition }}
+  if: "{{ condition }}"
   {%- endif %}
-  run: .github/workflows/scripts/{{ file }}
-  shell: bash
+  run: |
+    .github/workflows/scripts/{{ file }}
+  shell: "bash"
   {%- if withenv %}
   env:
     {{ set_env_vars(extra_env) | indent(4) }}
@@ -100,29 +106,22 @@ GITHUB_CONTEXT: {{ "${{ github.event.pull_request.commits_url }}" }}
 
 
 {%- macro set_secrets(condition=None, path=None) -%}
-- name: Setting secrets
+- name: "Setting secrets"
   {%- if path %}
-  working-directory: {{ path }}
+  working-directory: "{{ path }}"
   {%- endif %}
   {%- if condition %}
   if: {{ condition }}
   {%- endif %}
-  run: python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-  env:
-    SECRETS_CONTEXT: {{ "${{ toJson(secrets) }}" }}
-{%- endmacro -%}
-
-
-{%- macro install_python_deps(deps="") -%}
-- name: Install python dependencies
   run: |
-    echo ::group::PYDEPS
-    pip install {{ deps }}
-    echo ::endgroup::
+    python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
+  env:
+    SECRETS_CONTEXT: "{{ '${{ toJson(secrets) }}' }}"
 {%- endmacro -%}
+
 
 {%- macro configure_git() -%}
-- name: Configure Git with {{ release_user }} name and email
+- name: "Configure Git with {{ release_user }} name and email"
   run: |
     git config --global user.name '{{ release_user }}'
     git config --global user.email '{{ release_email }}'

@@ -6,20 +6,20 @@
   install_python_deps,
 with context %}
 ---
-name: {{ plugin_app_label | camel }} changelog update
+name: "{{ plugin_app_label | camel }} changelog update"
 on:
   push:
     branches:
-      - {{ plugin_default_branch }}
+      - "{{ plugin_default_branch }}"
     paths:
-      - CHANGES.rst
-      - CHANGES.md
+      - "CHANGES.rst"
+      - "CHANGES.md"
   workflow_dispatch:
 
 jobs:
 
   update-changelog:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
 
@@ -28,23 +28,23 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps(deps="-r doc_requirements.txt") | indent(6) }}
+      {{ install_python_deps(deps=["-r doc_requirements.txt"]) | indent(6) }}
 
-      - name: Fake api schema
+      - name: "Fake api schema"
         run: |
           mkdir -p docs/_build/html
           echo "{}" > docs/_build/html/api.json
           mkdir -p docs/_static
           echo "{}" > docs/_static/api.json
-      - name:
+      - name: "Build Docs"
         run: |
-          pip install "Jinja2<3.1"
           make diagrams html
-        working-directory: ./docs
+        working-directory: "./docs"
         env:
           PULP_CONTENT_ORIGIN: "http://localhost/"
 
-      - name: Publish changlog to pulpproject.org
-        run: .github/workflows/scripts/publish_docs.sh changelog ${GITHUB_REF##*/}
+      - name: "Publish changlog to pulpproject.org"
+        run: |
+          .github/workflows/scripts/publish_docs.sh changelog ${GITHUB_REF##*/}
         env:
-          PULP_DOCS_KEY: {{ '${{ secrets.PULP_DOCS_KEY }}' }}
+          PULP_DOCS_KEY: "{{ '${{ secrets.PULP_DOCS_KEY }}' }}"

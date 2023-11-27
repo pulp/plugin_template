@@ -24,7 +24,6 @@ export PULP_URL="{{ pulp_scheme }}://pulp"
 
 if [[ "$TEST" = "docs" ]]; then
   if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} CI" ]]; then
-    pip install towncrier==19.9.0
     towncrier --yes --version 4.0.0.ci
   fi
   cd docs

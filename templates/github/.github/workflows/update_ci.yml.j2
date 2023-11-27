@@ -7,7 +7,7 @@
 with context %}
 
 ---
-name: {{ plugin_app_label | camel }} CI Update
+name: "{{ plugin_app_label | camel }} CI Update"
 on:
   {%- if sync_ci %}
   schedule:
@@ -19,50 +19,41 @@ on:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
 
     strategy:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          repository: pulp/plugin_template
-          path: plugin_template
-          fetch-depth: 0
-
+      {{ checkout(repository="pulp/plugin_template", path="plugin_template") | indent(6) }}
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps("gitpython requests packaging jinja2 pyyaml") | indent(6) }}
+      {{ install_python_deps(["gitpython", "requests", "packaging", "jinja2", "pyyaml"]) | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
       {%- for branch in [plugin_default_branch] + ci_update_branches  %}
-      - uses: actions/checkout@v3
-        with:
-          path: {{ plugin_name }}
-          ref: '{{ branch }}'
-          fetch-depth: 0
+      {{ checkout(path=plugin_name, ref=branch, depth=0) | indent(6) }}
 
-      - name: Run update
-        working-directory: {{ plugin_name }}
+      - name: "Run update"
+        working-directory: "{{ plugin_name }}"
         run: |
           ../plugin_template/scripts/update_ci.sh
 
-      - name: Create Pull Request for CI files
-        uses: peter-evans/create-pull-request@v4
+      - name: "Create Pull Request for CI files"
+        uses: "peter-evans/create-pull-request@v4"
         with:
-          token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
-          path: {{ plugin_name }}
-          committer: {{ release_user }} <{{ release_email }}>
-          author: {{ release_user }} <{{ release_email }}>
-          title: 'Update CI files for branch {{ branch }}'
-          body: '{{ noissue_marker | default("[noissue]") }}'
-          branch: 'update-ci/{{ branch }}'
-          base: '{{ branch }}'
+          token: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          path: "{{ plugin_name }}"
+          committer: "{{ release_user }} <{{ release_email }}>"
+          author: "{{ release_user }} <{{ release_email }}>"
+          title: "Update CI files for branch {{ branch }}"
+          body: ""
+          branch: "update-ci/{{ branch }}"
+          base: "{{ branch }}"
           commit-message: |
             Update CI files
 
-            {{ noissue_marker | default("[noissue]") }}
+            {{ noissue_marker }}
           delete-branch: true
       {%- endfor %}
