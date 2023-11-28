@@ -98,9 +98,6 @@ jobs:
           tar -xvf docs.tar -C ./docs
           .github/workflows/scripts/publish_docs.sh nightly ${GITHUB_REF##*/}
       {%- endif %}
-
-      {{ display_logs() | indent(6) }}
-
 {%- if test_performance %}
 
   performance:

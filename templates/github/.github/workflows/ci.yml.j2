@@ -33,7 +33,7 @@ jobs:
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
       {{ setup_python() | indent(6) }}
-      {% if check_commit_message -%}
+      {%- if check_commit_message %}
       - name: Install requirements
         run: pip3 install github
       - name: Check commit message
@@ -42,7 +42,7 @@ jobs:
           {{ set_env_vars() | indent(10) }}
         run: sh .github/workflows/scripts/check_commit.sh
       {%- endif %}
-      {% if lint_requirements -%}
+      {%- if lint_requirements %}
       - name: Verify requirements files
         run: python .ci/scripts/check_requirements.py
       {%- endif %}
