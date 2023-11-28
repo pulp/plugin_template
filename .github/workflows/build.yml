@@ -19,7 +19,7 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: "actions/checkout@v4"
         with:
           path: "plugin_template"
           # We need the full history for bootstrapping
@@ -34,7 +34,7 @@ jobs:
 
       # Below this line we include the steps of the ci workflow of the generated plugin
 
-      - name: Install python dependencies
+      - name: "Install python dependencies"
         run: |
           echo ::group::PYDEPS
           pip install packaging wheel
