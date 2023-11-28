@@ -56,38 +56,24 @@ jobs:
   {%- if test_deprecations %}
 
   deprecations:
-    defaults:
-      run:
-        working-directory: "."
     runs-on: "ubuntu-latest"
     if: github.base_ref == '{{ plugin_default_branch }}'
     needs: "test"
     steps:
-      - name: Fail on deprecations
+      - name: "Create working directory"
         run: |
-          test -z "{{ "${{ needs.test.outputs.deprecations-pulp }}" }}"
-          {%- if test_azure %}
-          test -z "{{ "${{ needs.test.outputs.deprecations-azure }}" }}"
-          {%- endif %}
-          {%- if test_s3 %}
-          test -z "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}"
-          {%- endif %}
-          {%- if test_lowerbounds %}
-          test -z "{{ "${{ needs.test.outputs.deprecations-lowerbounds }}" }}"
-          {%- endif %}
-      - name: Print deprecations
-        if: failure()
+          mkdir -p "{{ plugin_name }}"
+        working-directory: "."
+      - name: "Download Deprecations"
+        uses: actions/download-artifact@v3
+        with:
+          name: "deprecations"
+          path: "{{ plugin_name }}"
+      - name: "Print deprecations"
         run: |
-          echo "{{ "${{ needs.test.outputs.deprecations-pulp }}" }}" | base64 -d
-          {%- if test_azure %}
-          echo "{{ "${{ needs.test.outputs.deprecations-azure }}" }}" | base64 -d
-          {%- endif %}
-          {%- if test_s3 %}
-          echo "{{ "${{ needs.test.outputs.deprecations-s3 }}" }}" | base64 -d
-          {%- endif %}
-          {%- if test_lowerbounds %}
-          echo "{{ "${{ needs.test.outputs.deprecations-lowerbounds }}" }}" | base64 -d
-          {%- endif %}
+          cat deprecations-*.txt | sort -u
+          ! cat deprecations-*.txt | grep '[^[:space:]]'
+
   {%- endif %}
 
 {%- if post_job_template %}

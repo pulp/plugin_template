@@ -40,17 +40,6 @@ jobs:
           {%- if test_lowerbounds %}
           - TEST: lowerbounds
           {%- endif %}
-    outputs:
-      deprecations-pulp: {{ "${{ steps.deprecations.outputs.deprecations-pulp }}" }}
-      {%- if test_azure %}
-      deprecations-azure: {{ "${{ steps.deprecations.outputs.deprecations-azure }}" }}
-      {%- endif %}
-      {%- if test_s3 %}
-      deprecations-s3: {{ "${{ steps.deprecations.outputs.deprecations-s3 }}" }}
-      {%- endif %}
-      {%- if test_lowerbounds %}
-      deprecations-lowerbounds: {{ "${{ steps.deprecations.outputs.deprecations-lowerbounds }}" }}
-      {%- endif %}
 
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}
@@ -85,10 +74,20 @@ jobs:
       {%- endif %}
 
       {{ run_script(name="Script", file="script.sh") | indent(6) }}
+      {%- if test_deprecations %}
 
-      - name: Extract Deprecations from Logs
-        id: deprecations
-        run: echo deprecations-{{ "${{ matrix.env.TEST }}" }}=$(docker logs pulp 2>&1 | grep -i pulpcore.deprecation | base64 -w 0) >> $GITHUB_OUTPUT
+      - name: "Extract Deprecations from Logs"
+        run: |
+          docker logs pulp 2>&1 | grep -i pulpcore.deprecation | tee deprecations-{{ "${{ matrix.env.TEST }}" }}.txt
+
+      - name: "Upload Deprecations"
+        uses: actions/upload-artifact@v3
+        with:
+          name: "deprecations"
+          path: "{{ plugin_name }}/deprecations-{{ '${{ matrix.env.TEST }}' }}.txt"
+          if-no-files-found: "error"
+          retention-days: 5
+      {%- endif %}
 
       {%- for plugin in plugins %}
       - name: Upload python client packages
