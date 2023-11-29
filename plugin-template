@@ -124,16 +124,16 @@ DEPRECATED_FILES = {
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
-        description="Create or update a plugin using the current " "template.",
+        description="Create or update a plugin using the current template.",
     )
     parser.add_argument(
         "plugin_name",
         type=str,
         help=textwrap.dedent(
             """\
-                            Create or update this plugin. The name should start with pulp- or pulp_.
+                Create or update this plugin. The name should start with pulp- or pulp_.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -141,10 +141,9 @@ def main():
         type=str,
         help=textwrap.dedent(
             """\
-                            the Django app label for the plugin - usually the part after pulp_ or
-                            pulp-.
+                the Django app label for the plugin - usually the part after pulp_ or pulp-.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -152,9 +151,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Create or update a plugin template config for a plugin and exit.
+                Create or update a plugin template config for a plugin and exit.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -162,9 +161,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Create a new plugin and template boilerplate code.
+                Create a new plugin and template boilerplate code.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -172,9 +171,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Generate or update functional and unit tests.
+                Generate or update functional and unit tests.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -182,9 +181,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Generate or update github CI/CD configuration files.
+                Generate or update github CI/CD configuration files.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -192,9 +191,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Generate or update plugin documentation.
+                Generate or update plugin documentation.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -202,9 +201,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Create a new plugin and template all non-excluded files.
+                Create a new plugin and template all non-excluded files.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -212,9 +211,9 @@ def main():
         action="store_true",
         help=textwrap.dedent(
             """\
-                            Include more output.
+                Include more output.
 
-                        """
+            """
         ),
     )
     parser.add_argument(
@@ -223,11 +222,11 @@ def main():
         action="store",
         help=textwrap.dedent(
             """\
-                            Add specified version to the ci_update_branches before templating.
-                            This new value will replace the previous latest version if
-                            `ci_update_release_behavior` is set to 'replace-previous-version'.
+                Add specified version to the ci_update_branches before templating.
+                This new value will replace the previous latest version if
+                `ci_update_release_behavior` is set to 'replace-previous-version'.
 
-                        """
+            """
         ),
     )
     args = parser.parse_args()
@@ -365,8 +364,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
                 "../",  # The parent dir to allow including pre/post templates from
             ]
         ),
-        line_statement_prefix="§=",
-        line_comment_prefix="§#",
+        line_statement_prefix="%%",
+        line_comment_prefix="%#",
     )
     env.filters["camel"] = utils.to_camel
     env.filters["caps"] = utils.to_caps
