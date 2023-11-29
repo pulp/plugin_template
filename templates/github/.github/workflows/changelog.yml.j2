@@ -28,7 +28,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps(deps=["-r doc_requirements.txt"]) | indent(6) }}
+      {{ install_python_deps(deps=["-r", "doc_requirements.txt"]) | indent(6) }}
 
       - name: "Fake api schema"
         run: |
