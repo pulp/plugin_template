@@ -25,7 +25,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps(["-r lint_requirements.txt"]) | indent(6) }}
+      {{ install_python_deps(["-r", "lint_requirements.txt"]) | indent(6) }}
 
       - name: Lint workflow files
         run: |

@@ -3,6 +3,7 @@
 import argparse
 import os
 import pprint
+import shlex
 import shutil
 import stat
 import subprocess
@@ -363,13 +364,16 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
                 "templates",  # The default templates folder
                 "../",  # The parent dir to allow including pre/post templates from
             ]
-        )
+        ),
+        line_statement_prefix="§=",
+        line_comment_prefix="§#",
     )
     env.filters["camel"] = utils.to_camel
     env.filters["caps"] = utils.to_caps
     env.filters["dash"] = utils.to_dash
     env.filters["snake"] = utils.to_snake
     env.filters["to_yaml"] = to_nice_yaml
+    env.filters["shquote"] = shlex.quote
 
     files_templated = 0
     files_copied = 0
