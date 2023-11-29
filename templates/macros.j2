@@ -52,9 +52,9 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
   run: |
     echo ::group::PYDEPS
     pip install {{ deps | map("shquote") | join(" ") }}
-    §= if 'httpie' in deps
+    %% if 'httpie' in deps
     echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/{{ plugin_name }}/.ci/assets/httpie/" >> $GITHUB_ENV
-    §= endif
+    %% endif
     echo ::endgroup::
 {%- endmacro -%}
 
@@ -96,7 +96,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
   if: "{{ condition }}"
   {%- endif %}
   run: |
-    .github/workflows/scripts/{{ file }}
+    {{ (".github/workflows/scripts/" + file) | shquote }}
   shell: "bash"
   {%- if withenv %}
   env:
