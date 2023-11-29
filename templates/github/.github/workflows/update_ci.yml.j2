@@ -25,7 +25,9 @@ jobs:
       fail-fast: false
 
     steps:
-      {{ checkout(repository="pulp/plugin_template", path="plugin_template") | indent(6) }}
+      {#- "depth=0" is needed to run "git describe". #}
+      {{ checkout(repository="pulp/plugin_template", path="plugin_template", depth=0) | indent(6) }}
+
       {{ setup_python() | indent(6) }}
 
       {{ install_python_deps(["gitpython", "requests", "packaging", "jinja2", "pyyaml"]) | indent(6) }}

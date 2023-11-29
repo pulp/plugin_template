@@ -373,7 +373,12 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
 
     files_templated = 0
     files_copied = 0
-    gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
+
+    try:
+        gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
+    except Exception:
+        gitref = "unknown"
+
     for relative_path in generate_relative_path_set(section_template_dir):
         if not config["stalebot"] and "stale" in relative_path:
             continue
