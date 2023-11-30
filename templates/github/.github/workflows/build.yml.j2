@@ -23,10 +23,12 @@ jobs:
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}
       {{ setup_python() | indent(6) }}
-      {{ install_python_deps(["packaging", "wheel"]) | indent(6) }}
+      {{ install_python_deps(["packaging", "twine", "wheel"]) | indent(6) }}
       - name: "Build package"
-        run: "python3 setup.py sdist bdist_wheel --python-tag py3"
-      - name: 'Upload Package whl'
+        run: |
+          python3 setup.py sdist bdist_wheel --python-tag py3
+          twine check
+      - name: "Upload Package whl"
         uses: "actions/upload-artifact@v3"
         with:
           name: "plugin_package"
