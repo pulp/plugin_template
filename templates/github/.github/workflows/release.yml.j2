@@ -88,7 +88,7 @@ jobs:
         run: |
           tar -xf {{ plugin_name }}.tar
 
-      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible"]) | indent(6) }}
+      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs"]) | indent(6) }}
 
       # Building the bindings and docs requires accessing the OpenAPI specs endpoint, so we need to
       # setup the Pulp instance.
