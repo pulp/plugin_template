@@ -27,7 +27,7 @@ jobs:
       - name: "Build package"
         run: |
           python3 setup.py sdist bdist_wheel --python-tag py3
-          twine check
+          twine check dist/*
       - name: "Upload Package whl"
         uses: "actions/upload-artifact@v3"
         with:
