@@ -22,8 +22,8 @@ rm -rf {{ plugin.name | snake }}-client
 pushd {{ plugin.name | snake }}-client
 python setup.py sdist bdist_wheel --python-tag py3
 
-twine check "dist/{{ plugin.name | snake }}_client-$VERSION-py3-none-any.whl" || exit 1
-twine check "dist/{{ plugin.name | snake }}-client-$VERSION.tar.gz" || exit 1
+twine check "dist/{{ plugin.name | snake }}_client-$VERSION-py3-none-any.whl"
+twine check "dist/{{ plugin.name | snake }}-client-$VERSION.tar.gz"
 
 cmd_prefix pip3 install "/root/pulp-openapi-generator/{{ plugin.name | snake }}-client/dist/{{ plugin.name | snake }}_client-${VERSION}-py3-none-any.whl"
 tar cvf ../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar ./dist
@@ -33,6 +33,21 @@ find ./docs/* -exec sed -i 's/README//g' {} \;
 cp README.md docs/index.md
 sed -i 's/docs\///g' docs/index.md
 find ./docs/* -exec sed -i 's/\.md//g' {} \;
+
+cat >> mkdocs.yml << DOCSYAML
+---
+site_name: {{ plugin.name | camel }} Client
+site_description: {{ plugin.app_label | camel }} bindings
+site_author: Pulp Team
+site_url: https://docs.pulpproject.org/{{ plugin.name | snake }}_client/
+repo_name: pulp/{{ plugin.name | snake }}
+repo_url: https://github.com/pulp/{{ plugin.name | snake }}
+theme: readthedocs
+DOCSYAML
+
+# Building the bindings docs
+mkdocs build
+
 tar cvf ../../{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar ./docs
 popd
 {%- endfor %}

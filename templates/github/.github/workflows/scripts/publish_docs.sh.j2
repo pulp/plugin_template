@@ -36,19 +36,6 @@ fi
 mkdir -p ../{{ plugin.app_label }}-bindings
 tar -xvf {{ plugin.app_label }}-python-client-docs.tar --directory ../{{ plugin.app_label }}-bindings
 pushd ../{{ plugin.app_label }}-bindings
-cat >> mkdocs.yml << DOCSYAML
----
-site_name: {{ plugin.name | camel }} Client
-site_description: {{ plugin.app_label | camel }} bindings
-site_author: Pulp Team
-site_url: https://docs.pulpproject.org/{{ plugin.name | snake }}_client/
-repo_name: pulp/{{ plugin.name | snake }}
-repo_url: https://github.com/pulp/{{ plugin.name | snake }}
-theme: readthedocs
-DOCSYAML
-
-# Building the bindings docs
-mkdocs build
 
 # publish to docs.pulpproject.org/{{ plugin.name | snake }}_client
 rsync -avzh site/ doc_builder_{{ plugin.name | snake }}@docs.pulpproject.org:/var/www/docs.pulpproject.org/{{ plugin.name | snake }}_client/
