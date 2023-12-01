@@ -48,7 +48,8 @@ DOCSYAML
 # Building the bindings docs
 mkdocs build
 
-tar cvf ../../{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar ./docs
+# Pack the built site.
+tar cvf ../../{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar ./site
 popd
 {%- endfor %}
 popd
