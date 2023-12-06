@@ -39,19 +39,44 @@ fi
 
 cd .ci/ansible/
 
+{%- set PULPCORE_PREFIX = "" if plugin_name == "pulpcore" else " pulpcore" %}
+PLUGIN_SOURCE="${PLUGIN_NAME}"
+{%- if test_s3 %}
+if [ "$TEST" = "s3" ]; then
+  PLUGIN_SOURCE="${PLUGIN_SOURCE}{{ PULPCORE_PREFIX }}[s3]"
+fi
+{%- endif %}
+{%- if test_azure %}
+if [ "$TEST" = "azure" ]; then
+  PLUGIN_SOURCE="${PLUGIN_SOURCE}{{ PULPCORE_PREFIX }}[azure]"
+fi
+{%- endif %}
+{%- if test_gcp %}
+if [ "$TEST" = "gcp" ]; then
+  PLUGIN_SOURCE="${PLUGIN_SOURCE}{{ PULPCORE_PREFIX }}[google]"
+fi
+{%- endif %}
+
 cat >> vars/main.yaml << VARSYAML
 image:
   name: pulp
   tag: "ci_build"
 plugins:
   - name: {{ plugin_name }}
-    source: "${PLUGIN_NAME}"
+    source: "${PLUGIN_SOURCE}"
 VARSYAML
 if [[ -f ../../ci_requirements.txt ]]; then
   cat >> vars/main.yaml << VARSYAML
     ci_requirements: true
 VARSYAML
 fi
+{%- if test_lowerbounds %}
+if [ "$TEST" = "lowerbounds" ]; then
+  cat >> vars/main.yaml << VARSYAML
+    lowerbounds: true
+VARSYAML
+fi
+{%- endif %}
 
 cat >> vars/main.yaml << VARSYAML
 services:
