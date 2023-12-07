@@ -14,9 +14,6 @@ RUN pip3 install
 {{ " " }}git+https://github.com/fabricio-aguiar/botocore.git@fix-100-continue
 {%- endif -%}
 {%- for item in plugins -%}
-{%- if item.name == "pulp-certguard" -%}
-{{ " " }}python-dateutil rhsm
-{%- endif -%}
 {{ " " }}{{ item.source }}
 {%- if item.lowerbounds | default(false) -%}
 {{ " " }}-c ./{{ item.name }}/lowerbounds_constraints.txt
