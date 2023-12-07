@@ -256,6 +256,13 @@ def main():
                         config["plugins"] = [
                             {"name": config["plugin_name"], "app_label": config["plugin_app_label"]}
                         ]
+                    if not all(
+                        (isinstance(version, str) for version in config["ci_update_branches"])
+                    ):
+                        config["ci_update_branches"] = [
+                            str(version) for version in config["ci_update_branches"]
+                        ]
+                        write_new_config = True
                     print(
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)
