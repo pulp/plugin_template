@@ -19,7 +19,7 @@ defaults:
 
 jobs:
   {%- if pre_job_template %}
-  {% include pre_job_template.path %}
+  {% include pre_job_template.path | indent(2) %}
   {%- endif %}
   {%- if check_commit_message or lint_requirements %}
   check-commits:
@@ -96,5 +96,5 @@ jobs:
           echo {{ "'${{toJson(needs)}}'" }} | jq -e 'to_entries|map(select(.value.result!="success"))|length == 0'
           echo "CI says: Looks good!"
 {%- if post_job_template %}
-  {% include post_job_template.path %}
+  {% include post_job_template.path | indent (2) %}
 {%- endif %}
