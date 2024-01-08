@@ -22,7 +22,7 @@ then
   exit
 fi
 
-twine upload -u pulp -p "$PYPI_PASSWORD" \
+twine upload -u pulp -p "$PYPI_API_TOKEN" \
 {%- for plugin in plugins %}
 "dist/{{ plugin.name | snake }}_client-$VERSION-py3-none-any.whl" \
 "dist/{{ plugin.name | snake }}-client-$VERSION.tar.gz" \

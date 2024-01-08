@@ -82,9 +82,8 @@ The following settings are stored in `template_config.yml`.
 
                         This job only executes when a tag is associated with the commit being
                         built. When enabling this job, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the Github secrets settings page for the repository[0]. The PYPI
-                        username is specified using --pypi-username option.
+                        secure environment variable called PYPI_API_TOKEN. The variable can
+                        be added in the Github secrets settings page for the repository[0].
 
                         This job uses the OpenAPI schema for the plugin to generate a Python
                         client library using openapi-generator-cli.
@@ -101,9 +100,8 @@ The following settings are stored in `template_config.yml`.
 
                         This job only executes when a tag is associated with the commit being
                         built. When enabling this job, the user is expected to provide a
-                        secure environment variable called PYPI_PASSWORD. The variable can
-                        be added in the Github secrets settings page for the repository[0]. The PYPI
-                        username is specified using --pypi-username option.
+                        secure environment variable called PYPI_API_TOKEN. The variable can
+                        be added in the Github secrets settings page for the repository[0].
 
   docker_fixtures       In Github Actions, use the pulp-fixtures docker container to serve up
                         fixtures instead of using fedorapeople.org.
@@ -150,14 +148,7 @@ The following settings are stored in `template_config.yml`.
   pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
                         Python docstring conventions.
 
-  pypi_username         The username that should be used when uploading packages to PyPI. It
-                        is required if deploy_client_to_pypi is specified.
-
   python_version        Python version to use in the CI. Currently only 3.6 and 3.8 are supported.
-
-  redmine_project       A string that corresponds to the redmine identifier for the repo's project.
-                        This is used during commit validation to make sure the commit is attached to
-                        an issue in the correct project.
 
   release_user          The GitHub user that is associated with the RELEASE_TOKEN secret on GitHub.
                         The username and token are used to push the Changelog and version bump commits
@@ -458,11 +449,11 @@ $ ./plugin-template --github PLUGIN_NAME
 ```
 
 The default behavior enables two build jobs that generate client libraries using the OpenAPI
-schema. One publishes to PyPI using ``pypi-username`` setting and the secret environment
-variable called $PYPI_PASSWORD. The other job publishes the client to rubygems.org and requires
-the $RUBYGEMS_API_KEY secret to be set. Both environment variables can be set in the Github secrets
-settings page for the plugin repository. The job that publishes tagged builds to PyPI uses the same
-configs as the client publishing job.
+schema. One publishes to PyPI using the secret environment variable called $PYPI_API_TOKEN.
+The other job publishes the client to rubygems.org and requires the $RUBYGEMS_API_KEY secret
+to be set. Both environment variables can be set in the Github secrets settings page for the
+plugin repository. The job that publishes tagged builds to PyPI uses the same configs as the
+client publishing job.
 
 The before_install.sh, install.sh, before_script.sh, and script.sh can be augmented by plugin
 writers by creating specially named scripts in their `.github/workflows/scripts/` directory. The
