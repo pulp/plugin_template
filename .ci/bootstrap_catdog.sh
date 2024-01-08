@@ -14,7 +14,6 @@ echo "${COMMIT_MSG}"
 pip install -r test_requirements.txt
 ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
 mkdir -p ../pulp_catdog/.ci/assets/bindings
-echo 'pypi_username: the_pypi_user' >> ../pulp_catdog/template_config.yml
 sed -i "s/test_s3: false/test_s3: true/g" ../pulp_catdog/template_config.yml
 sed -i "s/test_gcp: false/test_gcp: true/g" ../pulp_catdog/template_config.yml
 sed -i "s/test_azure: false/test_azure: true/g" ../pulp_catdog/template_config.yml

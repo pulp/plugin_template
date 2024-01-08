@@ -67,7 +67,6 @@ DEFAULT_SETTINGS = {
     "pulp_settings": None,
     "pulp_settings_s3": None,
     "pydocstyle": True,
-    "pypi_username": None,
     "python_version": "3.8",
     "release_email": "pulp-infra@redhat.com",
     "release_user": "pulpbot",
@@ -327,13 +326,6 @@ def main():
                     break
     except Exception:
         config["current_version"] = "0.1.0a1.dev"
-
-    if args.github or args.all:
-        if not config["pypi_username"] and (
-            config["deploy_client_to_pypi"] or config["deploy_to_pypi"]
-        ):
-            print("If PyPI scripts are included, PyPI username is required.")
-            return 2
 
     sections = [
         section
