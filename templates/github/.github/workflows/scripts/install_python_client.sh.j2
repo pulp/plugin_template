@@ -9,7 +9,10 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 source .github/workflows/scripts/utils.sh
 
-export PULP_URL="${PULP_URL:-{{ pulp_scheme }}://pulp}"
+PULP_URL="${PULP_URL:-{{ pulp_scheme }}://pulp}"
+export PULP_URL
+PULP_API_ROOT="${PULP_API_ROOT:-/pulp/}"
+export PULP_API_ROOT
 
 REPORTED_STATUS="$(pulp status)"
 REPORTED_VERSION="$(echo "$REPORTED_STATUS" | jq --arg plugin "{{ plugin_app_label }}" -r '.versions[] | select(.component == $plugin) | .version')"
@@ -18,7 +21,15 @@ VERSION="$(echo "$REPORTED_VERSION" | python -c 'from packaging.version import V
 pushd ../pulp-openapi-generator
 {%- for plugin in plugins %}
 rm -rf {{ plugin.name | snake }}-client
-./generate.sh {{ plugin.name | snake }} python "$VERSION"
+
+if pulp debug has-plugin --name "core" --specifier ">=3.44.0.dev"
+then
+  curl --fail-with-body -k -o api.json "${PULP_URL}${PULP_API_ROOT}api/v3/docs/api.json?bindings&component={{ plugin.app_label }}"
+  USE_LOCAL_API_JSON=1 ./generate.sh {{ plugin.name | snake }} python "$VERSION"
+else
+  ./generate.sh {{ plugin.name | snake }} python "$VERSION"
+fi
+
 pushd {{ plugin.name | snake }}-client
 python setup.py sdist bdist_wheel --python-tag py3
 
