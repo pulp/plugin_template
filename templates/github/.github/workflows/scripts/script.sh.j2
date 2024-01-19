@@ -129,17 +129,25 @@ cmd_prefix bash -c "cat /etc/pulp/certs/pulp_webserver.crt >> '$CERTIFI'"
 
 # check for any uncommitted migrations
 echo "Checking for uncommitted migrations..."
-cmd_user_prefix bash -c "django-admin makemigrations {{ plugin_app_label }} --check --dry-run"
+{%- for plugin in plugins %}
+cmd_user_prefix bash -c "django-admin makemigrations {{ plugin.app_label }} --check --dry-run"
+{%- endfor %}
 
 # Run unit tests.
-cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes -p no:pulpcore --pyargs {{ plugin_name | snake }}.tests.unit"
+{%- for plugin in plugins %}
+cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes --suppress-no-test-exit-code -p no:pulpcore --pyargs {{ plugin.name | snake }}.tests.unit"
+{%- endfor %}
 
 # Run functional tests
 if [[ "$TEST" == "performance" ]]; then
   if [[ -z ${PERFORMANCE_TEST+x} ]]; then
-    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_name | snake }}.tests.performance"
+    {%- for plugin in plugins %}
+    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --suppress-no-test-exit-code --capture=no --durations=0 --pyargs {{ plugin.name | snake }}.tests.performance"
+    {%- endfor %}
   else
-    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --pyargs --capture=no --durations=0 {{ plugin_name | snake }}.tests.performance.test_${PERFORMANCE_TEST}"
+    {%- for plugin in plugins %}
+    cmd_user_prefix bash -c "pytest -vv -r sx --color=yes --suppress-no-test-exit-code --capture=no --durations=0 --pyargs {{ plugin.name | snake }}.tests.performance.test_${PERFORMANCE_TEST}"
+    {%- endfor %}
   fi
   exit
 fi
@@ -147,25 +155,18 @@ fi
 if [ -f "$FUNC_TEST_SCRIPT" ]; then
   source "$FUNC_TEST_SCRIPT"
 else
-    if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel }} Nightly CI/CD" ]]
-    then
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional -m 'not parallel' --nightly"
-
-    {%- for item in additional_repos if item.pytest_args | default(false) %}
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }} --nightly"
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m 'not parallel' --nightly"
+  if [[ "$GITHUB_WORKFLOW" =~ "Nightly" ]]
+  then
+    {%- for plugin in plugins %}
+    cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
+    cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel' --nightly"
     {%- endfor %}
-
-    else
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin_name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ plugin_name | snake }}.tests.functional -m 'not parallel'"
-
-    {%- for item in additional_repos if item.pytest_args | default(false) %}
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ item.pytest_args }} -m parallel -n {{ parallel_test_workers }}"
-        cmd_user_prefix bash -c "pytest -v -r sx --color=yes --pyargs {{ item.pytest_args }} -m 'not parallel'"
+  else
+    {%- for plugin in plugins %}
+    cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
+    cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel'"
     {%- endfor %}
-    fi
+  fi 
 fi
 
 {%- if test_cli %}
