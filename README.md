@@ -47,18 +47,6 @@ You can edit them according to your needs to control subsequent calls to `plugin
 The following settings are stored in `template_config.yml`.
 
 ```bash
-  additional_repos    A list with additional repos to be installed on Github Actions.
-                        Each item in the list is a dict with the following fields:
-                        name: the name of the plugin
-                        bindings (optional): boolean whether or not generate bindings
-                        org (optional): github organization
-                        revision (optional): the git commit hash to install.
-                        pytest_args (optional): string to by passed to a pytest call.
-                        branch (optional): the git branch of the plugin. applies to non-tagged GHA jobs, such as PRs & cron jobs.
-                        pip_version_specifier: A pip version specifier for when the gets installed from PyPI.
-                                               Applies to TAGGED (release) jobs.
-                                               See pulpcore_pip_version_specifier, but defaults to undefined, the latest.
-
   black                 Boolean, whether to use black to format python source files.
 
   flake8                Boolean, whether to use flake8 to lint python source files.
@@ -124,6 +112,9 @@ The following settings are stored in `template_config.yml`.
   plugin_default_branch The default branch in your plugin repo, defaults to 'main'.
 
   plugin_name           Suppose our plugin is named 'pulp_test', then this is 'pulp_test'
+
+  plugins               List of dictionaries with `app_label` and `name` as keys. One entry per
+                        plugin resident in this repository.
 
   publish_docs_to_pulpprojectdotorg
                         Include a job for publishing documentation to
