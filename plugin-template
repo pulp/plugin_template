@@ -413,7 +413,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         else:
             if destination_relative_path.endswith(".copy"):
                 destination_relative_path = destination_relative_path[: -len(".copy")]
-            shutil.copyfile(
+            shutil.copy(
                 os.path.join(section_template_dir, relative_path),
                 os.path.join(plugin_root_dir, destination_relative_path),
             )
