@@ -28,9 +28,7 @@ DEFAULT_SETTINGS = {
     "cli_repo": "https://github.com/pulp/pulp-cli.git",
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
-    "ci_update_branches": [],
     "ci_update_docs": False,
-    "ci_update_release_behavior": None,
     "core_import_allowed": [],
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
@@ -45,6 +43,7 @@ DEFAULT_SETTINGS = {
     "github_org": "pulp",
     "issue_tracker": "github",
     "kanban": True,
+    "latest_release_branch": None,
     "lint_requirements": True,
     "noissue_marker": "[noissue]",
     "parallel_test_workers": 8,
@@ -73,6 +72,7 @@ DEFAULT_SETTINGS = {
     "stalebot_days_until_stale": 90,
     "stalebot_limit_to_pulls": True,
     "stalebot": True,
+    "supported_release_branches": [],
     "sync_ci": True,
     "test_azure": False,
     "test_cli": False,
@@ -216,14 +216,12 @@ def main():
         ),
     )
     parser.add_argument(
-        "--add-version-ci-update-branches",
+        "--latest-release-branch",
         metavar="VERSION_BRANCH",
         action="store",
         help=textwrap.dedent(
             """\
-                Add specified version to the ci_update_branches before templating.
-                This new value will replace the previous latest version if
-                `ci_update_release_behavior` is set to 'replace-previous-version'.
+                Mark specified version as the latest_release_branch before templating.
 
             """
         ),
@@ -247,6 +245,10 @@ def main():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
+                    # Rename "ci_update_branches" to "supported_release_branches"
+                    if "ci_update_branches" in config:
+                        config["supported_release_branches"] = config.pop("ci_update_branches")
+                        write_new_config = True
                     # remove deprecated options
                     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
                         config.pop(key)
@@ -256,10 +258,13 @@ def main():
                             {"name": config["plugin_name"], "app_label": config["plugin_app_label"]}
                         ]
                     if not all(
-                        (isinstance(version, str) for version in config["ci_update_branches"])
+                        (
+                            isinstance(version, str)
+                            for version in config["supported_release_branches"]
+                        )
                     ):
-                        config["ci_update_branches"] = [
-                            str(version) for version in config["ci_update_branches"]
+                        config["supported_release_branches"] = [
+                            str(version) for version in config["supported_release_branches"]
                         ]
                         write_new_config = True
                     print(
@@ -292,25 +297,9 @@ def main():
         else:
             return 2
 
-    valid_release_behavior = [None, "append-version", "replace-previous-version"]
-    if config["ci_update_release_behavior"] not in valid_release_behavior:
-        valid_release_behavior[0] = "null"
-        print("ci_update_release_behavior is not of a valid value: ", valid_release_behavior)
-        return 2
-
-    if new_version_branch := args.add_version_ci_update_branches:
+    if args.latest_release_branch:
         write_new_config = True
-        if config["ci_update_release_behavior"] == "replace-previous-version":
-            major_v, minor_v = new_version_branch.split(".", maxsplit=1)
-            minor_v = int(minor_v) - 1
-            try:
-                index = config["ci_update_branches"].index(f"{major_v}.{minor_v}")
-            except ValueError:
-                config["ci_update_branches"].append(new_version_branch)
-            else:
-                config["ci_update_branches"][index] = new_version_branch
-        else:
-            config["ci_update_branches"].append(new_version_branch)
+        config["latest_release_branch"] = str(args.latest_release_branch)
 
     # Config key is used by the template_config.yml.j2 template to dump
     # the config. (note: uses .copy() to avoid a self reference)
@@ -381,6 +370,20 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     except Exception:
         gitref = "unknown"
 
+    ci_update_branches = [config["plugin_default_branch"]]
+    latest_release_branch = config["latest_release_branch"]
+    if latest_release_branch is not None:
+        if latest_release_branch not in config["supported_release_branches"]:
+            ci_update_branches.append(latest_release_branch)
+    ci_update_branches.extend(config["supported_release_branches"])
+
+    template_vars = {
+        "section": name,
+        "gitref": gitref,
+        "ci_update_branches": ci_update_branches,
+        **config,
+    }
+
     for relative_path in generate_relative_path_set(section_template_dir):
         if not config["stalebot"] and "stale" in relative_path:
             continue
@@ -405,7 +408,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
                 template,
                 plugin_root_dir,
                 destination,
-                {"section": name, "gitref": gitref, **config},
+                template_vars,
             )
             files_templated += 1
             if verbose:
