@@ -14,7 +14,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- endmacro -%}
 
 
-{%- macro checkout(depth=1, repository=None, path=None, ref=None) -%}
+{%- macro checkout(depth=1, repository=None, path=None, ref=None, use_release_token=false) -%}
 - uses: "actions/checkout@v4"
   with:
     fetch-depth: {{ depth }}
@@ -26,6 +26,9 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
     {%- endif %}
     {%- if ref %}
     ref: "{{ ref }}"
+    {%- endif %}
+    {%- if use_release_token %}
+    token: {{ "${{ secrets.RELEASE_TOKEN }}" }}
     {%- endif %}
 {%- endmacro -%}
 
