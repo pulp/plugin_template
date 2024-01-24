@@ -100,7 +100,8 @@ The following settings are stored in `template_config.yml`.
                         'github'. To switch from Redmine to GitHub use the --migrate-github-issues
                         option.
 
-  ci_update_branches    Specify the branches that should receive regular CI updates.
+  latest_release_branch A pointer to the currently latest release branch (this is automatically
+                        updated).
 
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
@@ -163,6 +164,9 @@ The following settings are stored in `template_config.yml`.
   stalebot_days_until_close
                         The number of days of inactivity before an Issue or Pull Request with the stale
                         label is closed.
+
+  supported_release_branches
+                        Specify the release branches that should receive regular CI updates.
 
   sync_ci               Enables a nightly workflow to update the CI files.
 

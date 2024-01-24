@@ -33,7 +33,7 @@ jobs:
 
       {{ configure_git() | indent(6) }}
 
-      {%- for branch in [plugin_default_branch] + ci_update_branches  %}
+      {%- for branch in ci_update_branches %}
       {{ checkout(path=plugin_name, ref=branch, depth=0) | indent(6) }}
 
       - name: "Run update"

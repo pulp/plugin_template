@@ -56,7 +56,7 @@ jobs:
         working-directory: {{ plugin_name }}
         run: |
           find CHANGES -type f -regex ".*\.\(bugfix\|doc\|feature\|misc\|deprecation\|removal\)" -exec git rm {} +
-{% if ci_update_release_behavior %}
+
       - name: Checkout plugin template
         uses: actions/checkout@v3
         with:
@@ -67,9 +67,9 @@ jobs:
       - name: Update CI branches in template_config
         working-directory: plugin_template
         run: |
-          python3 ./plugin-template {{ plugin_name }} --github --add-version-ci-update-branches "${NEW_BRANCH}"
+          python3 ./plugin-template {{ plugin_name }} --github --latest-release-branch "${NEW_BRANCH}"
           git add -A
-{% endif %}
+
       - name: Make a PR with version bump and without CHANGES/*
         uses: peter-evans/create-pull-request@v4
         with:
