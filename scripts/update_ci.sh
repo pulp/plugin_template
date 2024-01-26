@@ -10,6 +10,7 @@ fi
 plugin_name="$(python ../plugin_template/scripts/get_template_config_value.py plugin_name)"
 ci_update_docs="$(python ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
 noissue_marker="$(python ../plugin_template/scripts/get_template_config_value.py noissue_marker)"
+use_black="$(python ../plugin_template/scripts/get_template_config_value.py black)"
 
 if [[ -z "$noissue_marker" ]]; then
   noissue_marker="[noissue]"
@@ -36,4 +37,17 @@ if [[ $(git status --porcelain) ]]; then
   git commit -m "Update CI files" -m "$noissue_marker"
 else
   echo "No updates needed"
+fi
+
+if [[ "$use_black" = "True" ]]
+then
+  pip install -r lint_requirements.txt
+  black .
+
+  if [[ $(git status --porcelain) ]]; then
+    git add -A
+    git commit -m "Reformat with black" -m "$noissue_marker"
+  else
+    echo "No formatting change needed"
+  fi
 fi
