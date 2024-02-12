@@ -1,0 +1,1 @@
+Allow CI base image to be configured with `ci_base_image`.

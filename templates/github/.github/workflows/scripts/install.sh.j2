@@ -96,11 +96,11 @@ cat >> vars/main.yaml << VARSYAML
 pulp_env: {{ pulp_env | tojson }}
 pulp_settings: {{ pulp_settings | tojson }}
 pulp_scheme: {{ pulp_scheme }}
-{% if python_version == "3.6" %}
-pulp_container_tag: "python36"
+{%- if ci_base_image.count(":") %}
+pulp_default_container: {{ ci_base_image }}
 {% else %}
-pulp_container_tag: "latest"
-{% endif %}
+pulp_default_container: {{ ci_base_image + ":latest" }}
+{% endif -%}
 VARSYAML
 
 {%- if docker_fixtures %}
