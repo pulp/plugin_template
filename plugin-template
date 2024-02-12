@@ -27,6 +27,7 @@ DEFAULT_SETTINGS = {
     "check_stray_pulpcore_imports": True,
     "cli_package": "pulp-cli",
     "cli_repo": "https://github.com/pulp/pulp-cli.git",
+    "ci_base_image": "ghcr.io/pulp/pulp-ci-centos",
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
     "ci_update_docs": False,
