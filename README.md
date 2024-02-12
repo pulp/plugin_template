@@ -140,8 +140,6 @@ The following settings are stored in `template_config.yml`.
   pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
                         Python docstring conventions.
 
-  python_version        Python version to use in the CI. Currently only 3.6 and 3.8 are supported.
-
   release_user          The GitHub user that is associated with the RELEASE_TOKEN secret on GitHub.
                         The username and token are used to push the Changelog and version bump commits
                         created by the release workflow. The default is 'pulpbot'.

@@ -29,7 +29,7 @@ jobs:
     steps:
       {{ checkout(depth=0, path=plugin_name, use_release_token=true) | indent(6) }}
 
-      {{ setup_python(pyversion="3.8") | indent(6) }}
+      {{ setup_python() | indent(6) }}
 
       {{ install_python_deps(["bump2version", "towncrier"]) | indent(6) }}
 
