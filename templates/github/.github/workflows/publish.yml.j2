@@ -121,7 +121,7 @@ jobs:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
 
-      {{ setup_python(pyversion="3.8") | indent(6) }}
+      {{ setup_python() | indent(6) }}
 
       {{ install_python_deps(["twine"]) | indent(6) }}
 
@@ -156,7 +156,7 @@ jobs:
           tar -xvf {{ plugin.app_label }}-python-client.tar
           {%- endfor %}
 
-      {{ setup_python(pyversion="3.8") | indent(6) }}
+      {{ setup_python() | indent(6) }}
 
       {{ install_python_deps(["twine"]) | indent(6) }}
 
@@ -212,7 +212,7 @@ jobs:
     steps:
       {{ checkout(depth=1, path=plugin_name) | indent(6) }}
 
-      {{ setup_python(pyversion="3.8") | indent(6) }}
+      {{ setup_python() | indent(6) }}
 
       {{ install_python_deps(["packaging~=21.3", "requests"]) | indent(6) }}
 

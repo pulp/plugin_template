@@ -27,7 +27,7 @@ DEFAULT_SETTINGS = {
     "check_stray_pulpcore_imports": True,
     "cli_package": "pulp-cli",
     "cli_repo": "https://github.com/pulp/pulp-cli.git",
-    "ci_base_image": "ghcr.io/pulp/pulp-ci-centos",
+    "ci_base_image": "ghcr.io/pulp/pulp-ci-centos9",
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
     "ci_update_docs": False,
@@ -67,7 +67,6 @@ DEFAULT_SETTINGS = {
     "pulp_settings": None,
     "pulp_settings_s3": None,
     "pydocstyle": True,
-    "python_version": "3.8",
     "release_email": "pulp-infra@redhat.com",
     "release_user": "pulpbot",
     "stalebot_days_until_close": 30,
@@ -416,6 +415,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         "section": name,
         "gitref": gitref,
         "ci_update_branches": ci_update_branches,
+        "python_version": "3.11",
         **config,
     }
 

@@ -23,7 +23,7 @@ jobs:
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
-      {{ setup_python(pyversion="3.8") | indent(6) }}
+      {{ setup_python() | indent(6) }}
 
       {{ install_python_deps(["bump2version", "jinja2", "pyyaml", "packaging"]) | indent(6) }}
 
