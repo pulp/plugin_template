@@ -21,7 +21,7 @@ jobs:
       {{ setup_python() | indent(6) }}
       {{ configure_git() | indent(6) }}
       {{ install_python_deps(["requests", "pyyaml"]) | indent(6) }}
-      - uses: "actions/checkout@v3"
+      - uses: "actions/checkout@v4"
       - name: "Update labels"
         run: |
           python3 .github/workflows/scripts/update_backport_labels.py
