@@ -138,6 +138,7 @@ cmd_user_prefix bash -c "django-admin makemigrations {{ plugin.app_label }} --ch
 cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes --suppress-no-test-exit-code -p no:pulpcore --pyargs {{ plugin.name | snake }}.tests.unit"
 {%- endfor %}
 
+{%- if plugins %}
 # Run functional tests
 if [[ "$TEST" == "performance" ]]; then
   if [[ -z ${PERFORMANCE_TEST+x} ]]; then
@@ -175,8 +176,9 @@ export PULP_FIXTURES_URL="http://pulp-fixtures:8080"
 {%- endif %}
 pushd ../{{ cli_package }}
 pip install -r test_requirements.txt
-pytest -v -m {{ plugin_name | snake }}
+pytest -v -m "{{ plugins | map(attribute='name') | join(' or ') | snake }}"
 popd
+{%- endif %}
 {%- endif %}
 
 if [ -f "$POST_SCRIPT" ]; then
