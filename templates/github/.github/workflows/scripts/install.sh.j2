@@ -11,7 +11,7 @@ set -euv
 source .github/workflows/scripts/utils.sh
 
 PLUGIN_VERSION="$(sed -n -e 's/^\s*current_version\s*=\s*//p' .bumpversion.cfg | python -c 'from packaging.version import Version; print(Version(input()))')"
-PLUGIN_NAME="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${PLUGIN_VERSION}-py3-none-any.whl"
+PLUGIN_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${PLUGIN_VERSION}-py3-none-any.whl"
 
 export PULP_API_ROOT="{{ api_root }}"
 
@@ -40,7 +40,6 @@ fi
 cd .ci/ansible/
 
 {%- set PULPCORE_PREFIX = "" if plugin_name == "pulpcore" else " pulpcore" %}
-PLUGIN_SOURCE="${PLUGIN_NAME}"
 {%- if test_s3 %}
 if [ "$TEST" = "s3" ]; then
   PLUGIN_SOURCE="${PLUGIN_SOURCE}{{ PULPCORE_PREFIX }}[s3]"
