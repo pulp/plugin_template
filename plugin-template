@@ -8,7 +8,6 @@ import shutil
 import stat
 import subprocess
 import sys
-import tempfile
 import textwrap
 import utils
 import yaml
@@ -56,7 +55,6 @@ DEFAULT_SETTINGS = {
     "post_job_template": None,
     "pre_job_template": None,
     "publish_docs_to_pulpprojectdotorg": False,
-    "pulpprojectdotorg_key_id": None,
     "pulp_env": {},
     "pulp_env_azure": {},
     "pulp_env_gcp": {},
@@ -481,28 +479,26 @@ def write_template_to_file(template, plugin_root_dir, relative_path, config):
     Render template with values from the config and write it to the target plugin directory.
     """
 
-    with tempfile.NamedTemporaryFile(mode="w", dir=plugin_root_dir, delete=False) as fd_out:
-        tempfile_path = fd_out.name
-        fd_out.write(template.render(**config))
+    destination_path = os.path.normpath(os.path.join(plugin_root_dir, relative_path))
+    data = template.render(**config)
+    with open(destination_path, "w") as fd_out:
+        fd_out.write(data)
         fd_out.write("\n")
 
-        destination_path = os.path.normpath(os.path.join(plugin_root_dir, relative_path))
-        os.rename(tempfile_path, destination_path)
-
-        if destination_path.endswith(".sh") or destination_path.endswith(".py"):
-            mode = (
-                stat.S_IRUSR
-                | stat.S_IWUSR
-                | stat.S_IXUSR
-                | stat.S_IRGRP
-                | stat.S_IWGRP
-                | stat.S_IXGRP
-                | stat.S_IROTH
-                | stat.S_IXOTH
-            )
-        else:
-            mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH
-        os.chmod(destination_path, mode)
+    if destination_path.endswith(".sh") or destination_path.endswith(".py"):
+        mode = (
+            stat.S_IRUSR
+            | stat.S_IWUSR
+            | stat.S_IXUSR
+            | stat.S_IRGRP
+            | stat.S_IWGRP
+            | stat.S_IXGRP
+            | stat.S_IROTH
+            | stat.S_IXOTH
+        )
+    else:
+        mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH
+    os.chmod(destination_path, mode)
 
 
 def generate_config(plugin_name, plugin_app_label):
