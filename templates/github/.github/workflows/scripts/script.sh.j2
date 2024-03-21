@@ -26,6 +26,12 @@ if [[ "$TEST" = "docs" ]]; then
   if [[ "$GITHUB_WORKFLOW" == "{{ plugin_app_label | camel | default("Pulp") }} CI" ]]; then
     towncrier build --yes --version 4.0.0.ci
   fi
+{%- if use_unified_docs %}
+  # Unified Docs Build
+  pulp-docs build
+{%- endif %}
+{%- if use_legacy_docs %}
+  # Legacy Docs Build
   cd docs
   make PULP_URL="$PULP_URL" diagrams html
   tar -cvf docs.tar ./_build
@@ -34,6 +40,7 @@ if [[ "$TEST" = "docs" ]]; then
   if [ -f "$POST_DOCS_TEST" ]; then
     source "$POST_DOCS_TEST"
   fi
+{%- endif %}
   exit
 fi
 
