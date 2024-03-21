@@ -82,6 +82,8 @@ DEFAULT_SETTINGS = {
     "test_reroute": True,
     "test_s3": False,
     "use_issue_template": True,
+    "use_legacy_docs": True,
+    "use_unified_docs": False,
 }
 
 

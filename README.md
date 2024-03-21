@@ -200,6 +200,8 @@ The following settings are stored in `template_config.yml`.
   pre_job_template      holds name and a path for a template to be included to run before jobs.
   post_job_template     holds name and a path for a template to be included to run after jobs.
   lint_requirements     Boolean (defaults True) to enable upper bound check on requirements.txt
+  use_unified_docs      Boolean (defaults False) to enable the unified docs CI (see [pulp-docs](https://github.com/pulp/pulp-docs).
+  use_legacy_docs       Boolean (defaults True) to enable the legacy docs CI.
 ```
 
 # Bootstrap a new Pulp plugin
