@@ -1,4 +1,5 @@
 """Tests that perform actions over content unit."""
+
 import unittest
 
 from pulp_smash.pulp3.utils import delete_orphans
