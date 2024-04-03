@@ -27,7 +27,7 @@ jobs:
           twine check dist/*
       - name: "Install built packages"
         run: |
-          pip install dist/{{ plugin_name }}-*-py3-none-any.whl
+          pip install dist/{{ plugin_name | snake }}-*-py3-none-any.whl -c .ci/assets/ci_constraints.txt
       - name: "Generate api specs"
         run: |
           pulpcore-manager openapi --file "api.json"
