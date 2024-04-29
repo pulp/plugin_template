@@ -42,7 +42,7 @@ jobs:
 
       {{ setup_python(pyversion="3.11") | indent(6) }}
 
-      {{ install_python_deps(["gitpython", "packaging", "toml"]) | indent(6) }}
+      {{ install_python_deps(["gitpython", "packaging"]) | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 

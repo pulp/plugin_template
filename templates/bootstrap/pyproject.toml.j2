@@ -7,13 +7,15 @@ build-backend = 'setuptools.build_meta'
 
 [tool.towncrier]
 package = "{{ plugin_name | dash }}"
-filename = "CHANGES.rst"
+filename = "CHANGES.md"
 directory = "CHANGES/"
-title_format = "{version} ({project_date})"
-template = "CHANGES/.TEMPLATE.rst"
+title_format = "## {version} ({project_date}) {% raw %}{{: #{version} }}{% endraw %}"
+template = "CHANGES/.TEMPLATE.md"
 {% if issue_tracker == 'github' %}
-issue_format = "`#{issue} <https://github.com/pulp/{{ plugin_name }}/issues/{issue}>`__"
+issue_format = "[#{issue}](https://github.com/pulp/{{ plugin_name }}/issues/{issue})"
 {% endif %}
+start_string = "[//]: # (towncrier release notes start)\n"
+underlines = ["", "", ""]
 
     [[tool.towncrier.type]]
         directory = "feature"
