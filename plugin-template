@@ -9,13 +9,13 @@ import stat
 import subprocess
 import sys
 import textwrap
-import utils
-import yaml
 from pathlib import Path
 
+import yaml
 from jinja2 import Environment, FileSystemLoader
 from packaging.requirements import Requirement
 
+import utils
 
 DEFAULT_SETTINGS = {
     "api_root": "/pulp/",
@@ -113,6 +113,7 @@ DEPRECATED_FILES = {
         ".travis",
         ".travis.yml",
         "flake8.cfg",
+        "CHANGES/.TEMPLATE.rst",
     ],
     "docs": [
         "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
