@@ -1,0 +1,2 @@
+tomlkit~=0.12.4
+pypandoc_binary~=1.13

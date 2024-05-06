@@ -13,7 +13,6 @@ from pathlib import Path
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
-from packaging.requirements import Requirement
 
 import utils
 
@@ -332,41 +331,15 @@ def main():
         print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
 
     if "github" in sections:
-        migrate_pytest_pin(plugin_root_dir)
+        utils.migrate_changelog_to_markdown(
+            plugin_root_dir,
+            gh_org=config["github_org"],
+            gh_repo=config["plugin_name"],
+        )
 
     if plugin_root_dir:
         print("\nDeprecation check:")
         check_for_deprecated_files(plugin_root_dir, sections)
-
-
-def migrate_pytest_pin(plugin_root_dir):
-    for item in ["func", "unit"]:
-        with open(f"{plugin_root_dir}/{item}test_requirements.txt", "r") as fp:
-            lines = fp.readlines()
-        modified = False
-        found = False
-        result = []
-        for line in lines:
-            try:
-                req = Requirement(line)
-            except ValueError:
-                result.append(line)
-                continue
-            if req.name == "pytest":
-                found = True
-                if not req.specifier:
-                    req.specifier = "<8"
-                    result.append(str(req) + "\n")
-                    modified = True
-                    continue
-            result.append(line)
-        if not found:
-            result.append("pytest<8\n")
-            modified = True
-
-        if modified:
-            with open(f"{plugin_root_dir}/{item}test_requirements.txt", "w") as fp:
-                fp.writelines(result)
 
 
 def to_nice_yaml(data):
