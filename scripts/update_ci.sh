@@ -23,6 +23,7 @@ else
 fi
 
 pushd ../plugin_template
+pip install -r requirements.txt
 ./plugin-template --github $docs $plugin_name
 popd
 
