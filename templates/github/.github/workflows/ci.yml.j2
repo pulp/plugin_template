@@ -68,10 +68,11 @@ jobs:
           mkdir -p "{{ plugin_name }}"
         working-directory: "."
       - name: "Download Deprecations"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: "deprecations"
+          pattern: "deprecations-*"
           path: "{{ plugin_name }}"
+          merge-multiple: true
       - name: "Print deprecations"
         run: |
           cat deprecations-*.txt | sort -u

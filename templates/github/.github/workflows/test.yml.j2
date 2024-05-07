@@ -48,7 +48,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      - uses: "actions/download-artifact@v3"
+      - uses: "actions/download-artifact@v4"
         with:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
@@ -81,9 +81,9 @@ jobs:
           docker logs pulp 2>&1 | grep -i pulpcore.deprecation | tee deprecations-{{ "${{ matrix.env.TEST }}" }}.txt
 
       - name: "Upload Deprecations"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: "deprecations"
+          name: "deprecations-{{ '${{ matrix.env.TEST }}' }}"
           path: "{{ plugin_name }}/deprecations-{{ '${{ matrix.env.TEST }}' }}.txt"
           if-no-files-found: "error"
           retention-days: 5
@@ -92,7 +92,7 @@ jobs:
       {%- for plugin in plugins %}
       - name: Upload python client packages
         if: {{ "${{ env.TEST == 'pulp' }}" }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "python-client.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload python client docs
         if: {{ "${{ env.TEST == 'pulp' }}" }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "python-client-docs.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
@@ -111,7 +111,7 @@ jobs:
       {%- if deploy_client_to_rubygems %}
       - name: Upload Ruby client
         if: {{ "${{ env.TEST == 'pulp' }}" }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "ruby-client.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
@@ -123,7 +123,7 @@ jobs:
       {%- if docs_test %}
       - name: Upload built docs
         if: {{ "${{ env.TEST == 'docs' }}" }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "docs.tar"
           path: "{{ plugin_name }}/docs/docs.tar"

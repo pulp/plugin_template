@@ -35,7 +35,7 @@ jobs:
           # We need the full history for bootstrapping
           fetch-depth: 0
 
-      - uses: "actions/setup-python@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.11"
 
@@ -52,7 +52,7 @@ jobs:
           repository: "pulp/pulp-openapi-generator"
           path: "pulp-openapi-generator"
 
-      - uses: "actions/download-artifact@v3"
+      - uses: "actions/download-artifact@v4"
         with:
           name: "plugin_package"
           path: "pulp_catdog/dist/"
@@ -128,15 +128,15 @@ jobs:
           docker logs pulp 2>&1 | grep -i pulpcore.deprecation | tee deprecations-${{ matrix.env.TEST }}.txt
 
       - name: "Upload Deprecations"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: "deprecations"
+          name: "deprecations-${{ matrix.env.TEST }}"
           path: "pulp_catdog/deprecations-${{ matrix.env.TEST }}.txt"
           if-no-files-found: "error"
           retention-days: 5
       - name: Upload python client packages
         if: ${{ env.TEST == 'pulp' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "python-client.tar"
           path: "pulp_catdog/catdog-python-client.tar"
@@ -145,7 +145,7 @@ jobs:
 
       - name: Upload python client docs
         if: ${{ env.TEST == 'pulp' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "python-client-docs.tar"
           path: "pulp_catdog/catdog-python-client-docs.tar"
@@ -153,7 +153,7 @@ jobs:
           retention-days: 5
       - name: Upload Ruby client
         if: ${{ env.TEST == 'pulp' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "ruby-client.tar"
           path: "pulp_catdog/catdog-ruby-client.tar"
@@ -161,7 +161,7 @@ jobs:
           retention-days: 5
       - name: Upload built docs
         if: ${{ env.TEST == 'docs' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "docs.tar"
           path: "pulp_catdog/docs/docs.tar"
