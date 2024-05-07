@@ -24,7 +24,7 @@ jobs:
           path: "plugin_template"
           # We need the full history for bootstrapping
           fetch-depth: 0
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: "Bootstrap catdog plugin"
@@ -44,7 +44,7 @@ jobs:
           python3 setup.py sdist bdist_wheel --python-tag py3
           twine check dist/*
       - name: "Upload Package whl"
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@v4"
         with:
           name: "plugin_package"
           path: "pulp_catdog/dist/"
