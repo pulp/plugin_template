@@ -69,6 +69,7 @@ jobs:
           name: "python-client.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
           if-no-files-found: "error"
+          overwrite: true
 
       - name: "Upload python client docs"
         uses: "actions/upload-artifact@v4"
@@ -76,6 +77,7 @@ jobs:
           name: "python-client-docs.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
           if-no-files-found: "error"
+          overwrite: true
 
       {%- if deploy_client_to_rubygems %}
       - name: "Upload ruby client packages"
@@ -84,6 +86,7 @@ jobs:
           name: "ruby-client.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
           if-no-files-found: "error"
+          overwrite: true
       {%- endif %}
       {%- endfor %}
 
@@ -100,6 +103,8 @@ jobs:
         with:
           name: "docs.tar"
           path: "{{ plugin_name }}/docs/docs.tar"
+          if-no-files-found: "error"
+          overwrite: true
       {%- endif %}
 
       {{ display_logs() | indent(6) }}
