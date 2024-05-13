@@ -87,6 +87,7 @@ jobs:
           path: "{{ plugin_name }}/deprecations-{{ '${{ matrix.env.TEST }}' }}.txt"
           if-no-files-found: "error"
           retention-days: 5
+          overwrite: true
       {%- endif %}
 
       {%- for plugin in plugins %}
@@ -98,6 +99,7 @@ jobs:
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
           if-no-files-found: "error"
           retention-days: 5
+          overwrite: true
 
       - name: Upload python client docs
         if: {{ "${{ env.TEST == 'pulp' }}" }}
@@ -107,6 +109,7 @@ jobs:
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
           if-no-files-found: "error"
           retention-days: 5
+          overwrite: true
 
       {%- if deploy_client_to_rubygems %}
       - name: Upload Ruby client
@@ -117,6 +120,7 @@ jobs:
           path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
           if-no-files-found: "error"
           retention-days: 5
+          overwrite: true
       {%- endif %}
       {%- endfor %}
 
@@ -127,6 +131,9 @@ jobs:
         with:
           name: "docs.tar"
           path: "{{ plugin_name }}/docs/docs.tar"
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
       {%- endif %}
 
       {{ display_logs() | indent(6) }}
