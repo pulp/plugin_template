@@ -66,27 +66,45 @@ jobs:
       - name: "Upload python client packages"
         uses: "actions/upload-artifact@v4"
         with:
-          name: "python-client.tar"
+          name: "{{ plugin.app_label }}-python-client.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
           if-no-files-found: "error"
           overwrite: true
 
+      - name: "Merge Python client packages"
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: python-client.tar
+          pattern: *-python-client.tar
+
       - name: "Upload python client docs"
         uses: "actions/upload-artifact@v4"
         with:
-          name: "python-client-docs.tar"
+          name: "{{ plugin.app_label }}-python-client-docs.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
           if-no-files-found: "error"
           overwrite: true
+
+      - name: "Merge Python client docs"
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: python-client-docs.tar
+          pattern: *-python-client-docs.tar
 
       {%- if deploy_client_to_rubygems %}
       - name: "Upload ruby client packages"
         uses: "actions/upload-artifact@v4"
         with:
-          name: "ruby-client.tar"
+          name: "{{ plugin.app_label }}-ruby-client.tar"
           path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
           if-no-files-found: "error"
           overwrite: true
+
+      - name: "Merge Ruby client packages"
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: ruby-client.tar
+          pattern: *-ruby-client.tar
       {%- endif %}
       {%- endfor %}
 
