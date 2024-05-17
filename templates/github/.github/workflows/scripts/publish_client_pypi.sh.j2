@@ -13,18 +13,16 @@ if [[ -z "$VERSION" ]]; then
   echo "No version specified."
   exit 1
 fi
+{%- for plugin in plugins %}
 
-RESPONSE="$(curl --write-out '%{http_code}' --silent --output /dev/null "https://pypi.org/project/{{ plugin_name | dash }}-client/$VERSION/")"
+RESPONSE="$(curl --write-out '%{http_code}' --silent --output /dev/null "https://pypi.org/project/{{ plugin.name | dash }}-client/$VERSION/")"
 
 if [ "$RESPONSE" == "200" ];
 then
-  echo "{{ plugin_name }} client $VERSION has already been released. Skipping."
-  exit
+  echo "{{ plugin.name }} client $VERSION has already been released. Skipping."
+else
+  twine upload -u __token__ -p "$PYPI_API_TOKEN" \
+  "dist/{{ plugin.name | snake }}_client-$VERSION-py3-none-any.whl" \
+  "dist/{{ plugin.name | snake }}-client-$VERSION.tar.gz"
 fi
-
-twine upload -u __token__ -p "$PYPI_API_TOKEN" \
-{%- for plugin in plugins %}
-"dist/{{ plugin.name | snake }}_client-$VERSION-py3-none-any.whl" \
-"dist/{{ plugin.name | snake }}-client-$VERSION.tar.gz" \
 {%- endfor %}
-;
