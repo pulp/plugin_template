@@ -76,7 +76,7 @@ jobs:
       {{ install_python_deps(["requests", "packaging~=21.3", "mkdocs", "pymdown-extensions", "Jinja2<3.1"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
-      {%- if publish_docs_to_pulpprojectdotorg and docs_test %}
+      {%- if publish_docs_to_pulpprojectdotorg %}
 
       - name: Download built docs
         uses: actions/download-artifact@v4
