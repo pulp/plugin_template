@@ -272,6 +272,18 @@ def main():
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)
                     )
+                    if not config["docs_test"]:
+                        if config["ci_update_docs"]:
+                            print("There's no use updating the docs pipeline without using it.")
+                            print("Disabling 'ci_update_docs'.")
+                            config["ci_update_docs"] = False
+                            write_new_config = True
+                        if config["publish_docs_to_pulpprojectdotorg"]:
+                            print("Don't publish docs without testing them.")
+                            print("Disabling 'publish_docs_to_pulpprojectdotorg'.")
+                            config["ci_update_docs"] = False
+                            write_new_config = True
+
                     if args.verbose:
                         print("\nUsing the following config:\n")
                         pp = pprint.PrettyPrinter(indent=4)
