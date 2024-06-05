@@ -36,6 +36,13 @@ if [[ "${REDIS_DISABLED:-false}" == true ]]; then
   echo "The Redis service was disabled for $TEST"
 fi
 
+if [[ "{{ ci_base_image }}" = */pulp-ci-centos ]]; then
+  # centos-stream-8 was archived; start using vault.centos.org as a mirror when downloading packages
+  cmd_prefix bash -c "sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* \
+	  && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* \
+	  && yum update -y"
+fi
+
 if [[ -f $POST_BEFORE_SCRIPT ]]; then
   source $POST_BEFORE_SCRIPT
 fi
