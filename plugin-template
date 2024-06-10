@@ -25,6 +25,7 @@ DEFAULT_SETTINGS = {
     "check_stray_pulpcore_imports": True,
     "cli_package": "pulp-cli",
     "cli_repo": "https://github.com/pulp/pulp-cli.git",
+    "ci_disable": False,
     "ci_base_image": "ghcr.io/pulp/pulp-ci-centos9",
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
@@ -394,6 +395,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     }
 
     for relative_path in generate_relative_path_set(section_template_dir):
+        print(relative_path)
         if not config["stalebot"] and "stale" in relative_path:
             continue
         if config["use_issue_template"] is False and "ISSUE_TEMPLATE" in relative_path:
@@ -419,6 +421,13 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
                 destination,
                 template_vars,
             )
+
+            # if the plugin wants to manage their own CI, "disable" the managed ci workflow
+            if os.path.basename(relative_path) == "ci.yml.j2" and config.get("ci_disable"):
+                src = os.path.join(plugin_root_dir, destination)
+                dst = os.path.join(plugin_root_dir, destination + ".disabled")
+                shutil.move(src, dst)
+
             files_templated += 1
             if verbose:
                 print(f"Templated file: {relative_path}")
