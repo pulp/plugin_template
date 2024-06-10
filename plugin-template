@@ -395,7 +395,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     }
 
     for relative_path in generate_relative_path_set(section_template_dir):
-        print(relative_path)
         if not config["stalebot"] and "stale" in relative_path:
             continue
         if config["use_issue_template"] is False and "ISSUE_TEMPLATE" in relative_path:
