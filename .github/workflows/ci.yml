@@ -19,8 +19,8 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
         with:
-          path: "plugin_template"
           fetch-depth: 0
+          path: "plugin_template"
       - uses: "actions/setup-python@v5"
         with:
           python-version: "3.11"
