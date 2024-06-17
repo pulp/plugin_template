@@ -25,11 +25,32 @@ jobs:
         run: |
           python3 setup.py sdist bdist_wheel --python-tag py3
           twine check dist/*
+      - name: "Install built packages"
+        run: |
+          pip install dist/{{ plugin_name }}-*-py3-none-any.whl
+      - name: "Generate api specs"
+        run: |
+          pulpcore-manager openapi --file "api.json"
+          {%- for plugin in plugins %}
+          pulpcore-manager openapi --bindings --component "{{ plugin.app_label }}" --file "{{ plugin.app_label }}-api.json"
+          {%- endfor %}
       - name: "Upload Package whl"
         uses: "actions/upload-artifact@v4"
         with:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+      - name: "Upload API specs"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "api_spec"
+          path: |
+            {{ plugin_name }}/api.json
+            {%- for plugin in plugins %}
+            {{ plugin_name }}/{{ plugin.app_label }}-api.json
+            {%- endfor %}
           if-no-files-found: "error"
           retention-days: 5
           overwrite: true
