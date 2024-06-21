@@ -3,6 +3,7 @@
   checkout,
   setup_python,
   install_python_deps,
+  run_script,
 with context %}
 ---
 name: "Build"
@@ -19,8 +20,9 @@ jobs:
 
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}
+      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
       {{ setup_python() | indent(6) }}
-      {{ install_python_deps(["packaging", "twine", "wheel"]) | indent(6) }}
+      {{ install_python_deps(["packaging", "twine", "wheel", "mkdocs", "jq"]) | indent(6) }}
       - name: "Build package"
         run: |
           python3 setup.py sdist bdist_wheel --python-tag py3
@@ -54,3 +56,41 @@ jobs:
           if-no-files-found: "error"
           retention-days: 5
           overwrite: true
+      {{ run_script(name="Build Python bindings packages", file="build_python_client.sh") | indent(6) }}
+      - name: "Upload python client packages"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "python-client.tar"
+          path: |
+            {%- for plugin in plugins %}
+            {{ plugin_name }}/{{ plugin.app_label }}-python-client.tar
+            {%- endfor %}
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+      - name: "Upload python client docs"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "python-client-docs.tar"
+          path: |
+            {%- for plugin in plugins %}
+            {{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar
+            {%- endfor %}
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+      {%- if deploy_client_to_rubygems %}
+      {{ run_script(name="Build Ruby bindings packages", file="build_ruby_client.sh") | indent(6) }}
+      - name: "Upload Ruby client"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "ruby-client.tar"
+          path: |
+            {%- for plugin in plugins %}
+            {{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar
+            {%- endfor %}
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+      {%- endif %}
+...
