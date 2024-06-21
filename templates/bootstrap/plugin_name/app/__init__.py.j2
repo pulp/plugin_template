@@ -8,3 +8,4 @@ class {{ plugin_name | camel }}PluginAppConfig(PulpPluginAppConfig):
     label = "{{ plugin_app_label }}"
     version = "0.1.0a1.dev"
     python_package_name = "{{ plugin_name }}"
+    domain_compatible = True

@@ -53,6 +53,21 @@ jobs:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
 
+      - uses: "actions/download-artifact@v4"
+        with:
+          name: "python-client.tar"
+          path: "{{ plugin_name }}"
+
+      - name: "Unpack client packages"
+        working-directory: "pulp-openapi-generator"
+        run: |
+          {%- for plugin in plugins %}
+          mkdir -p "{{ plugin.name | snake }}-client"
+          pushd "{{ plugin.name | snake }}-client"
+          tar xvf "../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
+          popd
+          {%- endfor %}
+
       {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
@@ -66,12 +81,6 @@ jobs:
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
       {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
-
-      {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
-
-      {%- if deploy_client_to_rubygems %}
-      {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False, condition="${{ env.TEST == 'pulp' }}") | indent(6) }}
-      {%- endif %}
 
       {{ run_script(name="Script", file="script.sh") | indent(6) }}
       {%- if test_deprecations %}
@@ -90,40 +99,6 @@ jobs:
           overwrite: true
       {%- endif %}
 
-      {%- for plugin in plugins %}
-      - name: Upload python client packages
-        if: {{ "${{ env.TEST == 'pulp' }}" }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: "python-client.tar"
-          path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
-          if-no-files-found: "error"
-          retention-days: 5
-          overwrite: true
-
-      - name: Upload python client docs
-        if: {{ "${{ env.TEST == 'pulp' }}" }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: "python-client-docs.tar"
-          path: "{{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar"
-          if-no-files-found: "error"
-          retention-days: 5
-          overwrite: true
-
-      {%- if deploy_client_to_rubygems %}
-      - name: Upload Ruby client
-        if: {{ "${{ env.TEST == 'pulp' }}" }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: "ruby-client.tar"
-          path: "{{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar"
-          if-no-files-found: "error"
-          retention-days: 5
-          overwrite: true
-      {%- endif %}
-      {%- endfor %}
-
       {%- if docs_test %}
       - name: Upload built docs
         if: {{ "${{ env.TEST == 'docs' }}" }}
@@ -137,3 +112,4 @@ jobs:
       {%- endif %}
 
       {{ display_logs() | indent(6) }}
+...

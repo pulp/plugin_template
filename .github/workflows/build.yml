@@ -27,10 +27,16 @@ jobs:
 
       # Below this line we include the steps of the ci workflow of the generated plugin
 
+      - uses: "actions/checkout@v4"
+        with:
+          fetch-depth: 1
+          repository: "pulp/pulp-openapi-generator"
+          path: "pulp-openapi-generator"
+      - uses: "actions/setup-python@v5"
       - name: "Install python dependencies"
         run: |
           echo ::group::PYDEPS
-          pip install packaging twine wheel
+          pip install packaging twine wheel mkdocs
           echo ::endgroup::
       - name: "Build package"
         run: |
@@ -61,3 +67,49 @@ jobs:
           if-no-files-found: "error"
           retention-days: 5
           overwrite: true
+      - name: "Build Python bindings packages"
+        run: |
+          .github/workflows/scripts/build_python_client.sh
+        shell: "bash"
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_CONTEXT: "${{ github.event.pull_request.commits_url }}"
+      - name: "Upload python client packages"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "python-client.tar"
+          path: |
+            pulp_catdog/catdog-python-client.tar
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+      - name: "Upload python client docs"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "python-client-docs.tar"
+          path: |
+            pulp_catdog/catdog-python-client-docs.tar
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+      - name: "Build Ruby bindings packages"
+        run: |
+          .github/workflows/scripts/build_ruby_client.sh
+        shell: "bash"
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_CONTEXT: "${{ github.event.pull_request.commits_url }}"
+      - name: "Upload Ruby client"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "ruby-client.tar"
+          path: |
+            pulp_catdog/catdog-ruby-client.tar
+          if-no-files-found: "error"
+          retention-days: 5
+          overwrite: true
+...
