@@ -46,6 +46,7 @@ DEFAULT_SETTINGS = {
     "latest_release_branch": None,
     "lint_requirements": True,
     "noissue_marker": "[noissue]",
+    "os_required_packages": [],
     "parallel_test_workers": 8,
     "plugin_app_label": None,
     "plugin_default_branch": "main",

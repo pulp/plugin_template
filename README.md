@@ -105,6 +105,9 @@ The following settings are stored in `template_config.yml`.
 
   docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
 
+  os_required_packages  A list of packages to be installed on the host OS (Ubuntu) in the build
+                        step.
+
   parallel_test_workers Run tests in parallel using `pytest-xdist` with N parallel runners. This
                         settings specifies N. By default it is 8.
 
