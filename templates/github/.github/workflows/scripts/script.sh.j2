@@ -56,6 +56,8 @@ cmd_prefix bash -c "chmod 600 ~pulp/.netrc"
 # Generate bindings
 ###################
 
+echo "::group::Generate bindings"
+
 touch bindings_requirements.txt
 pushd ../pulp-openapi-generator
   # Use app_label to generate api.json and package to produce the proper package name.
@@ -78,10 +80,10 @@ pushd ../pulp-openapi-generator
     # there, because we did not merge plugins into pulpcore back then.
     MODULE="$(jq -r '.module // (.package|gsub("-"; "_"))' <<<"${ITEM}")"
     PACKAGE="${MODULE%%.*}"
+    cmd_prefix pulpcore-manager openapi --bindings --component "${COMPONENT}" > "${COMPONENT}-api.json"
     if [[ ! " ${BUILT_CLIENTS} " =~ "${COMPONENT}" ]]
     then
       rm -rf "./${PACKAGE}-client"
-      cmd_prefix pulpcore-manager openapi --bindings --component "${COMPONENT}" > "${COMPONENT}-api.json"
       ./gen-client.sh "${COMPONENT}-api.json" "${COMPONENT}" python "${PACKAGE}"
       pushd "${PACKAGE}-client"
         python setup.py sdist bdist_wheel --python-tag py3
@@ -98,6 +100,17 @@ pushd ../pulp-openapi-generator
     echo "/root/pulp-openapi-generator/${PACKAGE}-client/dist/${PACKAGE}_client-${VERSION}-py3-none-any.whl" >> "../{{ plugin_name }}/bindings_requirements.txt"
   done
 popd
+
+echo "::endgroup::"
+
+echo "::group::Debug bindings diffs"
+{% for plugin in plugins %}
+# Bindings diff for {{ plugin.app_label }}
+jq '(.paths[][].parameters|select(.)) |= sort_by(.name)' < "{{ plugin.app_label }}-api.json" > "build-api.json"
+jq '(.paths[][].parameters|select(.)) |= sort_by(.name)' < "../pulp-openapi-generator/{{ plugin.app_label }}-api.json" > "test-api.json"
+jsondiff --indent 2 build-api.json test-api.json || true
+{%- endfor %}
+echo "::endgroup::"
 
 # Install test requirements
 ###########################
@@ -153,7 +166,7 @@ else
     cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
     cmd_user_prefix bash -c "pytest -v -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel'"
     {%- endfor %}
-  fi 
+  fi
 fi
 
 {%- if test_cli %}

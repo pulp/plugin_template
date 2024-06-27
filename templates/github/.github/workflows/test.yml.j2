@@ -48,12 +48,20 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      - uses: "actions/download-artifact@v4"
+      - name: "Download plugin package"
+        uses: "actions/download-artifact@v4"
         with:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
 
-      - uses: "actions/download-artifact@v4"
+      - name: "Download API specs"
+        uses: "actions/download-artifact@v4"
+        with:
+          name: "api_spec"
+          path: "{{ plugin_name }}/"
+
+      - name: "Download client packages"
+        uses: "actions/download-artifact@v4"
         with:
           name: "python-client.tar"
           path: "{{ plugin_name }}"
@@ -68,7 +76,7 @@ jobs:
           popd
           {%- endfor %}
 
-      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs"]) | indent(6) }}
+      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs", "jq", "jsonpatch"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
 
