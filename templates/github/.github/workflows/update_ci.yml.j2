@@ -39,7 +39,7 @@ jobs:
       - name: "Run update"
         working-directory: "{{ plugin_name }}"
         run: |
-          ../plugin_template/scripts/update_ci.sh
+          ../plugin_template/scripts/update_ci.sh{% if branch != plugin_default_branch %} --release{% endif %}
 
       - name: "Create Pull Request for CI files"
         uses: "peter-evans/create-pull-request@v6"
