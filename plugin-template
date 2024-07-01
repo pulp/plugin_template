@@ -518,7 +518,8 @@ def check_for_deprecated_files(plugin_root_dir, sections):
         for fp in DEPRECATED_FILES.get(section, []):
             path = Path(plugin_root_dir).joinpath(fp)
             if path.exists():
-                print(f"Found deprecated file: '{path}'. It is recommended you delete this file.")
+                path.unlink()
+                print(f"Removed deprecated file: '{path}'.")
                 files_found = True
 
     if not files_found:
