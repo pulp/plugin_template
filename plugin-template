@@ -111,6 +111,7 @@ DEPRECATED_FILES = {
         ".github/workflows/scripts/install_ruby_client.sh",
         ".github/workflows/scripts/release.py",
         ".github/workflows/scripts/stage-changelog-for-master.py",
+        ".github/workflows/scripts/post_docs_test.sh",
         ".github/workflows/scripts/update_ci.sh",
         ".travis",
         ".travis.yml",
@@ -120,6 +121,7 @@ DEPRECATED_FILES = {
     "docs": [
         "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
         "docs/_static/api.json",
+        "docs/_scripts/",
     ],
 }
 
@@ -518,8 +520,12 @@ def check_for_deprecated_files(plugin_root_dir, sections):
         for fp in DEPRECATED_FILES.get(section, []):
             path = Path(plugin_root_dir).joinpath(fp)
             if path.exists():
-                path.unlink()
-                print(f"Removed deprecated file: '{path}'.")
+                if path.is_dir():
+                    shutil.rmtree(path)
+                    print(f"Removed deprecated directory: '{path}'.")
+                else:
+                    path.unlink()
+                    print(f"Removed deprecated file: '{path}'.")
                 files_found = True
 
     if not files_found:

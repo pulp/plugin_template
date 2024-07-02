@@ -465,7 +465,6 @@ scripts are executed in the following order, with optional plugin provided scrip
 1. before_script.sh
 1. **post_before_script.sh**
 1. script.sh
-1. **post_docs_test.sh**
 1. **post_script.sh**
 
 # Additional Topics
