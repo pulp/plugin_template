@@ -37,7 +37,6 @@ DEFAULT_SETTINGS = {
     "doc_requirements_from_pulpcore": False,
     "docker_fixtures": False,
     "docs_test": True,
-    "extra_docs_requirements": [],
     "flake8_ignore": [],
     "flake8": True,
     "github_org": "pulp",
@@ -54,7 +53,6 @@ DEFAULT_SETTINGS = {
     "plugins": None,
     "post_job_template": None,
     "pre_job_template": None,
-    "publish_docs_to_pulpprojectdotorg": False,
     "pulp_env": {},
     "pulp_env_azure": {},
     "pulp_env_gcp": {},
@@ -82,8 +80,6 @@ DEFAULT_SETTINGS = {
     "test_reroute": True,
     "test_s3": False,
     "use_issue_template": True,
-    "use_legacy_docs": True,
-    "use_unified_docs": False,
 }
 
 
@@ -105,13 +101,17 @@ DEPRECATED_FILES = {
         ".ci/scripts/update_github.sh",
         ".ci/scripts/update_redmine.sh",
         ".ci/scripts/upper_bound.py",
+        ".github/workflows/changelog.yml",
         ".github/workflows/fips.yml",
         ".github/workflows/scripts/create_release_from_tag.sh",
         ".github/workflows/scripts/install_python_client.sh",
         ".github/workflows/scripts/install_ruby_client.sh",
         ".github/workflows/scripts/release.py",
         ".github/workflows/scripts/stage-changelog-for-master.py",
+        ".github/workflows/scripts/post_docs_test.sh",
         ".github/workflows/scripts/update_ci.sh",
+        ".github/workflows/scripts/docs-publisher.py",
+        ".github/workflows/scripts/publish_docs.sh",
         ".travis",
         ".travis.yml",
         "flake8.cfg",
@@ -279,11 +279,6 @@ def main():
                         if config["ci_update_docs"]:
                             print("There's no use updating the docs pipeline without using it.")
                             print("Disabling 'ci_update_docs'.")
-                            config["ci_update_docs"] = False
-                            write_new_config = True
-                        if config["publish_docs_to_pulpprojectdotorg"]:
-                            print("Don't publish docs without testing them.")
-                            print("Disabling 'publish_docs_to_pulpprojectdotorg'.")
                             config["ci_update_docs"] = False
                             write_new_config = True
 
@@ -518,8 +513,12 @@ def check_for_deprecated_files(plugin_root_dir, sections):
         for fp in DEPRECATED_FILES.get(section, []):
             path = Path(plugin_root_dir).joinpath(fp)
             if path.exists():
-                path.unlink()
-                print(f"Removed deprecated file: '{path}'.")
+                if path.is_dir():
+                    shutil.rmtree(path)
+                    print(f"Removed deprecated directory: '{path}'.")
+                else:
+                    path.unlink()
+                    print(f"Removed deprecated file: '{path}'.")
                 files_found = True
 
     if not files_found:

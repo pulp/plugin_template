@@ -1,23 +1,5 @@
 {% include 'header.j2' %}
 -r requirements.txt
 towncrier
-{%- if use_legacy_docs %}
 
-# Legacy docs
-plantuml
-sphinx~=7.1.2
-sphinx-rtd-theme==1.3.0
-sphinxcontrib-jquery
-sphinxcontrib-openapi
-mistune<4.0.0
-Jinja2<3.2
-{%- endif %}
-{%- if use_unified_docs %}
-
-# Unified docs
 pulp-docs @ git+https://github.com/pulp/pulp-docs@main
-{%- endif %}
-# Extra requirements
-{%- for req in extra_docs_requirements %}
-{{ req }}
-{%- endfor %}

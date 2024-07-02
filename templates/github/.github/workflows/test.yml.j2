@@ -107,17 +107,5 @@ jobs:
           overwrite: true
       {%- endif %}
 
-      {%- if docs_test %}
-      - name: Upload built docs
-        if: {{ "${{ env.TEST == 'docs' }}" }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: "docs.tar"
-          path: "{{ plugin_name }}/docs/docs.tar"
-          if-no-files-found: "error"
-          retention-days: 5
-          overwrite: true
-      {%- endif %}
-
       {{ display_logs() | indent(6) }}
 ...

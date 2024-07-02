@@ -1,23 +1,12 @@
 This is the ``plugin_template`` repository to help plugin writers get started and write their own
 plugin for [Pulp Project 3.0+](https://pypi.python.org/pypi/pulpcore/).
 
-
 # Plugin Writing Walkthrough
 
 If you are planning on writing a new Pulp plugin, but have no idea what you're doing you've come to the right place.
 The purpose of this guide is to walk you through, step by step, the Pulp plugin creation process.
 
 This guide specifically details *how* you write a new content plugin.
-
-[*Why* would you want to write a plugin?](https://docs.pulpproject.org/pulpcore/plugins/index.html)
-
-[*What* exactly is this Pulp thing?](https://docs.pulpproject.org/pulpcore/components.html)
-
-It's recommend that you develop on a system that already has
-[Pulp installed](https://docs.pulpproject.org/pulpcore/installation/instructions.html).
-This allows you to test your plugin at every step.
-
-It's also recommended that you go through the [planning guide](meta_docs/planning-guide.md) before starting to develop your plugin.
 
 # Generate a plugin template config for a new Pulp plugin
 
@@ -120,11 +109,6 @@ The following settings are stored in `template_config.yml`.
   plugins               List of dictionaries with `app_label` and `name` as keys. One entry per
                         plugin resident in this repository.
 
-  publish_docs_to_pulpprojectdotorg
-                        Include a job for publishing documentation to
-                        docs.pulpproject.org/<plugin_name>/. This job requires the project-specific
-                        authorized ssh key to be set as a secret named `PULP_DOCS_KEY`.
-
   pulp_settings         A dictionary of settings that the plugin tests require to be set.
 
   pulp_settings_<scenario>
@@ -203,8 +187,6 @@ The following settings are stored in `template_config.yml`.
   pre_job_template      holds name and a path for a template to be included to run before jobs.
   post_job_template     holds name and a path for a template to be included to run after jobs.
   lint_requirements     Boolean (defaults True) to enable upper bound check on requirements.txt
-  use_unified_docs      Boolean (defaults False) to enable the unified docs CI (see [pulp-docs](https://github.com/pulp/pulp-docs).
-  use_legacy_docs       Boolean (defaults True) to enable the legacy docs CI.
 ```
 
 # Bootstrap a new Pulp plugin
@@ -278,9 +260,6 @@ http://localhost:24817/pulp/api/v3/docs
 Your plugin is discoverable by Pulp because it is [a Django application that subclasses
 pulpcore.plugin.PulpPluginAppConfig]({{ plugin_name | snake }}/app/__init__.py)
 
-For more information about plugin discoverability, including how it works and plugin
-entrypoints see [the discoverability documentation](meta_docs/discoverability.md)
-
 
 # Customizing Plugin Behavior
 
@@ -290,7 +269,7 @@ Bootstrapping created various new endpoints (e.g. remote, repository and content
 Additional information should be added to these to tell Pulp how to handle your content.
 
 For each of these endpoints, the bootstrap has created a `model`, a `serializer` and a `viewset`.
-The [model](https://docs.djangoproject.com/en/2.1/topics/db/models/) is how the data is stored in the database.
+The [model](https://docs.djangoproject.com/en/3.2/topics/db/models/) is how the data is stored in the database.
 The [serializer](http://www.django-rest-framework.org/api-guide/serializers/) converts complex data to easily parsable types (XML, JSON).
 The [viewset](http://www.django-rest-framework.org/api-guide/viewsets/) provides the handlers to serve/receive the serialized data.
 
@@ -302,21 +281,19 @@ are located in `pulpcore.app`, plugins should always use `pulpcore.plugin` inste
 since `pulpcore.plugin` gurantees the plugin API semantic versioning
 
 Models:
- * model(s) for the specific content type(s) used in plugin, should be subclassed from [pulpcore.plugin.models.Content](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/models/content.py) model
- * model(s) for the plugin specific repository(ies), should be subclassed from [pulpcore.plugin.models.Repository](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/models/repository.py) model
- * model(s) for the plugin specific remote(s), should be subclassed from [pulpcore.plugin.models.Remote](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/models/repository.py) model
+ * model(s) for the specific content type(s) used in plugin, should be subclassed from [pulpcore.plugin.models.Content](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/models/content.py) model
+ * model(s) for the plugin specific repository(ies), should be subclassed from [pulpcore.plugin.models.Repository](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/models/repository.py) model
+ * model(s) for the plugin specific remote(s), should be subclassed from [pulpcore.plugin.models.Remote](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/models/repository.py) model
 
 Serializers:
- * serializer(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.serializers.ContentSerializer](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/serializers/content.py)
- * serializer(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.serializers.RemoteSerializer](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/serializers/repository.py)
- * serializer(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.serializers.RepositorySerializer](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/serializers/repository.py)
+ * serializer(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.serializers.ContentSerializer](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/serializers/content.py)
+ * serializer(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.serializers.RemoteSerializer](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/serializers/repository.py)
+ * serializer(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.serializers.RepositorySerializer](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/serializers/repository.py)
 
 Viewsets:
- * viewset(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.viewsets.ContentViewSet](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/viewsets/content.py)
- * viewset(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.viewsets.RepositoryViewset](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/viewsets/repository.py)
- * viewset(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.viewsets.RemoteViewset](https://github.com/pulp/pulpcore/blob/main/pulpcore/pulpcore/app/viewsets/repository.py)
-
-Keep [namespacing](meta_docs/subclassing/namespacing.md) in mind when writing your viewsets.
+ * viewset(s) for plugin specific content type(s), should be subclassed from [pulpcore.plugin.viewsets.ContentViewSet](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/viewsets/content.py)
+ * viewset(s) for plugin specific repository(ies), should be subclassed from [pulpcore.plugin.viewsets.RepositoryViewset](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/viewsets/repository.py)
+ * viewset(s) for plugin specific remote(s), should be subclassed from [pulpcore.plugin.viewsets.RemoteViewset](https://github.com/pulp/pulpcore/blob/main/pulpcore/app/viewsets/repository.py)
 
 ## Content
 
@@ -404,38 +381,6 @@ Note the sync route is predefined for you. This route kicks off a task [{{ plugi
 If you have more than one Repository type in your plugin, or you change the name of your existing one, you will also
 need to have a RepositoryVersionViewSet defined for it (just a viewset, no other objects needed). This hasfield, ``parent_viewset``, which should be set to the accompanying Repository class defined in your plugin.
 
-
-# Exporter
-
-TODO
-
-# Tasks
-
-[Tasks](meta_docs/tasks/index.md) such as sync and publish are needed to tell Pulp how to perform certain actions.
-
-[More about Sync task](meta_docs/tasks/add-remove.md)
-
-[More about Publish task](meta_docs/tasks/publish.md)
-
-[More about Export task](meta_docs/tasks/export.md)
-
-# Tests
-
-TODO
-
-# Documentation
-
-Your bootstrap template comes with a set of [prepopulated docs](docs/). You can host these on
-readthedocs when you are ready.
-
-Pulp also comes with a set of [auto API docs](meta_docs/reference/documentation.md). When your
-plugin is installed endpoints in the live api docs will be automatically populate.
-
-When you run 'make html' command to build the docs, you must have the pulp-api running on
-localhost. The 'make html' command first downloads the OpenAPI schema for the plugin and saves it
-in ``docs/_static/api.json``. This file will then provide data needed to display the restapi.html
-page in the root of the built docs.
-
 # Github Actions configuration
 
 The script for generating a CI/CD configuration provided in this repository can be used to change
@@ -465,16 +410,7 @@ scripts are executed in the following order, with optional plugin provided scrip
 1. before_script.sh
 1. **post_before_script.sh**
 1. script.sh
-1. **post_docs_test.sh**
 1. **post_script.sh**
-
-# Additional Topics
-
-* [CLI](metadocs/reference/cli.md)
-* [Community Development](metadocs/reference/community-development.md)
-* [Live API](metadocs/reference/live-api.md)
-* [Error Handling](metadocs/reference/error_handling.md)
-* [Releasing](metadocs/reference/releasing.md)
 
 # A Plugin Completeness Checklist
 
@@ -487,29 +423,3 @@ scripts are executed in the following order, with optional plugin provided scrip
 - [ ] Database migrations are generated and committed
 - [ ] Errors are handled according to Pulp conventions
 - [ ] Docs for plugin are available (any location and format preferred and provided by plugin writer)
-
-
-# Tagging plugin_template
-
-plugin_template uses towncrier to manage a changelog for plugin writers to view. Whenever there is a
-major change to plugin_template, we recommend generating the changelog and tagging it.
-
-The versions is the day in the format YYYY.MM.DD (eg "2020.08.11"). If there is more than one
-release on a day, you can append a number to end after a hyphen (eg "2020.08.11-1").
-
-1. First, generate the changelog with your version (`towncrier --yes --version 2020.08.11`)
-2. Check in the new changelog, push, and open your PR.
-3. After the PR is merged, create a tag pointing to the changelog commit (`git tag 2020.08.11 9fceb02`)
-4. Push your tag (`git push origin 2020.08.11`)
-
-
-# Contributing
-
-### Pull Request Checklist
-
-1. Unless a change is small or doesn't affect plugin writers, create an issue on
-https://pulp.plan.io/projects/pulp. Add the tag "Plugin Template".
-2. Add [a changelog update.](https://docs.pulpproject.org/contributing/git.html#changelog-update)
-3. Write an excellent [Commit Message.](https://docs.pulpproject.org/contributing/git.html#commit-message)
-Make sure you reference and link to the issue.
-4. Push your branch to your fork and open a [Pull request across forks.](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
