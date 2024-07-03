@@ -136,8 +136,6 @@ jobs:
 
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
-      {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
-
       {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
 
       {{ run_script(name="Performance Test", file="script.sh") | indent(6) }}
