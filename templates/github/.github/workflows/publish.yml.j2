@@ -25,102 +25,11 @@ jobs:
   build:
     uses: "./.github/workflows/build.yml"
 
-  build-bindings-docs:
-    needs:
-      - "build"
-    runs-on: "ubuntu-latest"
-    # Install scripts expect TEST to be set, 'docs' is most appropriate even though we don't run tests
-    env:
-      TEST: "docs"
-    steps:
-      {{ checkout(depth=1, path=plugin_name) | indent(6) }}
-
-      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
-
-      {{ setup_python() | indent(6) }}
-
-      - uses: "actions/download-artifact@v4"
-        with:
-          name: "plugin_package"
-          path: "{{ plugin_name }}/dist/"
-
-      {%- if deploy_client_to_rubygems %}
-      {{ setup_ruby() | indent(6) }}
-      {%- endif %}
-
-      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs"]) | indent(6) }}
-
-      # Building the bindings and docs requires accessing the OpenAPI specs endpoint, so we need to
-      # setup the Pulp instance.
-      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
-
-      {{ run_script(name="Install", file="install.sh") | indent(6) }}
-
-      {{ run_script(name="Install Python client", file="install_python_client.sh", withenv=False) | indent(6) }}
-
-      {%- if deploy_client_to_rubygems %}
-      {{ run_script(name="Install Ruby client", file="install_ruby_client.sh", withenv=False) | indent(6) }}
-      {%- endif %}
-
-      - name: "Upload python client packages"
-        uses: "actions/upload-artifact@v4"
-        with:
-          name: "python-client.tar"
-          path: |
-            {%- for plugin in plugins %}
-            {{ plugin_name }}/{{ plugin.app_label }}-python-client.tar
-            {%- endfor %}
-          if-no-files-found: "error"
-          overwrite: true
-
-      - name: "Upload python client docs"
-        uses: "actions/upload-artifact@v4"
-        with:
-          name: "python-client-docs.tar"
-          path: |
-            {%- for plugin in plugins %}
-            {{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar
-            {%- endfor %}
-          if-no-files-found: "error"
-          overwrite: true
-
-      {%- if deploy_client_to_rubygems %}
-      - name: "Upload ruby client packages"
-        uses: "actions/upload-artifact@v4"
-        with:
-          name: "ruby-client.tar"
-          path: |
-            {%- for plugin in plugins %}
-            {{ plugin_name }}/{{ plugin.app_label }}-ruby-client.tar
-            {%- endfor %}
-          if-no-files-found: "error"
-          overwrite: true
-      {%- endif %}
-
-      {%- if publish_docs_to_pulpprojectdotorg %}
-      - name: Build docs
-        run: |
-          export DJANGO_SETTINGS_MODULE=pulpcore.app.settings
-          export PULP_SETTINGS=$PWD/.ci/ansible/settings/settings.py
-          make -C docs/ PULP_URL="{{ pulp_scheme }}://pulp" diagrams html
-          tar -cvf docs/docs.tar docs/_build
-
-      - name: "Upload built docs"
-        uses: actions/upload-artifact@v4
-        with:
-          name: "docs.tar"
-          path: "{{ plugin_name }}/docs/docs.tar"
-          if-no-files-found: "error"
-          overwrite: true
-      {%- endif %}
-
-      {{ display_logs() | indent(6) }}
-
   {%- if deploy_to_pypi %}
   publish-package:
     runs-on: "ubuntu-latest"
     needs:
-      - "build-bindings-docs"
+      - "build"
 
     env:
       GITHUB_TOKEN: "{{ '${{ secrets.GITHUB_TOKEN }}' }}"
@@ -148,7 +57,7 @@ jobs:
   publish-python-bindings:
     runs-on: "ubuntu-latest"
     needs:
-      - "build-bindings-docs"
+      - "build"
 
     env:
       GITHUB_TOKEN: "{{ '${{ secrets.GITHUB_TOKEN }}' }}"
@@ -183,7 +92,7 @@ jobs:
   publish-ruby-bindings:
     runs-on: "ubuntu-latest"
     needs:
-      - "build-bindings-docs"
+      - "build"
 
     env:
       GITHUB_TOKEN: "{{ "${{ secrets.GITHUB_TOKEN }}" }}"
@@ -216,7 +125,7 @@ jobs:
   publish-docs:
     runs-on: "ubuntu-latest"
     needs:
-      - "build-bindings-docs"
+      - "build"
 
     env:
       GITHUB_TOKEN: "{{ "${{ secrets.GITHUB_TOKEN }}" }}"
@@ -251,7 +160,7 @@ jobs:
   create-gh-release:
     runs-on: "ubuntu-latest"
     needs:
-      - "build-bindings-docs"
+      - "build"
       {%- if deploy_to_pypi %}
       - "publish-package"
       {%- endif %}
