@@ -52,3 +52,12 @@ then
     echo "No formatting change needed"
   fi
 fi
+
+# Check that pulpcore lowerbounds is set to a supported branch
+if [[ "$plugin_name" != "pulpcore" ]]; then
+  python ../plugin_template/scripts/update_core_lowerbound.py
+  if [[ $(git status --porcelain) ]]; then
+    git add -A
+    git commit -m "Bump pulpcore lowerbounds to supported branch" -m "$noissue_marker"
+  fi
+fi
