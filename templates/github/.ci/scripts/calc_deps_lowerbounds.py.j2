@@ -4,13 +4,18 @@ from packaging.requirements import Requirement
 
 
 def main():
-    """Calculate the lower bound of dependencies where possible."""
+    """Calculate constraints for the lower bound of dependencies where possible."""
     with open("requirements.txt") as req_file:
         for line in req_file:
+            split_line = line.split("#", maxsplit=1)
             try:
-                requirement = Requirement(line)
+                comment = "  # " + split_line[1].strip()
+            except IndexError:
+                comment = ""
+            try:
+                requirement = Requirement(split_line[0])
             except ValueError:
-                print(line.strip())
+                print(f"# {line.strip()}")
             else:
                 for spec in requirement.specifier:
                     if spec.operator == ">=":
@@ -19,10 +24,10 @@ def main():
                         else:
                             operator = "=="
                         min_version = str(spec)[2:]
-                        print(f"{requirement.name}{operator}{min_version}")
+                        print(f"{requirement.name}{operator}{min_version}{comment}")
                         break
                 else:
-                    print(line.strip())
+                    print(f"# {line.strip()}")
 
 
 if __name__ == "__main__":
