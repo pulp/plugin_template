@@ -31,7 +31,7 @@ def main():
                                 min_version = parse(spec.version)
                                 if min_version not in versions:
                                     # Lowerbound is not a supported branch, modify to next lowest
-                                    valid_lowerbounds = requirement.specifier.filter(versions)
+                                    valid_lowerbounds = list(requirement.specifier.filter(versions))
                                     if valid_lowerbounds:
                                         new_min_version = min(valid_lowerbounds)
                                         print(f"Lower bounds updated to >={new_min_version}")
