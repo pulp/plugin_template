@@ -88,6 +88,28 @@ jobs:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
 
+      - name: "Download API specs"
+        uses: "actions/download-artifact@v4"
+        with:
+          name: "api_spec"
+          path: "{{ plugin_name }}/"
+
+      - name: "Download client packages"
+        uses: "actions/download-artifact@v4"
+        with:
+          name: "python-client.tar"
+          path: "{{ plugin_name }}"
+
+      - name: "Unpack client packages"
+        working-directory: "pulp-openapi-generator"
+        run: |
+          {%- for plugin in plugins %}
+          mkdir -p "{{ plugin.name | snake }}-client"
+          pushd "{{ plugin.name | snake }}-client"
+          tar xvf "../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
+          popd
+          {%- endfor %}
+
       {{ setup_python() | indent(6) }}
 
       {{ setup_env(test="performance") | indent(6) }}
