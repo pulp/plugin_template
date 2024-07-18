@@ -14,9 +14,7 @@ pushd ../pulp-openapi-generator
 {%- for plugin in plugins %}
 rm -rf "{{ plugin.name | snake }}-client"
 
-# We need to copy that over to be visible in the container.
-cp "../{{ plugin_name }}/{{ plugin.app_label }}-api.json" .
-./gen-client.sh "{{ plugin.app_label }}-api.json" "{{ plugin.app_label }}" python "{{ plugin.name | snake }}"
+./gen-client.sh "../{{ plugin_name }}/{{ plugin.app_label }}-api.json" "{{ plugin.app_label }}" python "{{ plugin.name | snake }}"
 
 pushd {{ plugin.name | snake }}-client
 python setup.py sdist bdist_wheel --python-tag py3
