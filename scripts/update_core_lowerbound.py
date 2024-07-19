@@ -29,7 +29,7 @@ def main():
                         for spec in requirement.specifier:
                             if spec.operator == ">=":
                                 min_version = parse(spec.version)
-                                if min_version not in versions:
+                                if parse(f"{min_version.major}.{min_version.minor}") not in versions:
                                     # Lowerbound is not a supported branch, modify to next lowest
                                     valid_lowerbounds = list(requirement.specifier.filter(versions))
                                     if valid_lowerbounds:
