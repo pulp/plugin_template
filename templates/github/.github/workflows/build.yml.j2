@@ -61,6 +61,7 @@ jobs:
           if-no-files-found: "error"
           retention-days: 5
           overwrite: true
+      {%- if plugins %}
       {{ run_script(name="Build Python bindings packages", file="build_python_client.sh") | indent(6) }}
       - name: "Upload python client packages"
         uses: "actions/upload-artifact@v4"
@@ -97,5 +98,6 @@ jobs:
           if-no-files-found: "error"
           retention-days: 5
           overwrite: true
+      {%- endif %}
       {%- endif %}
 ...

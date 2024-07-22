@@ -59,6 +59,7 @@ jobs:
         with:
           name: "api_spec"
           path: "{{ plugin_name }}/"
+      {%- if plugins %}
 
       - name: "Download client packages"
         uses: "actions/download-artifact@v4"
@@ -75,6 +76,7 @@ jobs:
           tar xvf "../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
           popd
           {%- endfor %}
+      {%- endif %}
 
       {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs", "jq", "jsonpatch"]) | indent(6) }}
 
