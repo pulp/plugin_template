@@ -396,11 +396,13 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             ci_update_branches.append(latest_release_branch)
     ci_update_branches.extend(config["supported_release_branches"])
 
+    ci_update_hour = sum((ord(c) for c in config["plugin_app_label"])) % 24
     template_vars = {
         "section": name,
         "gitref": gitref,
         "ci_update_branches": ci_update_branches,
         "python_version": "3.11",
+        "ci_update_hour": ci_update_hour,
         **config,
     }
 
