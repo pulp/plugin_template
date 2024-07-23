@@ -12,8 +12,8 @@ on:
   {%- if sync_ci %}
   schedule:
     # * is a special character in YAML so you have to quote this string
-    # runs at 2:30 UTC every Sunday
-    - cron: '30 2 * * 0'
+    # runs at {{ ci_update_hour }}:30 UTC every Sunday
+    - cron: '30 {{ ci_update_hour }} * * 0'
   {%- endif %}
   workflow_dispatch:
 
