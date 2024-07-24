@@ -41,7 +41,6 @@ DEFAULT_SETTINGS = {
     "flake8": True,
     "github_org": "pulp",
     "issue_tracker": "github",
-    "kanban": True,
     "latest_release_branch": None,
     "lint_requirements": True,
     "noissue_marker": "[noissue]",
@@ -102,6 +101,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/update_github.sh",
         ".ci/scripts/update_redmine.sh",
         ".ci/scripts/upper_bound.py",
+        ".github/workflows/kanban.yml",
         ".github/workflows/changelog.yml",
         ".github/workflows/fips.yml",
         ".github/workflows/scripts/create_release_from_tag.sh",
@@ -410,8 +410,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         if not config["stalebot"] and "stale" in relative_path:
             continue
         if config["use_issue_template"] is False and "ISSUE_TEMPLATE" in relative_path:
-            continue
-        if config["kanban"] is False and "kanban" in relative_path:
             continue
         destination_relative_path = relative_path.replace(
             "plugin_name", utils.to_snake(config["plugin_name"])
