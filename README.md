@@ -92,8 +92,6 @@ The following settings are stored in `template_config.yml`.
   latest_release_branch A pointer to the currently latest release branch (this is automatically
                         updated).
 
-  docs_test             Include a CI build for testing the 'make html' command for sphinx docs.
-
   os_required_packages  A list of packages to be installed on the host OS (Ubuntu) in the build
                         step.
 
@@ -229,12 +227,12 @@ provided by the plugin-template.
 
 # Add Documentation to a Pulp plugin
 
-The next step is to add documentation that can be hosted on
-[Read the Docs](https://readthedocs.org/).
+The next step is to add documentation.
+Pulp has a dedicated documentation tool that aggregates docs from subscribed plugins and handles
+its publishing.
 
-1. Run the `./plugin-template --docs` command to generate the docs.
-
-   ``$ ./plugin-template --docs PLUGIN_NAME``
+To learn more about how it works and how to include your plugin, check out
+[pulp-docs documentation](https://pulpproject.org/pulp-docs/docs/dev/).
 
 ## Discoverability
 
@@ -263,7 +261,7 @@ pulpcore.plugin.PulpPluginAppConfig]({{ plugin_name | snake }}/app/__init__.py)
 
 # Customizing Plugin Behavior
 
-First, look at the [overview](https://docs.pulpproject.org/pulpcore/plugins/plugin-writer/concepts/index.html) of Pulp Models to understand how Pulp fits these pieces together.
+First, look at the [overview](https://pulpproject.org/pulpcore/docs/dev/learn/plugin-concepts/) of Pulp Models to understand how Pulp fits these pieces together.
 
 Bootstrapping created various new endpoints (e.g. remote, repository and content).
 Additional information should be added to these to tell Pulp how to handle your content.
