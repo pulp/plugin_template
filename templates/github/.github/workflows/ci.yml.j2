@@ -43,6 +43,9 @@ jobs:
       {%- endif %}
   {%- endif %}
 
+  docs:
+    uses: "./.github/workflows/docs.yml"
+
   lint:
     {%- if pre_job_template %}
     needs: {{ pre_job_template.name }}
@@ -88,6 +91,7 @@ jobs:
       {%- endif %}
       - "lint"
       - "test"
+      - "docs"
     if: "always()"
     steps:
       - name: "Collect needed jobs results"

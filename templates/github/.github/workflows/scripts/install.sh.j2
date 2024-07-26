@@ -16,25 +16,18 @@ PLUGIN_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${PLUGIN_VERSI
 export PULP_API_ROOT="{{ api_root }}"
 
 PIP_REQUIREMENTS=("{{ cli_package }}")
-if [[ "$TEST" = "docs" || "$TEST" = "publish" ]]
-then
-  PIP_REQUIREMENTS+=("-r" "doc_requirements.txt")
 {%- if plugin_name == 'pulpcore' %}
+if [[ "$TEST" = "publish" ]]
+then
   PIP_REQUIREMENTS+=("psycopg2-binary")
-{%- elif doc_requirements_from_pulpcore %}
-  git clone https://github.com/pulp/pulpcore.git ../pulpcore
-  PIP_REQUIREMENTS+=("psycopg2-binary" "-r" "../pulpcore/doc_requirements.txt")
-{%- endif %}
 fi
+{%- endif %}
 
 pip install ${PIP_REQUIREMENTS[*]}
 
 {% if test_cli -%}
-if [[ "$TEST" != "docs" ]]
-then
-  PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
-  git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }} ../{{ cli_package }}
-fi
+PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
+git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }} ../{{ cli_package }}
 {%- endif %}
 
 cd .ci/ansible/
@@ -191,9 +184,7 @@ fi
 
 pulp config create --base-url {{ pulp_scheme }}://pulp{% if pulp_scheme != 'https' %} --no-verify-ssl{% endif %} --api-root "$PULP_API_ROOT" --username "admin" --password "password"
 {% if test_cli -%}
-if [[ "$TEST" != "docs" ]]; then
-  cp ~/.config/pulp/cli.toml "${REPO_ROOT}/../{{ cli_package }}/tests/cli.toml"
-fi
+cp ~/.config/pulp/cli.toml "${REPO_ROOT}/../{{ cli_package }}/tests/cli.toml"
 {%- endif %}
 
 ansible-playbook build_container.yaml

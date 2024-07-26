@@ -28,15 +28,12 @@ DEFAULT_SETTINGS = {
     "ci_base_image": "ghcr.io/pulp/pulp-ci-centos9",
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
-    "ci_update_docs": True,
     "core_import_allowed": [],
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
     "deploy_to_pypi": True,
     "disabled_redis_runners": [],
-    "doc_requirements_from_pulpcore": False,
     "docker_fixtures": False,
-    "docs_test": True,
     "flake8_ignore": [],
     "flake8": True,
     "github_org": "pulp",
@@ -124,6 +121,12 @@ DEPRECATED_FILES = {
     ],
 }
 
+DOCS_OPTION_DEPRECATION_INFO = """\
+'--docs' option is deprecated (July, 2024):
+    Most docs intervention are now handled by pulp-docs.
+    See https://github.com/pulp/pulp-docs.\
+"""
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -194,8 +197,10 @@ def main():
         "--docs",
         action="store_true",
         help=textwrap.dedent(
-            """\
+            f"""\
                 Generate or update plugin documentation.
+
+                {DOCS_OPTION_DEPRECATION_INFO}
 
             """
         ),
@@ -276,12 +281,6 @@ def main():
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)
                     )
-                    if not config["docs_test"]:
-                        if config["ci_update_docs"]:
-                            print("There's no use updating the docs pipeline without using it.")
-                            print("Disabling 'ci_update_docs'.")
-                            config["ci_update_docs"] = False
-                            write_new_config = True
 
                     if args.verbose:
                         print("\nUsing the following config:\n")
@@ -334,6 +333,9 @@ def main():
         if getattr(args, section) or args.all
     ]
     for section in sections:
+        if section == "docs":
+            print(DOCS_OPTION_DEPRECATION_INFO)
+            continue
         write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
     if write_new_config and not (args.generate_config or args.all):

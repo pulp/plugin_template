@@ -1,0 +1,41 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  checkout,
+  setup_python,
+  install_python_deps,
+with context %}
+---
+name: "Docs"
+on:
+  workflow_call:
+
+jobs:
+  test:
+    if: "endsWith(github.base_ref, 'main')"
+    runs-on: "ubuntu-20.04"
+    defaults:
+      run:
+        working-directory: "{{ plugin_name }}"
+    steps:
+      {{ checkout(depth=1, path=plugin_name) | indent(6) }}
+      {{ setup_python() | indent(6) }}
+      - name: "Setup cache key"
+        run: |
+          git ls-remote https://github.com/pulp/pulp-docs main | tee pulp-docs-main-sha
+      - uses: "actions/cache@v4"
+        with:
+          path: "~/.cache/pip"
+          key: {{ "${{ runner.os }}-pip-${{ hashFiles('pulp-docs-main-sha') }}" }}
+          restore-keys: |
+            {{ "${{ runner.os }}-pip-" }}
+      {{ install_python_deps(["-r", "doc_requirements.txt"]) | indent(6) }}
+      - name: "Build docs"
+        run: |
+          pulp-docs build
+
+  no-test:
+    if: "!endsWith(github.base_ref, 'main')"
+    runs-on: "ubuntu-20.04"
+    steps:
+      - run: |
+          echo "Skip docs testing on non-main branches."
