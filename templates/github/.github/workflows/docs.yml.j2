@@ -28,7 +28,10 @@ jobs:
           key: {{ "${{ runner.os }}-pip-${{ hashFiles('pulp-docs-main-sha') }}" }}
           restore-keys: |
             {{ "${{ runner.os }}-pip-" }}
-      {{ install_python_deps(["-r", "doc_requirements.txt"]) | indent(6) }}
+      {{ install_python_deps(["-r", "doc_requirements.txt", "towncrier"]) | indent(6) }}
+      - name: "Build changelog"
+        run: |
+          towncrier build --yes --version 4.0.0.ci
       - name: "Build docs"
         run: |
           pulp-docs build
