@@ -43,8 +43,10 @@ jobs:
       {%- endif %}
   {%- endif %}
 
+  {%- if is_pulpdocs_member %}
   docs:
     uses: "./.github/workflows/docs.yml"
+  {%- endif %}
 
   lint:
     {%- if pre_job_template %}
