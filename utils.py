@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from string import Template
 from textwrap import dedent
+import requests
 
 
 def is_valid(name):
@@ -42,6 +43,24 @@ def to_snake(name):
     Convert plugin name from snake case to dash representation
     """
     return name.replace("-", "_")
+
+
+def get_pulpdocs_members() -> list[str]:
+    """
+    Get repositories which are members of the Pulp managed documentation.
+
+    Raises if can't get the authoritative file.
+    """
+    response = requests.get(
+        "https://raw.githubusercontent.com/pulp/pulp-docs/main/src/pulp_docs/data/repolist.yml"
+    )
+    if response.status_code != 200:
+        raise ValueError(
+            "There was an error getting 'repolist.yml' from from pulp-docs repository."
+            "This mean we can't know if we should manage the doc-related workflows."
+        )
+
+    return [l.strip()[8:] for l in response.content.decode().split("\n") if "- name:" in l]
 
 
 # Changelog to markdown migration

@@ -327,6 +327,9 @@ def main():
     except Exception:
         config["current_version"] = "0.1.0a1.dev"
 
+    # Determine if plugin is a member of Pulp managed documentation
+    config["is_pulpdocs_member"] = config["plugin_name"] in utils.get_pulpdocs_members()
+
     sections = [
         section
         for section in ["generate_config", "bootstrap", "github", "docs", "test"]
