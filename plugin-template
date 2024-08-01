@@ -346,13 +346,6 @@ def main():
         file_path = os.path.join(plugin_root_dir, "template_config.yml")
         print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
 
-    if "github" in sections:
-        utils.migrate_changelog_to_markdown(
-            plugin_root_dir,
-            gh_org=config["github_org"],
-            gh_repo=config["plugin_name"],
-        )
-
     if plugin_root_dir:
         print("\nDeprecation check:")
         check_for_deprecated_files(plugin_root_dir, sections)
