@@ -42,8 +42,8 @@ jobs:
           python .ci/scripts/check_requirements.py
       {%- endif %}
   {%- endif %}
-
   {%- if is_pulpdocs_member %}
+  
   docs:
     uses: "./.github/workflows/docs.yml"
   {%- endif %}
