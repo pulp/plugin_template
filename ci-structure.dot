@@ -12,9 +12,10 @@ digraph "Pulp CI" {
     label="CI Jobs"
 
     lint [shape=box]
-    prerelease [shape=box label="prerelease checks"]
+    docs [shape=box]
+    prerelease [shape=box, label="prerelease checks (idea)"]
     build [shape=box, label="build wheel"]
-    build2 [shape=box label="build docs & bindings"]
+    build2 [shape=box, label="build bindings"]
     tests [shape=box3d]
     {
       rank=same
@@ -22,6 +23,7 @@ digraph "Pulp CI" {
       deprecations [shape=box]
       publish [shape=box]
     }
+    ready [shape=box, label="ready to ship"]
   }
 
   {
@@ -29,43 +31,39 @@ digraph "Pulp CI" {
 
     PyPi [shape=parallelogram]
     rubygems [shape=parallelogram]
-    ppo [shape=parallelogram label="pulpproject.org"]
   }
 
   subgraph cluster_built {
     label="Build Artifacts"
 
-    wheel -> apidoc -> {
-      bindings
-      docs
-    }
+    wheel -> apidoc -> bindings
   }
 
   git -> lint [label="PR"]
+  git -> docs [label="PR"]
   git -> build [label="nightly"]
   git -> prerelease [label="tag"]
   {lint prerelease} -> build -> build2
   build2 -> tests [label="PR"]
   build2 -> publish [label="Release"]
   tests -> deprecations
+  {tests docs} -> ready
 
   {
     edge [style=dotted]
 
     publish -> PyPi
     publish -> rubygems
-    publish -> ppo
   }
 
   {
     edge [style=dashed]
 
-    base -> {build2 tests}
+    base -> tests
 
     build -> wheel
-    build2 -> {apidoc bindings docs}
+    build2 -> {apidoc bindings}
     wheel -> {tests build2 publish}
     bindings -> {tests publish}
-    docs -> publish
   }
 }
