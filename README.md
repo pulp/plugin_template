@@ -147,18 +147,13 @@ The following settings are stored in `template_config.yml`.
   supported_release_branches
                         Specify the release branches that should receive regular CI updates.
 
-  sync_ci               Enables a nightly workflow to update the CI files.
+  sync_ci               Enables a weekly workflow to update the CI files.
 
   test_cli              Run the pulp-cli tests as part of the CI tests
 
   test_performance      Include a nightly job that runs a script to test performance. If using a
                         list, a separate job will run a specific performance test file for each
                         entry in the list. Otherwise, all performance tests will be run together.
-
-  test_released_plugin_with_next_pulpcore_release
-                        Include a cron job that tests the latest released version of the plugin to
-                        see if it is compatible with pulpcore's main branch. This helps ensure
-                        that pulpcore is following the deprecation policy for the plugin API.
 
   disabled_redis_runners
                         A list of test runners that should have the Redis service disabled. By
