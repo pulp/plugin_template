@@ -37,7 +37,6 @@ DEFAULT_SETTINGS = {
     "flake8_ignore": [],
     "flake8": True,
     "github_org": "pulp",
-    "issue_tracker": "github",
     "latest_release_branch": None,
     "lint_requirements": True,
     "noissue_marker": "[noissue]",

@@ -4,20 +4,16 @@ import re
 import sys
 from pathlib import Path
 import subprocess
-{% if issue_tracker == 'github' %}
-
 import os
 import warnings
 from github import Github
-{% endif %}
 
 NO_ISSUE = "[noissue]"
 CHANGELOG_EXTS = [".feature", ".bugfix", ".doc", ".removal", ".misc", ".deprecation"]
+KEYWORDS = ["fixes", "closes"]
+
 sha = sys.argv[1]
 message = subprocess.check_output(["git", "log", "--format=%B", "-n 1", sha]).decode("utf-8")
-
-{% if issue_tracker == 'github' %}
-KEYWORDS = ["fixes", "closes"]
 
 g = Github(os.environ.get("GITHUB_TOKEN"))
 repo = g.get_repo("pulp/{{ plugin_name }}")
@@ -33,13 +29,7 @@ def __check_status(issue):
             "'(cherry picked from commit ...)' to the original commit message."
         )
         sys.exit(f"Error: issue #{issue} is closed.")
-{% else %}
-KEYWORDS = []
 
-
-def __check_status(issue):
-    pass
-{% endif %}
 
 def __check_changelog(issue):
     matches = list(Path("CHANGES").rglob(f"{issue}.*"))
