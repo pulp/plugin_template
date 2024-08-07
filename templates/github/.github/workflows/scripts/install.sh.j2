@@ -16,16 +16,12 @@ PLUGIN_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${PLUGIN_VERSI
 export PULP_API_ROOT="{{ api_root }}"
 
 PIP_REQUIREMENTS=("{{ cli_package }}")
-{%- if plugin_name == 'pulpcore' %}
-if [[ "$TEST" = "publish" ]]
-then
-  PIP_REQUIREMENTS+=("psycopg2-binary")
-fi
-{%- endif %}
 
+# This must be the **only** call to "pip install" on the test runner.
 pip install ${PIP_REQUIREMENTS[*]}
 
 {% if test_cli -%}
+# Check out the {{ cli_package }} branch matching the installed version.
 PULP_CLI_VERSION="$(pip freeze | sed -n -e 's/{{ cli_package }}==//p')"
 git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }} ../{{ cli_package }}
 {%- endif %}
