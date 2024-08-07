@@ -29,7 +29,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps(["gitpython", "requests", "packaging", "jinja2", "pyyaml"]) | indent(6) }}
+      {{ install_python_deps(["gitpython", "packaging", "-r", "plugin_template/requirements.txt"]) | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 

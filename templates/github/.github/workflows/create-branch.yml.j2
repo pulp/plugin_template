@@ -23,9 +23,11 @@ jobs:
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
+      {{ checkout(repository="pulp/plugin_template", path="plugin_template") | indent(6) }}
+
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps(["bump2version", "jinja2", "pyyaml", "packaging", "requests"]) | indent(6) }}
+      {{ install_python_deps(["bump2version", "packaging", "-r", "plugin_template/requirements.txt"]) | indent(6) }}
 
       {{ set_secrets(path=plugin_name) | indent(6) }}
 
@@ -56,13 +58,6 @@ jobs:
         working-directory: {{ plugin_name }}
         run: |
           find CHANGES -type f -regex ".*\.\(bugfix\|doc\|feature\|misc\|deprecation\|removal\)" -exec git rm {} +
-
-      - name: Checkout plugin template
-        uses: actions/checkout@v4
-        with:
-          repository: pulp/plugin_template
-          path: plugin_template
-          fetch-depth: 0
 
       - name: Update CI branches in template_config
         working-directory: plugin_template
