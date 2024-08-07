@@ -85,10 +85,6 @@ The following settings are stored in `template_config.yml`.
 
   github_org            The Github organization to use for the plugin.
 
-  issue_tracker         Which issue tracker the project will use. Valid values are 'redmine' and
-                        'github'. To switch from Redmine to GitHub use the --migrate-github-issues
-                        option.
-
   latest_release_branch A pointer to the currently latest release branch (this is automatically
                         updated).
 
