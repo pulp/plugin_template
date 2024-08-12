@@ -52,6 +52,7 @@ DEFAULT_SETTINGS = {
     "pulp_env_azure": {},
     "pulp_env_gcp": {},
     "pulp_env_s3": {},
+    "pulp_openapi_generator_ref": None,
     "pulp_scheme": "https",
     "pulp_settings_azure": {"domain_enabled": True},
     "pulp_settings_gcp": None,
