@@ -114,10 +114,6 @@ DEPRECATED_FILES = {
         "flake8.cfg",
         "CHANGES/.TEMPLATE.rst",
     ],
-    "docs": [
-        "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
-        "docs/_static/api.json",
-    ],
 }
 
 DOCS_OPTION_DEPRECATION_INFO = """\
@@ -254,10 +250,6 @@ def main():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
-                    # Rename "ci_update_branches" to "supported_release_branches"
-                    if "ci_update_branches" in config:
-                        config["supported_release_branches"] = config.pop("ci_update_branches")
-                        write_new_config = True
                     # remove deprecated options
                     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
                         config.pop(key)
@@ -266,6 +258,7 @@ def main():
                         config["plugins"] = [
                             {"name": config["plugin_name"], "app_label": config["plugin_app_label"]}
                         ]
+                    # Make up for yaml being crazy with version strings.
                     if not all(
                         (
                             isinstance(version, str)
