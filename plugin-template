@@ -270,6 +270,9 @@ def main():
                             str(version) for version in config["supported_release_branches"]
                         ]
                         write_new_config = True
+                    if config["pulp_openapi_generator_ref"] == "PIN THIS":
+                        config["pulp_openapi_generator_ref"] = utils.fetch_latest_pog_tag()
+                        write_new_config = True
                     print(
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)

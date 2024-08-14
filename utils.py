@@ -58,3 +58,18 @@ def get_pulpdocs_members() -> list[str]:
         )
 
     return [line.strip()[8:] for line in response.content.decode().split("\n") if "- name:" in line]
+
+
+def fetch_latest_pog_tag():
+    response = requests.get(
+        "https://api.github.com/repos/pulp/pulp-openapi-generator/git/refs/tags"
+    )
+    tags = [item["ref"] for item in response.json()]
+    matched_tags = sorted(
+        [
+            ((int(match.group(1)), int(match.group(2))), f"{match.group(1)}.{match.group(2)}")
+            for match in (re.fullmatch(r"^refs/tags/(\d{8})\.(\d+)$", tag) for tag in tags)
+            if match is not None
+        ]
+    )
+    return matched_tags[-1][1]
