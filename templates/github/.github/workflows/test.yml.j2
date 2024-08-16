@@ -75,7 +75,7 @@ jobs:
           {%- endfor %}
       {%- endif %}
 
-      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible", "mkdocs", "jq", "jsonpatch"]) | indent(6) }}
+      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible~=10.3.0", "mkdocs", "jq", "jsonpatch"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
 
