@@ -133,8 +133,6 @@ The following settings are stored in `template_config.yml`.
                         the CI will run an additional pytest call running pulpcore tests with that
                         mark.
 
-  noissue_marker        A string that is used to mark a commit as not attached to an issue.
-
   stalebot              A boolean that indicates whether to use stalebot or not.
 
   stalebot_days_until_stale

@@ -20,12 +20,7 @@ fi
 
 plugin_name="$(python ../plugin_template/scripts/get_template_config_value.py plugin_name)"
 ci_update_docs="$(python ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
-noissue_marker="$(python ../plugin_template/scripts/get_template_config_value.py noissue_marker)"
 use_black="$(python ../plugin_template/scripts/get_template_config_value.py black)"
-
-if [[ -z "${noissue_marker}" ]]; then
-  noissue_marker="[noissue]"
-fi
 
 if [[ "${ci_update_docs}" == "True" ]]; then
   docs=("--docs")
@@ -46,7 +41,7 @@ fi
 
 if [[ $(git status --porcelain) ]]; then
   git add -A
-  git commit -m "Update CI files" -m "${noissue_marker}"
+  git commit -m "Update CI files"
 else
   echo "No updates needed"
 fi
@@ -59,7 +54,7 @@ then
   if [[ "$(git status --porcelain)" ]]
   then
     git add -A
-    git commit -m "Reformat with black" -m "${noissue_marker}"
+    git commit -m "Reformat with black"
   else
     echo "No formatting change needed"
   fi
@@ -70,6 +65,6 @@ if [[ "$plugin_name" != "pulpcore" ]]; then
   python ../plugin_template/scripts/update_core_lowerbound.py
   if [[ $(git status --porcelain) ]]; then
     git add -A
-    git commit -m "Bump pulpcore lowerbounds to supported branch" -m "$noissue_marker"
+    git commit -m "Bump pulpcore lowerbounds to supported branch"
   fi
 fi
