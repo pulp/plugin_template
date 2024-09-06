@@ -7,7 +7,7 @@ if [ "$GITHUB_EVENT_NAME" = "pull_request" ]
 then
     COMMIT_MSG=$(git log --format=%B -n 1 HEAD^2)
 else
-    COMMIT_MSG="Initial commit\n\n[noissue]"
+    COMMIT_MSG="Initial commit"
 fi
 echo "${COMMIT_MSG}"
 

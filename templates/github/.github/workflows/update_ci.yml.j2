@@ -49,12 +49,8 @@ jobs:
           committer: "{{ release_user }} <{{ release_email }}>"
           author: "{{ release_user }} <{{ release_email }}>"
           title: "Update CI files for branch {{ branch }}"
-          body: ""
           branch: "update-ci/{{ branch }}"
           base: "{{ branch }}"
-          commit-message: |
-            Update CI files
-
-            {{ noissue_marker }}
           delete-branch: true
       {%- endfor %}
+...
