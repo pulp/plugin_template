@@ -58,6 +58,7 @@ DEFAULT_SETTINGS = {
     "pulp_settings": None,
     "pulp_settings_s3": None,
     "pydocstyle": True,
+    "pytest_timeout": 3600,
     "release_email": "pulp-infra@redhat.com",
     "release_user": "pulpbot",
     "stalebot_days_until_close": 30,

@@ -135,13 +135,13 @@ else
   if [[ "$GITHUB_WORKFLOW" =~ "Nightly" ]]
   then
     {%- for plugin in plugins %}
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel' --nightly"
+    cmd_user_prefix bash -c "pytest -v --timeout={{ pytest_timeout }} -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
+    cmd_user_prefix bash -c "pytest -v --timeout={{ pytest_timeout }} -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel' --nightly"
     {%- endfor %}
   else
     {%- for plugin in plugins %}
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel'"
+    cmd_user_prefix bash -c "pytest -v --timeout={{ pytest_timeout }} -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
+    cmd_user_prefix bash -c "pytest -v --timeout={{ pytest_timeout }} -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel'"
     {%- endfor %}
   fi
 fi
