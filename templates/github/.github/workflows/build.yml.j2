@@ -20,7 +20,7 @@ jobs:
 
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}
-      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
+      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator", ref=pulp_openapi_generator_ref) | indent(6) }}
       {{ setup_python() | indent(6) }}
       {{ install_python_deps(["packaging", "twine", "wheel", "mkdocs", "jq"]) | indent(6) }}
       {%- if os_required_packages %}

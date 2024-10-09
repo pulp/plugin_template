@@ -6,16 +6,13 @@
   install_python_deps
 with context %}
 ---
-name: Create New Release Branch
+name: "Create New Release Branch"
 on:
   workflow_dispatch:
 
-env:
-  RELEASE_WORKFLOW: true
-
 jobs:
   create-branch:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
 
     strategy:
       fail-fast: false
@@ -59,27 +56,46 @@ jobs:
         run: |
           find CHANGES -type f -regex ".*\.\(bugfix\|doc\|feature\|misc\|deprecation\|removal\)" -exec git rm {} +
 
-      - name: Update CI branches in template_config
-        working-directory: plugin_template
+      - name: "Update CI branches in template_config"
+        working-directory: "plugin_template"
         run: |
           python3 ./plugin-template {{ plugin_name }} --github --latest-release-branch "${NEW_BRANCH}"
           git add -A
 
-      - name: Make a PR with version bump and without CHANGES/*
-        uses: peter-evans/create-pull-request@v6
+      - name: "Make a PR with version bump and without CHANGES/*"
+        uses: "peter-evans/create-pull-request@v6"
         with:
-          path: {{ plugin_name }}
-          token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
-          committer: {{release_user}} <{{ release_email }}>
-          author: {{release_user}} <{{ release_email }}>
-          branch: minor-version-bump
-          base: {{ plugin_default_branch }}
-          title: Bump minor version
+          path: "{{ plugin_name }}"
+          token: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          committer: "{{release_user}} <{{ release_email }}>"
+          author: "{{release_user}} <{{ release_email }}>"
+          branch: "minor-version-bump"
+          base: "{{ plugin_default_branch }}"
+          title: "Bump minor version"
           commit-message: |
             Bump minor version
           delete-branch: true
 
-      - name: Push release branch
-        working-directory: {{ plugin_name }}
+      - name: "Push release branch"
+        working-directory: "{{ plugin_name }}"
         run: |
           git push origin "${NEW_BRANCH}"
+          git switch "${NEW_BRANCH}"
+          ../plugin_template/scripts/update_ci --release
+
+      - name: "Make a PR with to setup the new release branch"
+        uses: "peter-evans/create-pull-request@v6"
+        with:
+          path: "{{ plugin_name }}"
+          token: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          committer: "{{release_user}} <{{ release_email }}>"
+          author: "{{release_user}} <{{ release_email }}>"
+          branch: "{{ 'update-ci/${{ env.NEW_BRANCH }}' }}"
+          base: "${{ '{{ env.NEW_BRANCH }}' }}"
+          title: "Setup Release branch"
+          body: "[noissue]"
+          commit-message: |
+            Bump minor version
+            [noissue]
+          delete-branch: true
+...

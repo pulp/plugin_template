@@ -52,6 +52,7 @@ DEFAULT_SETTINGS = {
     "pulp_env_azure": {},
     "pulp_env_gcp": {},
     "pulp_env_s3": {},
+    "pulp_openapi_generator_ref": None,
     "pulp_scheme": "https",
     "pulp_settings_azure": {"domain_enabled": True},
     "pulp_settings_gcp": None,
@@ -113,10 +114,6 @@ DEPRECATED_FILES = {
         ".travis.yml",
         "flake8.cfg",
         "CHANGES/.TEMPLATE.rst",
-    ],
-    "docs": [
-        "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
-        "docs/_static/api.json",
     ],
 }
 
@@ -254,10 +251,6 @@ def main():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
-                    # Rename "ci_update_branches" to "supported_release_branches"
-                    if "ci_update_branches" in config:
-                        config["supported_release_branches"] = config.pop("ci_update_branches")
-                        write_new_config = True
                     # remove deprecated options
                     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
                         config.pop(key)
@@ -266,6 +259,7 @@ def main():
                         config["plugins"] = [
                             {"name": config["plugin_name"], "app_label": config["plugin_app_label"]}
                         ]
+                    # Make up for yaml being crazy with version strings.
                     if not all(
                         (
                             isinstance(version, str)
@@ -275,6 +269,9 @@ def main():
                         config["supported_release_branches"] = [
                             str(version) for version in config["supported_release_branches"]
                         ]
+                        write_new_config = True
+                    if config["pulp_openapi_generator_ref"] == "PIN THIS":
+                        config["pulp_openapi_generator_ref"] = utils.fetch_latest_pog_tag()
                         write_new_config = True
                     print(
                         "\nLoaded plugin template config from "

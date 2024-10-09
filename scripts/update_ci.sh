@@ -15,6 +15,7 @@ then
   sed -i \
     -e 's/^\(ci_update_docs: \)true$/\1false/' \
     -e 's/^\(docs_test: \)true$/\1false/' \
+    -e 's/^\(pulp_openapi_generator_ref: \)null/\1"PIN THIS"/' \
     "template_config.yml"
 fi
 
