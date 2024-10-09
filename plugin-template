@@ -347,6 +347,7 @@ def main():
 
     if "github" in sections:
         migrate_pytest_plugins(plugin_root_dir)
+        append_releasing_to_manifest(plugin_root_dir)
 
     if plugin_root_dir:
         print("\nDeprecation check:")
@@ -377,6 +378,14 @@ def migrate_pytest_plugins(plugin_root_dir):
     if modified:
         with open(f"{plugin_root_dir}/functest_requirements.txt", "w") as fp:
             fp.writelines(lines)
+
+
+def append_releasing_to_manifest(plugin_root):
+    manifest_file = Path(plugin_root) / "MANIFEST.in"
+    if manifest_file.exists():
+        manifest_text = manifest_file.read_text()
+        if "exclude releasing.md" not in manifest_text:
+            manifest_file.write_text(manifest_text + "exclude releasing.md\n")
 
 
 def to_nice_yaml(data):
