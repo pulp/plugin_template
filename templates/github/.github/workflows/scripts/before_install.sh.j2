@@ -25,7 +25,11 @@ fi
 COMMIT_MSG=$(git log --format=%B --no-merges -1)
 export COMMIT_MSG
 
+{% if setup_py -%}
 COMPONENT_VERSION=$(sed -ne "s/\s*version.*=.*['\"]\(.*\)['\"][\s,]*/\1/p" setup.py)
+{%- else -%}
+COMPONENT_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+{%- endif %}
 
 mkdir .ci/ansible/vars || true
 echo "---" > .ci/ansible/vars/main.yaml
@@ -38,11 +42,6 @@ export POST_BEFORE_INSTALL=$PWD/.github/workflows/scripts/post_before_install.sh
 
 if [ -f $PRE_BEFORE_INSTALL ]; then
   source $PRE_BEFORE_INSTALL
-fi
-
-if [[ -n $(echo -e $COMMIT_MSG | grep -P "Required PR:.*") ]]; then
-  echo "The Required PR mechanism has been removed. Consider adding a scm requirement to requirements.txt."
-  exit 1
 fi
 
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "{{ plugin_default_branch }}" ]
@@ -61,10 +60,10 @@ then
 fi
 
 if [[ "$TEST" = "pulp" ]]; then
-  python3 .ci/scripts/calc_constraints.py -u requirements.txt > upperbounds_constraints.txt
+  python3 .ci/scripts/calc_constraints.py -u {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > upperbounds_constraints.txt
 fi
 if [[ "$TEST" = "lowerbounds" ]]; then
-  python3 .ci/scripts/calc_constraints.py requirements.txt > lowerbounds_constraints.txt
+  python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
 fi
 
 if [ -f $POST_BEFORE_INSTALL ]; then

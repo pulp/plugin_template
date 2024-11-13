@@ -22,7 +22,7 @@ jobs:
       {{ checkout(path=plugin_name) | indent(6) }}
       {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
       {{ setup_python() | indent(6) }}
-      {{ install_python_deps(["packaging", "twine", "wheel", "mkdocs", "jq"]) | indent(6) }}
+      {{ install_python_deps(["build", "packaging", "twine", "wheel", "mkdocs", "jq"]) | indent(6) }}
       {%- if os_required_packages %}
       - name: "Install OS packages"
         run: |
@@ -30,7 +30,7 @@ jobs:
       {%- endif %}
       - name: "Build package"
         run: |
-          python3 setup.py sdist bdist_wheel --python-tag py3
+          python3 -m build
           twine check dist/*
       - name: "Install built packages"
         run: |

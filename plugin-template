@@ -424,17 +424,19 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     except Exception:
         gitref = "unknown"
 
+    setup_py = os.path.exists(os.path.join(plugin_root_dir, "setup.py"))
     ci_update_branches = [config["plugin_default_branch"]]
     latest_release_branch = config["latest_release_branch"]
     if latest_release_branch is not None:
         if latest_release_branch not in config["supported_release_branches"]:
             ci_update_branches.append(latest_release_branch)
     ci_update_branches.extend(config["supported_release_branches"])
-
     ci_update_hour = sum((ord(c) for c in config["plugin_app_label"])) % 24
+
     template_vars = {
         "section": name,
         "gitref": gitref,
+        "setup_py": setup_py,
         "ci_update_branches": ci_update_branches,
         "python_version": "3.11",
         "ci_update_hour": ci_update_hour,
