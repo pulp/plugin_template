@@ -36,11 +36,6 @@ jobs:
         run: |
           .github/workflows/scripts/check_commit.sh
       {%- endif %}
-      {%- if lint_requirements %}
-      - name: "Verify requirements files"
-        run: |
-          python .ci/scripts/check_requirements.py
-      {%- endif %}
   {%- endif %}
   {%- if is_pulpdocs_member %}
 

@@ -56,6 +56,12 @@ jobs:
         run: |
           check-manifest
       {%- endif %}
+      {%- if lint_requirements %}
+
+      - name: "Verify requirements files"
+        run: |
+          python .ci/scripts/check_requirements.py
+      {%- endif %}
       {%- if check_stray_pulpcore_imports %}
 
       - name: "Check for pulpcore imports outside of pulpcore.plugin"
