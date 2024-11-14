@@ -30,7 +30,8 @@ jobs:
 
       - name: "Verify bump version config"
         run: |
-          bump2version --dry-run --list release
+          bump-my-version bump --dry-run release
+          bump-my-version show-bump
       {%- if black %}
 
       # run black separately from flake8 to get a diff

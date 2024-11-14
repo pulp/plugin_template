@@ -27,7 +27,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      {{ install_python_deps(["bump2version", "packaging", "-r", "plugin_template/requirements.txt"]) | indent(6) }}
+      {{ install_python_deps(["bump-my-version", "packaging", "-r", "plugin_template/requirements.txt"]) | indent(6) }}
 
       {{ set_secrets(path=plugin_name) | indent(6) }}
 
@@ -36,7 +36,7 @@ jobs:
         run: |
           # Just to be sure...
           git checkout {{ plugin_default_branch }}
-          NEW_BRANCH="$(bump2version --dry-run --list release | sed -Ene 's/^new_version=([[:digit:]]+\.[[:digit:]]+)\..*$/\1/p')"
+          NEW_BRANCH="$(bump-my-version show new_version --increment release | sed -Ene 's/^([[:digit:]]+\.[[:digit:]]+)\.[[:digit:]]+$/\1/p')"
           if [ -z "$NEW_BRANCH" ]
           then
             echo Could not determine the new branch name.
@@ -52,7 +52,7 @@ jobs:
       - name: Bump version on {{ plugin_default_branch }} branch
         working-directory: {{ plugin_name }}
         run: |
-          bump2version --no-commit minor
+          bump-my-version bump --no-commit minor
 
       - name: Remove entries from CHANGES directory
         working-directory: {{ plugin_name }}
