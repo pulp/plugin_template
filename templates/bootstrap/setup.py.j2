@@ -7,7 +7,7 @@ with open("requirements.txt") as requirements:
 
 setup(
     name="{{ plugin_name | dash }}",
-    version="0.1.0a1.dev",
+    version="{{ current_version }}",
     description="{{ plugin_name | dash }} plugin for the Pulp Project",
     long_description="{{ plugin_name | dash }} plugin for the Pulp Project",
     long_description_content_type="text/markdown",

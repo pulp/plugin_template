@@ -1,9 +1,7 @@
+-r requirements.txt
 black
 check-manifest
 flake8
-jinja2
 mock
 git+https://github.com/pulp/pulp-smash.git#egg=pulp-smash
 pytest
-pyyaml
-requests_cache

@@ -1,28 +1,14 @@
 from datetime import timedelta
 import itertools
-import pathlib
 import re
 import requests_cache
+import stat
+import tomlkit
 import tomllib
 import yaml
 
 
-def current_version(plugin_root_dir):
-    plugin_root_dir = pathlib.Path(plugin_root_dir)
-    try:
-        path = plugin_root_dir / "pyproject.toml"
-        pyproject_toml = tomllib.loads(path.read_text())
-        current_version = pyproject_toml["project"]["version"]
-    except Exception:
-        try:
-            path = plugin_root_dir / ".bumpversion.cfg"
-            for line in path.read_text().splitlines():
-                if line.startswith("current_version = "):
-                    current_version = line[18:].strip()
-                    break
-        except Exception:
-            current_version = "0.1.0a1.dev"
-    return current_version
+# Jinja tests and filters
 
 
 def is_valid(name):
@@ -64,6 +50,41 @@ def to_snake(name):
     return name.replace("-", "_")
 
 
+def to_nice_yaml(data):
+    """Implement a filter for Jinja 2 templates to render human readable YAML."""
+    return yaml.dump(data, indent=2, allow_unicode=True, default_flow_style=False)
+
+
+# Information gathering
+
+
+def ci_update_branches(config):
+    release_branches = set()
+    release_branches.add(config["latest_release_branch"])
+    release_branches.update(config["supported_release_branches"])
+
+    return [config["plugin_default_branch"]] + sorted(
+        [branch for branch in release_branches if branch is not None]
+    )
+
+
+def current_version(plugin_root_path):
+    try:
+        path = plugin_root_path / "pyproject.toml"
+        pyproject_toml = tomllib.loads(path.read_text())
+        current_version = pyproject_toml["project"]["version"]
+    except Exception:
+        try:
+            path = plugin_root_path / ".bumpversion.cfg"
+            for line in path.read_text().splitlines():
+                if line.startswith("current_version = "):
+                    current_version = line[18:].strip()
+                    break
+        except Exception:
+            current_version = "0.0.0.dev"
+    return current_version
+
+
 def get_pulpdocs_members() -> list[str]:
     """
     Get repositories which are members of the Pulp managed documentation.
@@ -86,3 +107,48 @@ def get_pulpdocs_members() -> list[str]:
         for repo in itertools.chain(*repolist["repos"].values())
         if "subpackage_of" not in repo
     ]
+
+
+# Utilities for templating
+
+
+def template_to_file(template, plugin_root_path, relative_path, template_vars):
+    """
+    Render template with values from the config and write it to the target plugin directory.
+    """
+
+    destination_path = plugin_root_path / relative_path
+    data = template.render(**template_vars)
+    destination_path.write_text(data + "\n")
+
+    if destination_path.suffix in [".sh", ".py"]:
+        mode = (
+            stat.S_IRUSR
+            | stat.S_IWUSR
+            | stat.S_IXUSR
+            | stat.S_IRGRP
+            | stat.S_IWGRP
+            | stat.S_IXGRP
+            | stat.S_IROTH
+            | stat.S_IXOTH
+        )
+    else:
+        mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH
+    destination_path.chmod(mode)
+
+
+def merge_toml(template, plugin_root_path, relative_path, template_vars):
+    """
+    Template a file of the form 'basename.toml.merge_key' and combine its content beneath
+    'merge_key' with the actual 'basename.toml' file.
+    """
+    basename, merge_key = relative_path.split(".toml.", maxsplit=1)
+    data = tomlkit.loads(template.render(**template_vars))
+    if merge_key in data:
+        path = plugin_root_path / f"{basename}.toml"
+        old_toml = tomlkit.load(path.open())
+        if merge_key not in old_toml:
+            old_toml[merge_key] = data[merge_key]
+        else:
+            old_toml[merge_key].update(data[merge_key])
+        tomlkit.dump(old_toml, path.open("w"))
