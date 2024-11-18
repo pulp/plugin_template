@@ -1,2 +1,3 @@
 __pycache__
 ci-structure.pdf
+.requests_cache.sqlite
