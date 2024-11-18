@@ -88,7 +88,9 @@ jobs:
       {%- endif %}
       - "lint"
       - "test"
+      {%- if is_pulpdocs_member %}
       - "docs"
+      {%- endif %}
     if: "always()"
     steps:
       - name: "Collect needed jobs results"
