@@ -6,6 +6,6 @@ class {{ plugin_name | camel }}PluginAppConfig(PulpPluginAppConfig):
 
     name = "{{ plugin_name | snake }}.app"
     label = "{{ plugin_app_label }}"
-    version = "0.1.0a1.dev"
+    version = "{{ current_version }}"
     python_package_name = "{{ plugin_name }}"
     domain_compatible = True
