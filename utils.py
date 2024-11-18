@@ -1,6 +1,28 @@
-#!/usr/bin/env python3
+from datetime import timedelta
+import itertools
+import pathlib
 import re
-import requests
+import requests_cache
+import tomllib
+import yaml
+
+
+def current_version(plugin_root_dir):
+    plugin_root_dir = pathlib.Path(plugin_root_dir)
+    try:
+        path = plugin_root_dir / "pyproject.toml"
+        pyproject_toml = tomllib.loads(path.read_text())
+        current_version = pyproject_toml["project"]["version"]
+    except Exception:
+        try:
+            path = plugin_root_dir / ".bumpversion.cfg"
+            for line in path.read_text().splitlines():
+                if line.startswith("current_version = "):
+                    current_version = line[18:].strip()
+                    break
+        except Exception:
+            current_version = "0.1.0a1.dev"
+    return current_version
 
 
 def is_valid(name):
@@ -48,7 +70,8 @@ def get_pulpdocs_members() -> list[str]:
 
     Raises if can't get the authoritative file.
     """
-    response = requests.get(
+    session = requests_cache.CachedSession(".requests_cache", expire_after=timedelta(days=1))
+    response = session.get(
         "https://raw.githubusercontent.com/pulp/pulp-docs/main/src/pulp_docs/data/repolist.yml"
     )
     if response.status_code != 200:
@@ -57,4 +80,9 @@ def get_pulpdocs_members() -> list[str]:
             "This mean we can't know if we should manage the doc-related workflows."
         )
 
-    return [line.strip()[8:] for line in response.content.decode().split("\n") if "- name:" in line]
+    repolist = yaml.safe_load(response.content.decode())
+    return [
+        repo["name"]
+        for repo in itertools.chain(*repolist["repos"].values())
+        if "subpackage_of" not in repo
+    ]

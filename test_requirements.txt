@@ -6,3 +6,4 @@ mock
 git+https://github.com/pulp/pulp-smash.git#egg=pulp-smash
 pytest
 pyyaml
+requests_cache
