@@ -114,17 +114,7 @@ DEPRECATED_FILES = {
         "flake8.cfg",
         "CHANGES/.TEMPLATE.rst",
     ],
-    "docs": [
-        "docs/_static/.this_makes_it_so_git_keeps_the__static_folder",
-        "docs/_static/api.json",
-    ],
 }
-
-DOCS_OPTION_DEPRECATION_INFO = """\
-'--docs' option is deprecated (July, 2024):
-    Most docs intervention are now handled by pulp-docs.
-    See https://github.com/pulp/pulp-docs.\
-"""
 
 
 def main():
@@ -193,18 +183,6 @@ def main():
         ),
     )
     parser.add_argument(
-        "--docs",
-        action="store_true",
-        help=textwrap.dedent(
-            f"""\
-                Generate or update plugin documentation.
-
-                {DOCS_OPTION_DEPRECATION_INFO}
-
-            """
-        ),
-    )
-    parser.add_argument(
         "--all",
         action="store_true",
         help=textwrap.dedent(
@@ -247,35 +225,24 @@ def main():
             try:
                 config_in_file = yaml.safe_load(config_file)
                 if config_in_file:
-                    # TODO: validate config
                     config = config_in_file
                     # Add any missing value from the list of defaults
                     for key, value in DEFAULT_SETTINGS.items():
                         if key not in config:
                             config[key] = value
                             write_new_config = True
-                    # Rename "ci_update_branches" to "supported_release_branches"
-                    if "ci_update_branches" in config:
-                        config["supported_release_branches"] = config.pop("ci_update_branches")
-                        write_new_config = True
                     # remove deprecated options
                     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
                         config.pop(key)
                         write_new_config = True
-                    if config["plugins"] is None:
-                        config["plugins"] = [
-                            {"name": config["plugin_name"], "app_label": config["plugin_app_label"]}
-                        ]
-                    if not all(
+                    # TODO: validate config
+                    # validate versions are strings
+                    assert all(
                         (
                             isinstance(version, str)
                             for version in config["supported_release_branches"]
                         )
-                    ):
-                        config["supported_release_branches"] = [
-                            str(version) for version in config["supported_release_branches"]
-                        ]
-                        write_new_config = True
+                    )
                     print(
                         "\nLoaded plugin template config from "
                         "{path}/template_config.yml.\n".format(path=plugin_root_dir)
@@ -288,7 +255,7 @@ def main():
                         print("\n")
             except yaml.YAMLError as exc:
                 print(exc)
-                exit()
+                return 2
     except FileNotFoundError:
         print(
             "\nCould not find a plugin template config at {path}/template_config.yml.\n".format(
@@ -317,13 +284,10 @@ def main():
 
     sections = [
         section
-        for section in ["generate_config", "bootstrap", "github", "docs", "test"]
+        for section in ["generate_config", "bootstrap", "github", "test"]
         if getattr(args, section) or args.all
     ]
     for section in sections:
-        if section == "docs":
-            print(DOCS_OPTION_DEPRECATION_INFO)
-            continue
         write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
     if write_new_config and not (args.generate_config or args.all):
@@ -332,46 +296,15 @@ def main():
         print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
 
     if "github" in sections:
-        migrate_pytest_plugins(plugin_root_dir)
-        append_releasing_to_manifest(plugin_root_dir)
+        migrate_dummy(plugin_root_dir)
 
     if plugin_root_dir:
         print("\nDeprecation check:")
         check_for_deprecated_files(plugin_root_dir, sections)
 
 
-def migrate_pytest_plugins(plugin_root_dir):
-    with open(f"{plugin_root_dir}/functest_requirements.txt", "r") as fp:
-        lines = fp.readlines()
-    modified = False
-    for item in ["pytest-xdist", "pytest-timeout"]:
-        found = False
-        result = []
-        for line in lines:
-            try:
-                req = Requirement(line)
-            except ValueError:
-                result.append(line)
-                continue
-            if req.name == item:
-                found = True
-            result.append(line)
-        if not found:
-            result.append(f"{item}\n")
-            modified = True
-        lines = result
-
-    if modified:
-        with open(f"{plugin_root_dir}/functest_requirements.txt", "w") as fp:
-            fp.writelines(lines)
-
-
-def append_releasing_to_manifest(plugin_root):
-    manifest_file = Path(plugin_root) / "MANIFEST.in"
-    if manifest_file.exists():
-        manifest_text = manifest_file.read_text()
-        if "exclude releasing.md" not in manifest_text:
-            manifest_file.write_text(manifest_text + "exclude releasing.md\n")
+def migrate_dummy(plugin_root_dir):
+    pass
 
 
 def write_template_section(config, name, plugin_root_dir, verbose=False):
@@ -379,11 +312,11 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     Template or copy all files for the section.
     """
     plugin_root_path = Path(plugin_root_dir)
-    section_template_dir = "templates/{name}".format(name=name)
+    section_template_dir = f"templates/{name}"
     env = Environment(
         loader=FileSystemLoader(
             [
-                section_template_dir,  # The scpecified section folder
+                section_template_dir,  # The specified section folder
                 "templates",  # The default templates folder
                 "../",  # The parent dir to allow including pre/post templates from
             ]
@@ -505,7 +438,7 @@ def check_for_deprecated_files(plugin_root_dir, sections):
     files_found = False
     for section in sections:
         for fp in DEPRECATED_FILES.get(section, []):
-            path = Path(plugin_root_dir).joinpath(fp)
+            path = Path(plugin_root_dir) / fp
             if path.exists():
                 if path.is_dir():
                     shutil.rmtree(path)
