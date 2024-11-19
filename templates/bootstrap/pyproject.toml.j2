@@ -5,13 +5,50 @@ requires = [
 ]
 build-backend = 'setuptools.build_meta'
 
+[project]
+name = "{{ plugin_name | dash }}"
+version = "{{ current_version }}"
+description = "{{ plugin_name | dash }} plugin for the Pulp Project"
+readme = "README.md"
+authors = [
+  {name="AUTHOR", email="author@email.here"},
+]
+classifiers = [
+  "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+  "Operating System :: POSIX :: Linux",
+  "Framework :: Django",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+dependencies = [
+  "pulpcore>=3.40,<=3.60",
+]
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://example.com"
+Repository = "https://github.com/{{ github_org }}/{{ plugin_name }}"
+"Bug Tracker" = "https://github.com/{{ github_org }}/{{ plugin_name }}/issues"
+Changelog = "https://example.com/changes/"
+
+
+[project.entry-points."pulpcore.plugin"]
+{{ plugin_name }} = "{{ plugin_name | snake }}:default_app_config"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
 [tool.towncrier]
-package = "{{ plugin_name | dash }}"
 filename = "CHANGES.md"
 directory = "CHANGES/"
 title_format = "## {version} ({project_date}) {% raw %}{{: #{version} }}{% endraw %}"
 template = "CHANGES/.TEMPLATE.md"
-issue_format = "[#{issue}](https://github.com/pulp/{{ plugin_name }}/issues/{issue})"
+issue_format = "[#{issue}](https://github.com/{{ github_org }}/{{ plugin_name }}/issues/{issue})"
 start_string = "[//]: # (towncrier release notes start)\n"
 underlines = ["", "", ""]
 
@@ -48,7 +85,7 @@ underlines = ["", "", ""]
 {% if black %}
 [tool.black]
 line-length = 100
-target-version = ["py36", "py37"]
+target-version = ["py39", "py310", "py311", "py312"]
 exclude = '''
 /(
     \.eggs
@@ -59,6 +96,7 @@ exclude = '''
   | dist
   | migrations
   | docs
+  | protobuf
 )/
 '''
 {% endif %}
@@ -67,10 +105,7 @@ exclude = '''
 [tool.check-manifest]
 ignore = [
     ".git-blame-ignore-revs",
-    ".bumpversion.cfg",
     "CHANGES/**",
-    "CONTRIBUTING.rst",
-    "HISTORY.rst",
     "dev_requirements.txt",
     "doc_requirements.txt",
     "lint_requirements.txt",
