@@ -12,7 +12,6 @@ from pathlib import Path
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
-from packaging.requirements import Requirement
 
 import utils
 
