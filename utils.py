@@ -72,7 +72,10 @@ def current_version(plugin_root_path):
     try:
         path = plugin_root_path / "pyproject.toml"
         pyproject_toml = tomllib.loads(path.read_text())
-        current_version = pyproject_toml["project"]["version"]
+        try:
+            current_version = pyproject_toml["project"]["version"]
+        except Exception:
+            current_version = pyproject_toml["tool"]["bumpversion"]["current_version"]
     except Exception:
         try:
             path = plugin_root_path / ".bumpversion.cfg"

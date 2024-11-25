@@ -23,7 +23,7 @@ values = [
 [[tool.bumpversion.files]]
 # This section is managed by the plugin template. Do not edit manually.
 
-filename = "./{{ plugin.name }}/app/{% if plugin.name == "pulpcore" %}apps{% else %}__init__{% endif %}.py"
+filename = "./{{ plugin.name | snake }}/app/{% if plugin.name == "pulpcore" %}apps{% else %}__init__{% endif %}.py"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 {%- endfor %}
