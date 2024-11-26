@@ -23,6 +23,6 @@ then
 fi
 
 twine upload -u __token__ -p "$PYPI_API_TOKEN" \
-"dist/{{ plugin_name | snake }}-$VERSION-py3-none-any.whl" \
-"dist/{{ plugin_name | dash }}-$VERSION.tar.gz" \
+dist/{{ plugin_name | snake | replace("_", "?") }}-"$VERSION"-py3-none-any.whl \
+dist/{{ plugin_name | snake | replace("_", "?") }}-"$VERSION".tar.gz \
 ;
