@@ -1,13 +1,13 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
   checkout,
-  setup_python,
-  setup_ruby,
-  install_python_deps,
-  setup_env,
-  display_logs,
-  run_script,
   configure_git,
+  display_logs,
+  install_python_deps,
+  matrix_env,
+  run_script,
+  setup_env,
+  setup_python,
 with context %}
 ---
 name: "{{ plugin_app_label | camel }} Nightly CI"
@@ -33,6 +33,9 @@ jobs:
   test:
     needs: "build"
     uses: "./.github/workflows/test.yml"
+    with:
+      matrix_env: |
+        {{ matrix_env(performance=true) | from_yaml | tojson }}
 
   changelog:
     runs-on: ubuntu-latest
@@ -57,75 +60,4 @@ jobs:
           branch: "changelog/update"
           delete-branch: true
           path: "{{ plugin_name }}"
-
-{%- if test_performance %}
-
-  performance:
-    runs-on: "ubuntu-latest"
-    needs: "test"
-
-    strategy:
-      fail-fast: false
-      matrix:
-        env:
-        {%- if test_performance is iterable and test_performance|length > 1 %}
-          {%- for test in test_performance %}
-          - TEST: performance
-            PERFORMANCE_TEST: {{test}}
-          {%- endfor %}
-        {%- else %}
-          - TEST: performance
-        {%- endif %}
-
-    steps:
-      {{ checkout(path=plugin_name) | indent(6) }}
-
-      {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
-
-      {{ setup_python() | indent(6) }}
-
-      - name: "Download plugin package"
-        uses: "actions/download-artifact@v4"
-        with:
-          name: "plugin_package"
-          path: "{{ plugin_name }}/dist/"
-
-      - name: "Download API specs"
-        uses: "actions/download-artifact@v4"
-        with:
-          name: "api_spec"
-          path: "{{ plugin_name }}/"
-      {%- if plugins %}
-
-      - name: "Download client packages"
-        uses: "actions/download-artifact@v4"
-        with:
-          name: "python-client.tar"
-          path: "{{ plugin_name }}"
-
-      - name: "Unpack client packages"
-        working-directory: "pulp-openapi-generator"
-        run: |
-          {%- for plugin in plugins %}
-          mkdir -p "{{ plugin.name | snake }}-client"
-          pushd "{{ plugin.name | snake }}-client"
-          tar xvf "../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
-          popd
-          {%- endfor %}
-      {%- endif %}
-
-      {{ install_python_deps(["towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible~=10.3.0", "mkdocs", "jq", "jsonpatch", "bump-my-version"]) | indent(6) }}
-
-      {{ setup_env(test="performance") | indent(6) }}
-
-      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
-
-      {{ run_script(name="Install", file="install.sh") | indent(6) }}
-
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
-
-      {{ run_script(name="Script", file="script.sh") | indent(6) }}
-
-      {{ display_logs() | indent(6) }}
-{%- endif %}
 ...
