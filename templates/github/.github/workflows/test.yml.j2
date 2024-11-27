@@ -81,10 +81,6 @@ jobs:
 
       {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
 
-      {%- if deploy_client_to_rubygems %}
-      {{ setup_ruby(condition="${{ env.TEST == 'pulp' }}") | indent(6) }}
-      {%- endif %}
-
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
       {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
