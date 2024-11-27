@@ -1,17 +1,20 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
   checkout,
-  setup_python,
-  setup_ruby,
-  install_python_deps,
-  setup_env,
   display_logs,
+  install_python_deps,
   run_script,
+  setup_env,
+  setup_python,
 with context %}
 ---
 name: "Test"
 on:
   workflow_call:
+    inputs:
+      matrix_env:
+        required: true
+        type: string
 
 defaults:
   run:
@@ -23,20 +26,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env:
-          - TEST: pulp
-          {%- if test_azure %}
-          - TEST: azure
-          {%- endif %}
-          {%- if test_gcp %}
-          - TEST: gcp
-          {%- endif %}
-          {%- if test_s3 %}
-          - TEST: s3
-          {%- endif %}
-          {%- if test_lowerbounds %}
-          - TEST: lowerbounds
-          {%- endif %}
+        {%- raw %}
+        env: ${{ fromJSON(inputs.matrix_env) }}
+        {%- endraw %}
 
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}

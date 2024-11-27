@@ -1,9 +1,10 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
-  set_env_vars,
   checkout,
-  setup_python,
   install_python_deps,
+  matrix_env,
+  set_env_vars,
+  setup_python,
 with context %}
 ---
 name: "{{ plugin_app_label | camel }} CI"
@@ -56,6 +57,9 @@ jobs:
   test:
     needs: "build"
     uses: "./.github/workflows/test.yml"
+    with:
+      matrix_env: |
+        {{ matrix_env() | from_yaml | tojson }}
   {%- if test_deprecations %}
 
   deprecations:

@@ -67,10 +67,13 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
   run: |
     echo "TEST={{ "${{ matrix.env.TEST }}" }}" >> $GITHUB_ENV
 
-    {%- if test_performance and test == "performance" %}
     {%- if test_performance is iterable and test_performance|length > 1 %}
-    echo "PERFORMANCE_TEST={{ "${{ matrix.env.PERFORMANCE_TEST }}" }}" >> $GITHUB_ENV
-    {%- endif %}
+    {%- raw %}
+    if [ "${{ matrix.env.TEST }}" = "performance" ]
+    then
+      echo "PERFORMANCE_TEST=${{ matrix.env.PERFORMANCE_TEST }}" >> $GITHUB_ENV
+    fi
+    {%- endraw %}
     {%- endif %}
 {%- endmacro -%}
 
@@ -128,4 +131,33 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
   run: |
     git config --global user.name '{{ release_user }}'
     git config --global user.email '{{ release_email }}'
+{%- endmacro -%}
+
+
+{%- macro matrix_env(performance=false) -%}
+---
+- TEST: "pulp"
+{%- if test_azure %}
+- TEST: "azure"
+{%- endif %}
+{%- if test_gcp %}
+- TEST: "gcp"
+{%- endif %}
+{%- if test_s3 %}
+- TEST: "s3"
+{%- endif %}
+{%- if test_lowerbounds %}
+- TEST: "lowerbounds"
+{%- endif %}
+{%- if performance and test_performance %}
+{%- if test_performance is iterable and test_performance|length > 1 %}
+{%- for test in test_performance %}
+- TEST: "performance"
+  PERFORMANCE_TEST: "{{test}}"
+{%- endfor %}
+{%- else %}
+- TEST: "performance"
+{%- endif %}
+{%- endif %}
+...
 {%- endmacro -%}

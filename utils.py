@@ -55,6 +55,11 @@ def to_nice_yaml(data):
     return yaml.dump(data, indent=2, allow_unicode=True, default_flow_style=False)
 
 
+def from_yaml(data):
+    """Jinja filter to convert yaml data into a variable."""
+    return yaml.safe_load(data)
+
+
 # Information gathering
 
 
