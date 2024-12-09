@@ -9,20 +9,15 @@ cd "$(dirname "$(realpath -e "$0")")/../../.."
 
 VERSION="$1"
 
-if [[ -z "$VERSION" ]]; then
+if [[ -z "${VERSION}" ]]
+then
   echo "No version specified."
   exit 1
 fi
+
+twine upload -u __token__ -p "${PYPI_API_TOKEN}" \
 {%- for plugin in plugins %}
-
-RESPONSE="$(curl --write-out '%{http_code}' --silent --output /dev/null "https://pypi.org/project/{{ plugin.name | dash }}-client/$VERSION/")"
-
-if [ "$RESPONSE" == "200" ];
-then
-  echo "{{ plugin.name }} client $VERSION has already been released. Skipping."
-else
-  twine upload -u __token__ -p "$PYPI_API_TOKEN" \
-  "dist/{{ plugin.name | snake }}_client-$VERSION-py3-none-any.whl" \
-  "dist/{{ plugin.name | snake }}-client-$VERSION.tar.gz"
-fi
+"dist/{{ plugin.name | snake }}_client-${VERSION}-py3-none-any.whl" \
+"dist/{{ plugin.name | snake }}-client-${VERSION}.tar.gz" \
 {%- endfor %}
+;
