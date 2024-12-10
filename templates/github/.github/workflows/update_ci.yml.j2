@@ -58,6 +58,7 @@ jobs:
           delete-branch: true
       {%- if plugin_app_label == "file" %}
       - name: "Experiment: Mark PR automerge"
+        working-directory: "{{ plugin_name }}"
         run: |
           gh pr merge --rebase --auto "{{ '${{ steps.create_pr_' + branch_slug + '.outputs.pull-request-number }}' }}"
         if: "steps.create_pr_{{ branch_slug }}.outputs.pull-request-number"
