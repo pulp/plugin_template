@@ -57,11 +57,14 @@ jobs:
           delete-branch: true
       {%- if plugin_app_label == "file" %}
       - name: "Experiment: Mark PR automerge"
+      {%- raw %}
         run: |
           gh pr merge --rebase --auto "${{ steps.create_pr.outputs.pull-request-number }}"
+        if: "steps.create_pr.outputs.pull-request-number"
         env:
-          token: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          token: "{{ secrets.RELEASE_TOKEN }}"
         continue-on-error: true
+      {%- endraw %}
       {%- endif %}
       {%- endfor %}
 ...
