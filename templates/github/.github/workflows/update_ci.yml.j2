@@ -44,9 +44,7 @@ jobs:
 
       - name: "Create Pull Request for CI files"
         uses: "peter-evans/create-pull-request@v6"
-      {%- if plugin_app_label == "file" %}
         id: "create_pr_{{ branch_slug }}"
-      {%- endif %}
         with:
           token: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
           path: "{{ plugin_name }}"
@@ -56,8 +54,7 @@ jobs:
           branch: "update-ci/{{ branch }}"
           base: "{{ branch }}"
           delete-branch: true
-      {%- if plugin_app_label == "file" %}
-      - name: "Experiment: Mark PR automerge"
+      - name: "Mark PR automerge"
         working-directory: "{{ plugin_name }}"
         run: |
           gh pr merge --rebase --auto "{{ '${{ steps.create_pr_' + branch_slug + '.outputs.pull-request-number }}' }}"
@@ -65,6 +62,5 @@ jobs:
         env:
           GH_TOKEN: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
         continue-on-error: true
-      {%- endif %}
       {%- endfor %}
 ...
