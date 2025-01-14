@@ -126,6 +126,7 @@ minio_access_key: "'$MINIO_ACCESS_KEY'"\
 minio_secret_key: "'$MINIO_SECRET_KEY'"\
 pulp_scenario_settings: {{ pulp_settings_s3 | tojson }}\
 pulp_scenario_env: {{ pulp_env_s3 | tojson }}\
+test_storages_compat_layer: {{ test_storages_compat_layer | tojson }}\
 ' vars/main.yaml
 
   {%- if test_reroute %}
