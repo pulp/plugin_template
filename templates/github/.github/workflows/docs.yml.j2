@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     if: "endsWith(github.base_ref, 'main')"
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-latest"
     defaults:
       run:
         working-directory: "{{ plugin_name }}"
@@ -38,7 +38,7 @@ jobs:
 
   no-test:
     if: "!endsWith(github.base_ref, 'main')"
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-latest"
     steps:
       - run: |
           echo "Skip docs testing on non-main branches."
