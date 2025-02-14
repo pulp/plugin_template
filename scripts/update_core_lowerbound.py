@@ -31,6 +31,7 @@ def scan_requirement(line, supported_versions):
                             new_requirement = line.replace(spec.version, str(new_min_version))
                             updated = True
                         else:
+                            print(supported_versions)
                             print(
                                 "No supported lower bounds can satisfy requirement"
                                 " range, this branch can no longer be supported."
@@ -78,6 +79,8 @@ def main():
 
     core_template = yaml.safe_load(request.content)
     supported_versions = {parse(v) for v in core_template["supported_release_branches"]}
+    latest = core_template["latest_release_branch"]
+    supported_versions.add(parse(latest))
     try:
         scan_pyproject_toml(supported_versions)
     except Exception:
