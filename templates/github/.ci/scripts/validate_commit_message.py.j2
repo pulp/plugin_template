@@ -44,7 +44,7 @@ if blocking_matches:
     sys.exit("This PR is not ready for consumption.")
 
 g = Github(os.environ.get("GITHUB_TOKEN"))
-repo = g.get_repo("pulp/{{ plugin_name }}")
+repo = g.get_repo("{{ github_org }}/{{ plugin_name }}")
 
 
 def check_status(issue):
