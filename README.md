@@ -28,7 +28,7 @@ settings used by the `./plugin-template` command when generating new plugins and
    to the `--plugin-app-label`, e.g. `pulp_maven`.
 
 The first time this command is run, a new directory by the name of PLUGIN_NAME is created inside
-the parent directory of the `plugin_template' directory. The `template_config.yml` is written to
+the parent directory of the `plugin_template` directory. The `template_config.yml` is written to
 the root of this new directory.
 It is filled with default values for various aspects of the plugin scaffolding.
 You can edit them according to your needs to control subsequent calls to `plugin-template`.
