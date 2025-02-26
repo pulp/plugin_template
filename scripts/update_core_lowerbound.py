@@ -26,9 +26,10 @@ def scan_requirement(line, supported_versions):
                         # Lowerbound is not a supported branch, modify to next lowest
                         valid_lowerbounds = list(requirement.specifier.filter(supported_versions))
                         if valid_lowerbounds:
-                            new_min_version = min(valid_lowerbounds)
+                            new_min_branch = min(valid_lowerbounds)
+                            new_min_version = f"{new_min_branch.major}.{new_min_branch.minor}.0"
                             print(f"Lower bounds updated to >={new_min_version}")
-                            new_requirement = line.replace(spec.version, str(new_min_version))
+                            new_requirement = line.replace(spec.version, new_min_version)
                             updated = True
                         else:
                             print(supported_versions)
