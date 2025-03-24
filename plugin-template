@@ -5,7 +5,6 @@ import os
 import pprint
 import shlex
 import shutil
-import subprocess
 import sys
 import textwrap
 from pathlib import Path
@@ -97,6 +96,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/update_github.sh",
         ".ci/scripts/update_redmine.sh",
         ".ci/scripts/upper_bound.py",
+        ".github/template_gitref",
         ".github/workflows/kanban.yml",
         ".github/workflows/changelog.yml",
         ".github/workflows/fips.yml",
@@ -335,14 +335,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     files_templated = 0
     files_copied = 0
 
-    try:
-        gitref = subprocess.check_output(["git", "describe", "--dirty"]).decode().strip()
-    except Exception:
-        gitref = "unknown"
-
     template_vars = {
         "section": name,
-        "gitref": gitref,
         "setup_py": (plugin_root_path / "setup.py").exists(),
         "ci_update_branches": utils.ci_update_branches(config),
         "python_version": "3.11",
