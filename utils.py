@@ -159,4 +159,7 @@ def merge_toml(template, plugin_root_path, relative_path, template_vars):
             old_toml[merge_key] = data[merge_key]
         else:
             old_toml[merge_key].update(data[merge_key])
-        tomlkit.dump(old_toml, path.open("w"))
+        output = tomlkit.dumps(old_toml)
+        if output[-1] != "\n":
+            output = output + "\n"
+        path.write_text(output)
