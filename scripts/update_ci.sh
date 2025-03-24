@@ -33,12 +33,6 @@ pip install -r requirements.txt
 ./plugin-template --github "${docs[@]}" "${plugin_name}"
 popd
 
-# Check if only gitref file has changed, so no effect on CI workflows.
-if [ -z "$(git diff --name-only | grep -v "template_gitref")" ]; then
-  echo "No changes detected."
-  git ls-files | grep template_gitref | xargs git restore
-fi
-
 if [[ $(git status --porcelain) ]]; then
   git add -A
   git commit -m "Update CI files"
