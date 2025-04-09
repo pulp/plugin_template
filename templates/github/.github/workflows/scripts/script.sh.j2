@@ -118,7 +118,7 @@ cmd_user_prefix bash -c "django-admin makemigrations {{ plugin.app_label }} --ch
 
 # Run unit tests.
 {%- for plugin in plugins %}
-cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes --suppress-no-test-exit-code -p no:pulpcore --pyargs {{ plugin.name | snake }}.tests.unit"
+cmd_user_prefix bash -c "PULP_DATABASES__default__USER=postgres pytest -v -r sx --color=yes --suppress-no-test-exit-code -p no:pulpcore --durations=20 --pyargs {{ plugin.name | snake }}.tests.unit"
 {%- endfor %}
 
 {%- if plugins %}
@@ -142,13 +142,13 @@ else
   if [[ "$GITHUB_WORKFLOW" =~ "Nightly" ]]
   then
     {%- for plugin in plugins %}
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel' --nightly"
+    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --durations=20 --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }} --nightly"
+    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --durations=20 --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel' --nightly"
     {%- endfor %}
   else
     {%- for plugin in plugins %}
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
-    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel'"
+    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --durations=20 --pyargs {{ plugin.name | snake }}.tests.functional -m parallel -n {{ parallel_test_workers }}"
+    cmd_user_prefix bash -c "pytest -v --timeout=300 -r sx --color=yes --suppress-no-test-exit-code --durations=20 --pyargs {{ plugin.name | snake }}.tests.functional -m 'not parallel'"
     {%- endfor %}
   fi
 fi
