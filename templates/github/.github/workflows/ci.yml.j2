@@ -29,7 +29,7 @@ jobs:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
       {{ setup_python() | indent(6) }}
       {%- if check_commit_message %}
-      {{ install_python_deps(["requests", "pygithub"]) | indent(6) }}
+      {{ install_python_deps(["requests", "pygithub", "pyyaml"]) | indent(6) }}
       - name: "Check commit message"
         if: github.event_name == 'pull_request'
         env:
