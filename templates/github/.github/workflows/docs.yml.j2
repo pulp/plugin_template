@@ -11,34 +11,28 @@ on:
 
 jobs:
   test:
-    if: "endsWith(github.base_ref, 'main')"
+    if: "endsWith(github.base_ref, '{{ plugin_default_branch }}')"
     runs-on: "ubuntu-latest"
     defaults:
       run:
         working-directory: "{{ plugin_name }}"
     steps:
       {{ checkout(depth=1, path=plugin_name) | indent(6) }}
-      {{ setup_python() | indent(6) }}
-      - name: "Setup cache key"
-        run: |
-          git ls-remote https://github.com/pulp/pulp-docs main | tee pulp-docs-main-sha
-      - uses: "actions/cache@v4"
-        with:
-          path: "~/.cache/pip"
-          key: {{ "${{ runner.os }}-pip-${{ hashFiles('pulp-docs-main-sha') }}" }}
-          restore-keys: |
-            {{ "${{ runner.os }}-pip-" }}
-      {{ install_python_deps(["-r", "doc_requirements.txt"]) | indent(6) }}
+      {{ checkout(depth=0, repository="pulp/pulp-docs", path="pulp-docs", ref="rewrite-as-mkdocs-plugin") | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
+      {{ install_python_deps(["../pulp-docs", "towncrier"]) | indent(6) }}
       - name: "Build changelog"
         run: |
           towncrier build --yes --version 4.0.0.ci
       - name: "Build docs"
+        working-directory: "pulp-docs"
         run: |
+          pulp-docs fetch --dest ..
           pulp-docs build
 
   no-test:
-    if: "!endsWith(github.base_ref, 'main')"
+    if: "!endsWith(github.base_ref, '{{ plugin_default_branch }}')"
     runs-on: "ubuntu-latest"
     steps:
       - run: |
-          echo "Skip docs testing on non-main branches."
+          echo "Skip docs testing on non-default branches."
