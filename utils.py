@@ -1,8 +1,8 @@
 from datetime import timedelta
-import itertools
 import re
 import requests_cache
 import stat
+import textwrap
 import tomlkit
 import tomllib
 import yaml
@@ -93,7 +93,7 @@ def current_version(plugin_root_path):
     return current_version
 
 
-def get_pulpdocs_members() -> list[str]:
+def get_pulpdocs_members(pulpdocs_branch="main") -> list[str]:
     """
     Get repositories which are members of the Pulp managed documentation.
 
@@ -101,7 +101,7 @@ def get_pulpdocs_members() -> list[str]:
     """
     session = requests_cache.CachedSession(".requests_cache", expire_after=timedelta(days=1))
     response = session.get(
-        "https://raw.githubusercontent.com/pulp/pulp-docs/main/src/pulp_docs/data/repolist.yml"
+        f"https://raw.githubusercontent.com/pulp/pulp-docs/{pulpdocs_branch}/mkdocs.yml"
     )
     if response.status_code != 200:
         raise ValueError(
@@ -109,12 +109,38 @@ def get_pulpdocs_members() -> list[str]:
             "This mean we can't know if we should manage the doc-related workflows."
         )
 
-    repolist = yaml.safe_load(response.content.decode())
-    return [
-        repo["name"]
-        for repo in itertools.chain(*repolist["repos"].values())
-        if "subpackage_of" not in repo
-    ]
+    class IgnoreTags(yaml.SafeLoader):
+        pass
+
+    IgnoreTags.add_multi_constructor("tag", lambda *a, **kw: None)
+    mkdocs_config = yaml.load(response.content.decode(), Loader=IgnoreTags)
+    repository_members = set()
+    try:
+        found = False
+        for plugin in mkdocs_config["plugins"]:
+            if "PulpDocs" in plugin:
+                found = True
+                for component in plugin["PulpDocs"]["components"]:
+                    repository = component["path"].split("/")[0]
+                    repository_members.add(repository)
+                break
+        if not found:
+            raise KeyError("PulpDocs plugin not found")
+    except KeyError:
+        EXPECTED = """
+        plugins:
+          - PulpDocs:
+              components:
+                - title: "Pulpcore"
+                  path: "pulpcore"
+                  git_url: "https://github.com/pulp/pulpcore"
+                  kind: "Core"
+                  rest_api: "core"
+                - ...
+        """
+        raise ValueError(f"Expected mkdocs.yml with structure:\n{textwrap.dedent(EXPECTED)}")
+
+    return list(repository_members)
 
 
 # Utilities for templating

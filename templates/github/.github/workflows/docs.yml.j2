@@ -5,12 +5,12 @@
   install_python_deps,
 with context %}
 ---
-name: "Docs"
+name: "Docs CI"
 on:
   workflow_call:
 
 jobs:
-  test:
+  changelog:
     if: "endsWith(github.base_ref, '{{ plugin_default_branch }}')"
     runs-on: "ubuntu-latest"
     defaults:
@@ -18,17 +18,15 @@ jobs:
         working-directory: "{{ plugin_name }}"
     steps:
       {{ checkout(depth=1, path=plugin_name) | indent(6) }}
-      {{ checkout(depth=0, repository="pulp/pulp-docs", path="pulp-docs", ref="rewrite-as-mkdocs-plugin") | indent(6) }}
       {{ setup_python(pyversion="3.12") | indent(6) }}
-      {{ install_python_deps(["../pulp-docs", "towncrier"]) | indent(6) }}
+      {{ install_python_deps(["towncrier"]) | indent(6) }}
       - name: "Build changelog"
         run: |
           towncrier build --yes --version 4.0.0.ci
-      - name: "Build docs"
-        working-directory: "pulp-docs"
-        run: |
-          pulp-docs fetch --dest ..
-          pulp-docs build
+  docs:
+    uses: 'pulp/pulp-docs/.github/workflows/docs-ci.yml@{{ pulpdocs_branch }}'
+    with:
+      pulpdocs_ref: '{{ pulpdocs_branch }}'
 
   no-test:
     if: "!endsWith(github.base_ref, '{{ plugin_default_branch }}')"
