@@ -335,6 +335,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     files_templated = 0
     files_copied = 0
 
+    PULPDOCS_BRANCH = "rewrite-as-mkdocs-plugin"
     template_vars = {
         "section": name,
         "setup_py": (plugin_root_path / "setup.py").exists(),
@@ -342,7 +343,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         "python_version": "3.11",
         "ci_update_hour": sum((ord(c) for c in config["plugin_app_label"])) % 24,
         "current_version": utils.current_version(plugin_root_path),
-        "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(),
+        "pulpdocs_branch": PULPDOCS_BRANCH,
+        "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
         **config,
     }
 
