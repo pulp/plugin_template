@@ -426,6 +426,10 @@ def generate_relative_path_set(root_dir):
             template_abs_path = os.path.join(root, file_name)
             template_relative_path = os.path.relpath(template_abs_path, root_dir)
             applicable_paths.add(template_relative_path)
+    applicable_paths = list(applicable_paths)
+    if "pyproject.toml.j2" in applicable_paths:
+        applicable_paths.remove("pyproject.toml.j2")
+        applicable_paths.insert(0, "pyproject.toml.j2")
     return applicable_paths
 
 
