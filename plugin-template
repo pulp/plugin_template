@@ -213,10 +213,19 @@ def main():
             """
         ),
     )
+    parser.add_argument(
+        "--plugin-root-dir",
+        action="store",
+        help=textwrap.dedent(
+            """\
+                Root directory of the plugin if it's not '../{plugin_name}'
+            """
+        ),
+    )
     args = parser.parse_args()
 
     here = os.path.dirname(os.path.abspath(__file__))
-    plugin_root_dir = os.path.join(os.path.dirname(here), args.plugin_name)
+    plugin_root_dir = args.plugin_root_dir or os.path.join(os.path.dirname(here), args.plugin_name)
     plugin_config_path = os.path.join(plugin_root_dir, "template_config.yml")
     write_new_config = False
 
