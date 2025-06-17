@@ -20,6 +20,9 @@ jobs:
     strategy:
       fail-fast: false
 
+    permissions:
+      contents: write
+
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
