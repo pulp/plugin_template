@@ -172,6 +172,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: TAG_NAME,
-              body: `{% raw %}${{ steps.get_release_notes.outputs.body }}{% endraw %}`,
+              body: `{% raw %}${{ steps.get_release_notes.outputs.body }}
+
+[View the full changelog](CHANGES.md#${TAG_NAME}){% endraw %}`,
               make_latest: "legacy",
             });
