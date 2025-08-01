@@ -72,6 +72,13 @@ fi
 {%- endif %}
 
 cat >> vars/main.yaml << VARSYAML
+{%- if extra_files %}
+extra_files:
+  {%- for item in extra_files %}
+  - origin: "{{ item.origin }}"
+    destination: "{{ item.destination }}"
+  {%- endfor %}
+{%- endif %}
 services:
   - name: pulp
     image: "pulp:ci_build"
