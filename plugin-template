@@ -33,6 +33,7 @@ DEFAULT_SETTINGS = {
     "deploy_to_pypi": True,
     "disabled_redis_runners": [],
     "docker_fixtures": False,
+    "extra_files": [],
     "flake8_ignore": [],
     "flake8": True,
     "github_org": "pulp",
