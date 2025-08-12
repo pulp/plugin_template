@@ -154,6 +154,7 @@ if [ "$TEST" = "azure" ]; then
   sed -i -e '$a azure_test: true\
 pulp_scenario_settings: {{ pulp_settings_azure | tojson }}\
 pulp_scenario_env: {{ pulp_env_azure | tojson }}\
+test_storages_compat_layer: {{ test_storages_compat_layer | tojson }}\
 ' vars/main.yaml
 fi
 {%- endif %}
