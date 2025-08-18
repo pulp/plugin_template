@@ -73,7 +73,6 @@ DEFAULT_SETTINGS = {
     "test_performance": False,
     "test_reroute": True,
     "test_s3": False,
-    "test_storages_compat_layer": False,
     "use_issue_template": True,
 }
 
