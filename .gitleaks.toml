@@ -1,0 +1,7 @@
+[allowlist]
+  description = "Allow specific test-keys."
+  regexes = [
+    '''AKIAIT2Z5TDYPX3ARJBA''',
+    '''qR+vjWPU50fCqQuUWbj9Fain/j2pV+ZtBCiDiieS''',
+    '''fqRvjWaPU5o0fCqQuUWbj9Fainj2pVZtBCiDiieS''',
+  ]
