@@ -409,7 +409,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     files_templated = 0
     files_copied = 0
 
-    PULPDOCS_BRANCH = "rewrite-as-mkdocs-plugin"
+    PULPDOCS_BRANCH = "main"
     template_vars = {
         "section": name,
         "setup_py": (plugin_root_path / "setup.py").exists(),
