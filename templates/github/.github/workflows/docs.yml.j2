@@ -8,10 +8,14 @@ with context %}
 name: "Docs CI"
 on:
   workflow_call:
+    inputs:
+      run_docs:
+        description: "Whether to run docs jobs"
+        required: true
+        type: string
 
 jobs:
   changelog:
-    if: "endsWith(github.base_ref, '{{ plugin_default_branch }}')"
     runs-on: "ubuntu-latest"
     defaults:
       run:
@@ -24,14 +28,7 @@ jobs:
         run: |
           towncrier build --yes --version 4.0.0.ci
   docs:
-    if: "endsWith(github.base_ref, '{{ plugin_default_branch }}')"
+    if: {{ '${{ inputs.run_docs == \'1\' }}' }}
     uses: 'pulp/pulp-docs/.github/workflows/docs-ci.yml@{{ pulpdocs_branch }}'
     with:
       pulpdocs_ref: '{{ pulpdocs_branch }}'
-
-  no-test:
-    if: "!endsWith(github.base_ref, '{{ plugin_default_branch }}')"
-    runs-on: "ubuntu-latest"
-    steps:
-      - run: |
-          echo "Skip docs testing on non-default branches."
