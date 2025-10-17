@@ -186,10 +186,7 @@ minimal code and tests.
    and tests.
 
    ``$ ./plugin-template --bootstrap PLUGIN_NAME``
-
-In addition to the basic plugin boilerplate, this template also provides a basic set of
-functional tests using the [pulp_smash](https://pulp-smash.readthedocs.io/en/latest/) framework.
-
+   
 In order to use these tests, you will need to address the "FIXME" messages left in places where
 plugin-writer intervention is required.
 
