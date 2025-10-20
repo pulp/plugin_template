@@ -20,7 +20,7 @@ pushd {{ plugin.name | snake }}-client
 python setup.py sdist bdist_wheel --python-tag py3
 
 twine check "dist/{{ plugin.name | snake }}_client-"*"-py3-none-any.whl"
-twine check "dist/{{ plugin.name | snake }}-client-"*".tar.gz"
+twine check "dist/{{ plugin.name | snake }}_client-"*".tar.gz"
 
 tar cvf "../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar" ./dist
 
