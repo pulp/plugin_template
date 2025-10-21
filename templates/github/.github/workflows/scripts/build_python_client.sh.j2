@@ -17,7 +17,7 @@ rm -rf "{{ plugin.name | snake }}-client"
 ./gen-client.sh "../{{ plugin_name }}/{{ plugin.app_label }}-api.json" "{{ plugin.app_label }}" python "{{ plugin.name | snake }}"
 
 pushd {{ plugin.name | snake }}-client
-python setup.py sdist bdist_wheel --python-tag py3
+python -m build
 
 twine check "dist/{{ plugin.name | snake }}_client-"*"-py3-none-any.whl"
 twine check "dist/{{ plugin.name | snake }}_client-"*".tar.gz"
