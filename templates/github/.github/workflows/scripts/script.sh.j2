@@ -64,7 +64,7 @@ pushd ../pulp-openapi-generator
     cmd_prefix pulpcore-manager openapi --bindings --component "${COMPONENT}" > "${COMPONENT}-api.json"
     if [[ ! " ${BUILT_CLIENTS} " =~ "${COMPONENT}" ]]
     then
-      rm -rf "./${PACKAGE}-client"
+      rm -rf "./${PACKAGE}_client"
       ./gen-client.sh "${COMPONENT}-api.json" "${COMPONENT}" python "${PACKAGE}"
       pushd "${PACKAGE}-client"
         python setup.py sdist bdist_wheel --python-tag py3

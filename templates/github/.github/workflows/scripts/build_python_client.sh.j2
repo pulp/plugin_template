@@ -12,13 +12,14 @@ cd "$(dirname "$(realpath -e "$0")")"/../../..
 
 pushd ../pulp-openapi-generator
 {%- for plugin in plugins %}
-rm -rf "{{ plugin.name | snake }}-client"
+rm -rf "{{ plugin.name | snake }}_client"
 
 ./gen-client.sh "../{{ plugin_name }}/{{ plugin.app_label }}-api.json" "{{ plugin.app_label }}" python "{{ plugin.name | snake }}"
 
 pushd {{ plugin.name | snake }}-client
 python setup.py sdist bdist_wheel --python-tag py3
 
+ls dist/
 twine check "dist/{{ plugin.name | snake }}_client-"*"-py3-none-any.whl"
 twine check "dist/{{ plugin.name | snake }}_client-"*".tar.gz"
 

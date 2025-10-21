@@ -60,8 +60,8 @@ jobs:
         working-directory: "pulp-openapi-generator"
         run: |
           {%- for plugin in plugins %}
-          mkdir -p "{{ plugin.name | snake }}-client"
-          pushd "{{ plugin.name | snake }}-client"
+          mkdir -p "{{ plugin.name | snake }}_client"
+          pushd "{{ plugin.name | snake }}_client"
           tar xvf "../../{{ plugin_name }}/{{ plugin.app_label }}-python-client.tar"
           popd
           {%- endfor %}
