@@ -79,18 +79,16 @@ jobs:
     runs-on: "ubuntu-latest"
     needs:
       - "build"
-
-    env:
-      GITHUB_TOKEN: "{{ "${{ secrets.GITHUB_TOKEN }}" }}"
+    environment:
+      name: "rubygems"
+    permissions:
+      id-token: "write"
 
     steps:
-      {{ checkout(depth=1, path=plugin_name) | indent(6) }}
-
       - name: "Download Ruby client"
         uses: "actions/download-artifact@v4"
         with:
           name: "ruby-client.tar"
-          path: "{{ plugin_name }}/"
 
       - name: "Untar Ruby client packages"
         run: |
@@ -100,11 +98,14 @@ jobs:
 
       {{ setup_ruby() | indent(6) }}
 
-      {{ set_secrets() | indent(6) }}
+      - name: "Set RubyGems Credentials"
+        uses: "rubygems/configure-rubygems-credentials@v1.0.0"
 
-      - name: "Publish client to rubygems"
+      - name: "Publish client to RubyGems"
         run: |
-          bash .github/workflows/scripts/publish_client_gem.sh {{ "${{ github.ref_name }}" }}
+          {%- for plugin in plugins %}
+          gem push "{{ plugin.name | snake }}_client-{{ "${{ github.ref_name }}" }}.gem"
+          {%- endfor %}
   {%- endif %}
   {%- endif %}
 
