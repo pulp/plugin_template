@@ -59,10 +59,13 @@ jobs:
       id-token: "write"
 
     steps:
+      {{ checkout(depth=1, path=plugin_name) | indent(6) }}
+
       - name: "Download Python client"
         uses: "actions/download-artifact@v4"
         with:
           name: "python-client.tar"
+          path: "{{ plugin_name }}/"
 
       - name: "Untar python client packages"
         run: |
@@ -72,6 +75,8 @@ jobs:
 
       - name: "Publish client to pypi"
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: "{{ plugin_name }}/dist/"
   {%- endif %}
 
   {%- if deploy_client_to_rubygems %}
@@ -85,10 +90,13 @@ jobs:
       id-token: "write"
 
     steps:
+      {{ checkout(depth=1, path=plugin_name) | indent(6) }}
+
       - name: "Download Ruby client"
         uses: "actions/download-artifact@v4"
         with:
           name: "ruby-client.tar"
+          path: "{{ plugin_name }}/"
 
       - name: "Untar Ruby client packages"
         run: |
