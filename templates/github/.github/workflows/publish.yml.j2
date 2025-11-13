@@ -161,14 +161,16 @@ jobs:
 
       - name: "Create release on GitHub"
         uses: "actions/github-script@v7"
+        env:
+          RELEASE_BODY: {% raw %}${{ steps.get_release_notes.outputs.body }}{% endraw %}
         with:
           script: |
-            const { TAG_NAME } = process.env;
+            const { TAG_NAME, RELEASE_BODY } = process.env;
 
             await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: TAG_NAME,
-              body: `{% raw %}${{ steps.get_release_notes.outputs.body }}{% endraw %}`,
+              body: RELEASE_BODY,
               make_latest: "legacy",
             });
