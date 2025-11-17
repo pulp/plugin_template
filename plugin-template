@@ -379,6 +379,12 @@ def main():
         print("\nDeprecation check:")
         check_for_deprecated_files(plugin_root_dir, sections)
 
+    if config["black"]:
+        try:
+            subprocess.run(["black", "--quiet", "."], cwd=plugin_root_dir)
+        except FileNotFoundError:
+            pass
+
 
 def migrate_dummy(plugin_root_dir):
     pass
@@ -422,6 +428,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         "current_version": utils.current_version(plugin_root_path),
         "pulpdocs_branch": PULPDOCS_BRANCH,
         "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
+        "black_version": utils.black_version(),
         **config,
     }
 
@@ -471,20 +478,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             files_copied += 1
             if verbose:
                 print(f"Copied file: {relative_path}")
-
-    if config["black"]:
-        black_paths = filter(lambda x: x.endswith(".py.j2"), relative_path_set)
-        black_paths = map(lambda x: x[: -len(".j2")], black_paths)
-        black_paths = map(
-            lambda x: x.replace("plugin_name", utils.to_snake(config["plugin_name"])), black_paths
-        )
-        black_paths = filter(
-            lambda x: os.path.exists(os.path.join(plugin_root_dir, x)), black_paths
-        )
-        try:
-            subprocess.run(["black", "--quiet"] + list(black_paths), cwd=plugin_root_dir)
-        except FileNotFoundError:
-            pass
 
     print(f"Section: {name} \n    templated: {files_templated}\n    copied: {files_copied}")
     return 0

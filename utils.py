@@ -1,4 +1,5 @@
 from datetime import timedelta
+from pathlib import Path
 import re
 import requests_cache
 import stat
@@ -91,6 +92,16 @@ def current_version(plugin_root_path):
         except Exception:
             current_version = "0.0.0.dev"
     return current_version
+
+
+def black_version():
+    PATTERN = re.compile(r"^black==(?P<version>.*)$")
+    requirements_file = Path(__file__).parent / "requirements.txt"
+    for line in requirements_file.read_text().splitlines():
+        if match := PATTERN.fullmatch(line):
+            return match.group("version")
+
+    raise ValueError("'black' not found in 'requirements.txt'")
 
 
 def get_pulpdocs_members(pulpdocs_branch="main") -> list[str]:
