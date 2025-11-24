@@ -31,9 +31,7 @@ jobs:
 
       {{ setup_python() | indent(6) }}
 
-      # Click is pinned because of:
-      # https://github.com/pallets/click/issues/3065
-      {{ install_python_deps(["bump-my-version", "towncrier", "click<8.3"]) | indent(6) }}
+      {{ install_python_deps(["bump-my-version", "towncrier"]) | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
