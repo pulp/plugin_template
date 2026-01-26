@@ -1,5 +1,4 @@
-# This needs to match the version in templates/github/lint_requirement.txt.j2
-black==24.3.0
+pre-commit
 jinja2
 pyyaml
 requests~=2.32.3

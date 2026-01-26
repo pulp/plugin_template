@@ -42,8 +42,7 @@ fi
 
 if [[ "${use_black}" == "True" ]]
 then
-  pip install -r lint_requirements.txt
-  black .
+  pre-commit run -a black || true  # always zero exit-code
 
   if [[ "$(git status --porcelain)" ]]
   then

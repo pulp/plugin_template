@@ -5,7 +5,6 @@ import os
 import pprint
 import shlex
 import shutil
-import subprocess
 import sys
 import textwrap
 from pathlib import Path
@@ -182,6 +181,14 @@ DEPRECATED_FILES = {
         "flake8.cfg",
         "CHANGES/.TEMPLATE.rst",
     ],
+}
+
+PRECOMMIT_VERSIONS = {
+    "pre-commit-hooks": "v3.2.0",
+    "flake8": "7.3.0",
+    "black": "24.3.0",
+    "yamllint": "v1.37.1",
+    "check-manifest": "0.51",
 }
 
 
@@ -374,20 +381,35 @@ def main():
 
     if "github" in sections:
         migrate_dummy(plugin_root_dir)
+        migrate_checkmanifest_ignores(plugin_root_dir)
 
     if plugin_root_dir:
         print("\nDeprecation check:")
         check_for_deprecated_files(plugin_root_dir, sections)
 
-    if config["black"]:
-        try:
-            subprocess.run(["black", "--quiet", "."], cwd=plugin_root_dir)
-        except FileNotFoundError:
-            pass
 
-
-def migrate_dummy(plugin_root_dir):
+def migrate_dummy(plugin_root_dir: str):
     pass
+
+
+def migrate_checkmanifest_ignores(plugin_root_dir: str):
+    # appends new check-manifest.ignore files to pyproject unmanaged section
+    # remove after plugins are up-to-date
+    import tomlkit
+    import contextlib
+
+    pyproject_path = Path(plugin_root_dir) / "pyproject.toml"
+    if not pyproject_path.exists():
+        # handle manually
+        return
+    pyproject_data = tomlkit.loads(pyproject_path.read_text())
+    ignore_files = [".yamllint.yaml", ".pre-commit-config.yaml"]
+    for ignore_file in ignore_files:
+        with contextlib.suppress(KeyError):
+            if ignore_file in pyproject_data["tool"]["check-manifest"]["ignore"]:
+                continue
+            pyproject_data["tool"]["check-manifest"]["ignore"].append(ignore_file)
+    pyproject_path.write_text(tomlkit.dumps(pyproject_data))
 
 
 def write_template_section(config, name, plugin_root_dir, verbose=False):
@@ -414,6 +436,8 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
     env.filters["to_yaml"] = utils.to_nice_yaml
     env.filters["from_yaml"] = utils.from_yaml
     env.filters["shquote"] = shlex.quote
+    env.filters["normalize_rev"] = utils.normalize_rev
+    env.filters["quote"] = lambda o: repr(o)
 
     files_templated = 0
     files_copied = 0
@@ -428,7 +452,7 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
         "current_version": utils.current_version(plugin_root_path),
         "pulpdocs_branch": PULPDOCS_BRANCH,
         "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
-        "black_version": utils.black_version(),
+        "precommit_versions": PRECOMMIT_VERSIONS,
         **config,
     }
 

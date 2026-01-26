@@ -1,0 +1,4 @@
+# CI linting uses pre-commit
+# keeping here for compatibility
+black==24.3.0
+flake8==7.3.0

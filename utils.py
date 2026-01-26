@@ -1,5 +1,4 @@
 from datetime import timedelta
-from pathlib import Path
 import re
 import requests_cache
 import stat
@@ -51,9 +50,16 @@ def to_snake(name):
     return name.replace("-", "_")
 
 
+def normalize_rev(rev: str):
+    """
+    Normalize common revision patterns. E.g.: 'v1.2.3' -> '1.2.3'.
+    """
+    return re.sub("^[a-zA-Z]+|[a-zA-Z]+$", "", rev)
+
+
 def to_nice_yaml(data):
     """Implement a filter for Jinja 2 templates to render human readable YAML."""
-    return yaml.dump(data, indent=2, allow_unicode=True, default_flow_style=False)
+    return yaml.dump(data, indent=2, allow_unicode=True, default_flow_style=False).strip()
 
 
 def from_yaml(data):
@@ -92,16 +98,6 @@ def current_version(plugin_root_path):
         except Exception:
             current_version = "0.0.0.dev"
     return current_version
-
-
-def black_version():
-    PATTERN = re.compile(r"^black==(?P<version>.*)$")
-    requirements_file = Path(__file__).parent / "requirements.txt"
-    for line in requirements_file.read_text().splitlines():
-        if match := PATTERN.fullmatch(line):
-            return match.group("version")
-
-    raise ValueError("'black' not found in 'requirements.txt'")
 
 
 def get_pulpdocs_members(pulpdocs_branch="main") -> list[str]:

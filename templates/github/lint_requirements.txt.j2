@@ -1,13 +1,16 @@
 {% include 'header.j2' %}
 
+# CI linting uses pre-commit
+# keeping here for compatibility
 {% if black -%}
-black=={{ black_version }}
+black=={{ precommit_versions["black"] | normalize_rev }}
 {% endif -%}
-bump-my-version
-check-manifest
-flake8
+check-manifest=={{ precommit_versions["check-manifest"] | normalize_rev }}
+flake8=={{ precommit_versions["flake8"] | normalize_rev }}
+yamllint=={{ precommit_versions["yamllint"] | normalize_rev }}
+
 {% if black -%}
 flake8-black
 {% endif -%}
+bump-my-version
 packaging
-yamllint

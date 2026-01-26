@@ -27,13 +27,16 @@ jobs:
       - uses: "actions/setup-python@v5"
         with:
           python-version: "3.11"
+      - name: "Install python dependencies"
+        working-directory: "plugin_template"
+        run: |
+          echo ::group::PYDEPS
+          pip install pre-commit
+          echo ::endgroup::
       - name: "Lint plugin_template"
         working-directory: "plugin_template"
         run: |
-          pip3 install black==24.3.0 flake8
-          black --version
-          black --check --diff plugin-template utils.py
-          flake8 plugin-template utils.py
+          pre-commit run --all-files -v
       - name: "Bootstrap catdog plugin"
         working-directory: "plugin_template"
         run: |
@@ -41,48 +44,19 @@ jobs:
 
       # Below this line we include the steps of the ci workflow of the generated plugin
 
-      - name: "Install python dependencies"
+      # cache example from: https://pre-commit.com/#github-actions-example
+      - name: set PY
+        run: echo "PY=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Run pre-commit
+        shell: "bash"
+        env:
+          PY_COLORS: "1"
+          FORCE_COLOR: "1"
+          PRE_COMMIT_COLOR: "always"
+          TERM: "xterm-256color"
         run: |
-          echo ::group::PYDEPS
-          pip install -r lint_requirements.txt
-          echo ::endgroup::
-
-      - name: "Lint workflow files"
-        run: |
-          yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
-
-      - name: "Verify bump version config"
-        run: |
-          bump-my-version bump --dry-run release
-          bump-my-version show-bump
-
-      # run black separately from flake8 to get a diff
-      - name: "Run black"
-        run: |
-          black --version
-          black --check --diff .
-
-      # Lint code.
-      - name: "Run flake8"
-        run: |
-          flake8
-
-      - name: "Run extra lint checks"
-        run: |
-          [ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh
-
-      - name: "Check for any files unintentionally left out of MANIFEST.in"
-        run: |
-          check-manifest
-
-      - name: "Verify requirements files"
-        run: |
-          python .ci/scripts/check_requirements.py
-
-      - name: "Check for pulpcore imports outside of pulpcore.plugin"
-        run: |
-          sh .ci/scripts/check_pulpcore_imports.sh
-
-      - name: "Check for common gettext problems"
-        run: |
-          sh .ci/scripts/check_gettext.sh
+          pre-commit run --all-files -v
