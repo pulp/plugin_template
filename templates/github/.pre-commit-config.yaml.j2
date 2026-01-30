@@ -9,20 +9,28 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
-  {% if flake8 -%}
-  - repo: 'https://github.com/pycqa/flake8'
-    rev: {{ precommit_versions["flake8"] | quote }}
+  - repo: 'https://github.com/adrienverge/yamllint'
+    rev: {{ precommit_versions["yamllint"] | quote }}
     hooks:
-      - id: flake8
-        args: ["--config", ".flake8"]
-        language_version: '3.11'
-  {%- endif %}
+      - id: yamllint
+        name: Lint workflow files
+        args: ["--strict"]
   {%- if black %}
+
+  - repo: local
+    hooks:
+      - id: check-bump
+        name: Verify bump version config
+        language: python
+        entry: .ci/scripts/check_bump.sh
+        pass_filenames: false
+        additional_dependencies: ["bump-my-version"]
 
   - repo: 'https://github.com/psf/black'
     rev: {{ precommit_versions["black"] | quote }}
     hooks:
       - id: black
+        name: Run black
         language_version: "3.11"
         pass_filenames: false
         args: ["--extend-exclude", ".*venv.*", "."]
@@ -30,44 +38,58 @@ repos:
         additional_dependencies: ["flake8-black"]
         {%- endif %}
   {%- endif %}
+  {%- if flake8 %}
 
-  - repo: 'https://github.com/adrienverge/yamllint'
-    rev: {{ precommit_versions["yamllint"] | quote }}
+  - repo: 'https://github.com/pycqa/flake8'
+    rev: {{ precommit_versions["flake8"] | quote }}
     hooks:
-      - id: yamllint
+      - id: flake8
+        name: Run flake8
+        args: ["--config", ".flake8"]
+        language_version: '3.11'
+  {%- endif %}
+
+  - repo: local
+    hooks:
+      - id: extra-lint
+        name: Run extra lint checks
+        language: unsupported
+        types: [python]
+        entry: sh -c "[ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh"
+
   {%- if check_manifest %}
 
   - repo: 'https://github.com/mgedmin/check-manifest'
     rev: {{ precommit_versions["check-manifest"] | quote }}
     hooks:
       - id: check-manifest
+        name: Check files unintentionally left out of MANIFEST.in
   {%- endif %}
 
   # Custom checks
   - repo: local
     hooks:
-      - id: check-bump
-        name: check-bump
-        language: python
-        entry: .ci/scripts/check_bump.sh
-        pass_filenames: false
-        additional_dependencies: ["bump-my-version"]
-
+        {%- if lint_requirements %}
       - id: check-requirements
-        name: check-requirements
+        name: Verify requirements files
         language: python
         entry: python .ci/scripts/check_requirements.py
         pass_filenames: false
         additional_dependencies: ["packaging"]
+        {%- endif %}
+        {%- if check_stray_pulpcore_imports %}
+
+      - id: check-pulpcore-imports
+        name: Check pulpcore imports outside 'pulpcore.plugin'
+        language: unsupported_script
+        types: [python]
+        entry: .ci/scripts/check_pulpcore_imports.sh
+        {%- endif %}
+        {%- if check_gettext %}
 
       - id: check-gettext
-        name: check-gettext
+        name: Check for common gettext problems
         language: unsupported_script
         types: [python]
         entry: .ci/scripts/check_gettext.sh
-
-      - id: extra-lint
-        name: extra-lint
-        language: unsupported
-        types: [python]
-        entry: sh -c "[ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh"
+        {%- endif %}

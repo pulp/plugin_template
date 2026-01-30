@@ -5,14 +5,20 @@
 # make sure this script runs at the repo root
 cd "$(dirname "$(realpath -e "$0")")"/../..
 
-set -uv
+set -eu
+
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <filename> [filename ...]"
+  exit 1
+fi
 
 # check for imports not from pulpcore.plugin. exclude tests
-MATCHES=$(grep -n -r --include \*.py "from pulpcore.*import" . | grep -v "tests\|plugin" {%- for allow in core_import_allowed -%}| grep -v "{{allow}}" {%- endfor -%})
-
-if [ $? -ne 1 ]; then
-  printf "\nERROR: Detected bad imports from pulpcore:\n"
+if MATCHES=$(
+  grep -n "from pulpcore.*import" "$@" |
+  grep -v "tests\|plugin" {%- for allow in core_import_allowed %} |
+  grep -v "{{allow}}" {%- endfor %}
+); then
+  echo "ERROR: Detected bad imports. Plugins should import from 'pulpcore.plugin':"
   echo "$MATCHES"
-  printf "\nPlugins should import from pulpcore.plugin."
   exit 1
 fi

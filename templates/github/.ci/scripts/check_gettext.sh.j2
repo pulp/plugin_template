@@ -15,7 +15,7 @@ fi
 # grep returns 1 if it doesn't find a match
 PATTERN="_(f[\"\']"
 if RESULT=$(grep -n "$PATTERN" "$@"); then
-  printf "\nERROR: Detected mix of f-strings and gettext:\n"
+  echo "ERROR: Detected mix of f-strings and gettext:"
   echo "$RESULT"
   exit 1
 fi
