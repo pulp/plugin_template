@@ -1,20 +1,30 @@
+# /// script
+# dependencies = [
+#     "pyyaml>=6.0.3,<6.1.0",
+# ]
+#
+# ///
+
+import sys
+
 import argparse
 import yaml
 
-# Parse the command-line argument
-parser = argparse.ArgumentParser()
-parser.add_argument("value_name", help="Name of the value to extract")
-args = parser.parse_args()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("value_name", help="Name of the value to extract")
+    args = parser.parse_args()
 
-# Read the YAML file
-with open("template_config.yml") as file:
-    data = yaml.safe_load(file)
+    with open("template_config.yml") as file:
+        data = yaml.safe_load(file)
 
-# Extract the value based on the provided name
-value = data.get(args.value_name)
+    try:
+        value = data.get(args.value_name)
+    except KeyError:
+        sys.exit(1)
 
-# Output the value
-if value is not None:
-    print(value)
-else:
-    print("")
+    # Output the value
+    if value is not None:
+        print(value)
+    else:
+        print("")

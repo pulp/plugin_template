@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -eu -o pipefail
 
 if [ ! -f "template_config.yml" ]
 then
@@ -18,19 +18,19 @@ then
     "template_config.yml"
 fi
 
-plugin_name="$(python ../plugin_template/scripts/get_template_config_value.py plugin_name)"
-ci_update_docs="$(python ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
-use_black="$(python ../plugin_template/scripts/get_template_config_value.py black)"
+PLUGIN_NAME="$(python ../plugin_template/scripts/get_template_config_value.py plugin_name)"
+CI_UPDATE_DOCS="$(python ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
+USE_BLACK="$(python ../plugin_template/scripts/get_template_config_value.py black)"
 
-if [[ "${ci_update_docs}" == "True" ]]; then
-  docs=("--docs")
+if [[ "${CI_UPDATE_DOCS}" == "True" ]]; then
+  DOCS=("--docs")
 else
-  docs=()
+  DOCS=()
 fi
 
 pushd ../plugin_template
-pip install -r requirements.txt
-./plugin-template --github "${docs[@]}" "${plugin_name}"
+  pip install -r requirements.txt
+  ./plugin-template --github "${DOCS[@]}" "${PLUGIN_NAME}"
 popd
 
 if [[ $(git status --porcelain) ]]; then
@@ -40,7 +40,7 @@ else
   echo "No updates needed"
 fi
 
-if [[ "${use_black}" == "True" ]]
+if [[ "${USE_BLACK}" == "True" ]]
 then
   pip install -r lint_requirements.txt
   black .
@@ -55,7 +55,7 @@ then
 fi
 
 # Check that pulpcore lowerbounds is set to a supported branch
-if [[ "$plugin_name" != "pulpcore" ]]; then
+if [[ "${PLUGIN_NAME}" != "pulpcore" ]]; then
   python ../plugin_template/scripts/update_core_lowerbound.py
   if [[ $(git status --porcelain) ]]; then
     git add -A
