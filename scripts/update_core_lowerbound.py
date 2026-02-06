@@ -1,4 +1,13 @@
 #!/bin/env python
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "packaging>=26.0,<26.1",
+#     "pyyaml>=6.0.3,<6.1.0",
+#     "requests>=2.32.5,<2.33.0",
+#     "tomlkit>=0.14.0,<0.14.1",
+# ]
+# ///
 
 import requests
 import tomlkit
