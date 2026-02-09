@@ -19,9 +19,6 @@ defaults:
     working-directory: "{{ plugin_name }}"
 
 jobs:
-  {%- if pre_job_template %}
-  {% include pre_job_template.path | indent(2) %}
-  {%- endif %}
   {%- if check_commit_message or lint_requirements %}
   check-commits:
     runs-on: "ubuntu-latest"
@@ -86,9 +83,6 @@ jobs:
   lint:
     needs:
       - "check-changes"
-      {%- if pre_job_template %}
-      - "{{ pre_job_template.name }}"
-      {%- endif %}
     if: needs.check-changes.outputs.run_tests == '1'
     uses: "./.github/workflows/lint.yml"
 
@@ -170,7 +164,3 @@ jobs:
 
           check_jobs "$FILTERS"
           echo "CI says: Looks good!"
-
-{%- if post_job_template %}
-  {% include post_job_template.path | indent (2) %}
-{%- endif %}

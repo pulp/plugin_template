@@ -54,8 +54,6 @@ DEFAULT_SETTINGS = {
     "plugin_default_branch": "main",
     "plugin_name": None,
     "plugins": None,
-    "post_job_template": None,
-    "pre_job_template": None,
     "pulp_env": {},
     "pulp_env_azure": {},
     "pulp_env_gcp": {},
@@ -362,7 +360,6 @@ def write_template_section(config, name, plugin_root_dir, verbose=False):
             [
                 section_templates_dir,  # Where all templates are actually templated.
                 templates_dir,  # Included to find the macros.
-                "../",  # The parent dir to allow including pre/post templates from.
             ]
         ),
         line_statement_prefix="%%",
