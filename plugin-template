@@ -364,7 +364,7 @@ def write_template_section(config: dict[str, t.Any], name: str, plugin_root_dir:
         loader=FileSystemLoader(
             [
                 section_templates_dir,  # Where all templates are actually templated.
-                templates_dir,  # Included to find the macros.
+                templates_dir / "include",  # Included to find the macros.
             ]
         ),
         extensions=["jamldump.jinja2.Jaml"],
