@@ -110,7 +110,9 @@ def get_pulpdocs_members(pulpdocs_branch="main") -> list[str]:
 
     Raises if can't get the authoritative file.
     """
-    session = requests_cache.CachedSession(".requests_cache", expire_after=timedelta(days=1))
+    session = requests_cache.CachedSession(
+        Path(__file__).parent / ".requests_cache", expire_after=timedelta(days=1)
+    )
     response = session.get(
         f"https://raw.githubusercontent.com/pulp/pulp-docs/{pulpdocs_branch}/mkdocs.yml"
     )

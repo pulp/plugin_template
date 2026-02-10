@@ -14,13 +14,13 @@
 import typing as t
 import argparse
 import os
-import pprint
 import shlex
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
+import jamldump
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
@@ -208,7 +208,7 @@ def main() -> int:
     parser.add_argument(
         "--plugin-app-label",
         type=str,
-        help="The Django app label for the plugin - usually the part after pulp_ or pulp-.",
+        help="The Django app label for the plugin - defaults to the part after pulp_ or pulp-.",
     )
     parser.add_argument(
         "--generate-config",
@@ -264,57 +264,21 @@ def main() -> int:
     plugin_config_path = plugin_root_dir / "template_config.yml"
     write_new_config = False
 
-    try:
-        with open(plugin_config_path) as config_file:
-            try:
-                config_in_file = yaml.safe_load(config_file)
-                if config_in_file:
-                    config = config_in_file
-                    # Add any missing value from the list of defaults
-                    for key, value in DEFAULT_SETTINGS.items():
-                        if key not in config:
-                            config[key] = value
-                            write_new_config = True
-                    # remove deprecated options
-                    for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
-                        config.pop(key)
-                        write_new_config = True
-                    # TODO: validate config
-                    # validate versions are strings
-                    assert all(
-                        (
-                            isinstance(version, str)
-                            for version in config["supported_release_branches"]
-                        )
-                    )
-                    print(
-                        "\nLoaded plugin template config from "
-                        "{path}/template_config.yml.\n".format(path=plugin_root_dir)
-                    )
+    if plugin_config_path.exists():
+        config, write_new_config = load_config(plugin_config_path, args.verbose)
+        if args.plugin_name is not None and args.plugin_name != config["plugin_name"]:
+            raise RuntimeError("Aborting: 'plugin_name' in the config does not match.")
+        if (
+            args.plugin_app_label is not None
+            and args.plugin_app_label != config["plugin_app_label"]
+        ):
+            raise RuntimeError("Aborting: 'plugin_app_label' in the config does not match.")
 
-                    if args.verbose:
-                        print("\nUsing the following config:\n")
-                        pp = pprint.PrettyPrinter(indent=4)
-                        pp.pprint(config)
-                        print("\n")
-            except yaml.YAMLError as exc:
-                print(exc)
-                return 2
-    except FileNotFoundError:
-        print(
-            "\nCould not find a plugin template config at {path}/template_config.yml.\n".format(
-                path=plugin_root_dir
-            )
-        )
+    else:
+        print(f"Could not find a plugin template config at {plugin_config_path}.")
         if args.all or args.generate_config:
-            if not args.plugin_app_label:
-                print(
-                    "\n--plugin-app-label needs to be specified when generating a template "
-                    "config. See ./plugin-template -h for usage.\n"
-                )
-                return 2
-            else:
-                config = generate_config(args.plugin_name, args.plugin_app_label)
+            print(f"Creating a new plugin at {plugin_root_dir}")
+            config = generate_new_config(args.plugin_name, args.plugin_app_label)
         else:
             return 2
 
@@ -325,41 +289,58 @@ def main() -> int:
     sections = [
         section
         for section in ["generate_config", "bootstrap", "github", "test"]
-        if getattr(args, section) or args.all
+        if getattr(args, section) or args.all or (section == "generate_config" and write_new_config)
     ]
     for section in sections:
         write_template_section(config, section, plugin_root_dir, verbose=args.verbose)
 
-    if write_new_config and not (args.generate_config or args.all):
-        write_template_section(config, "generate_config", plugin_root_dir, verbose=args.verbose)
-        file_path = os.path.join(plugin_root_dir, "template_config.yml")
-        print("\nAn updated plugin template config written to {path}.\n".format(path=file_path))
+    # This is a dummy call left here as an example for future migrations to come.
+    migrate_dummy(plugin_root_dir, config, sections)
 
-    if "github" in sections:
-        migrate_dummy(plugin_root_dir)
+    remove_deprecated_files(plugin_root_dir, sections)
 
-    if plugin_root_dir:
-        print("\nDeprecation check:")
-        check_for_deprecated_files(plugin_root_dir, sections)
+    reformat_files(plugin_root_dir, config)
 
-    if config["black"]:
-        try:
-            subprocess.run(["black", "--quiet", "."], cwd=plugin_root_dir)
-        except FileNotFoundError:
-            pass
+    return 0
 
 
-def migrate_dummy(plugin_root_dir: Path) -> None:
+def load_config(plugin_config_path: Path, verbose: bool) -> tuple[dict[str, t.Any], bool]:
+    write_new_config = False
+    with open(plugin_config_path) as config_file:
+        config = yaml.safe_load(config_file)
+    # Add any missing value from the list of defaults
+    for key, value in DEFAULT_SETTINGS.items():
+        if key not in config:
+            config[key] = value
+            write_new_config = True
+    # remove deprecated options
+    for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
+        config.pop(key)
+        write_new_config = True
+    # TODO: validate config
+    # validate versions are strings
+    assert all((isinstance(version, str) for version in config["supported_release_branches"]))
+    print(f"Loaded plugin template config from {plugin_config_path}.")
+
+    if verbose:
+        print("Using the following config:")
+        print(jamldump.to_jaml(config))
+
+    return config, write_new_config
+
+
+def migrate_dummy(plugin_root_dir: Path, config: dict[str, t.Any], sections: list[str]) -> None:
     pass
 
 
-def write_template_section(config: dict[str, t.Any], name: str, plugin_root_dir: str, verbose:bool=False) -> None:
+def write_template_section(
+    config: dict[str, t.Any], section: str, plugin_root_dir: Path, verbose: bool = False
+) -> None:
     """
     Template or copy all files for the section.
     """
-    plugin_root_path = Path(plugin_root_dir)
     templates_dir = Path(__file__).parent.resolve() / "templates"
-    section_templates_dir = templates_dir / name
+    section_templates_dir = templates_dir / section
     env = Environment(
         loader=FileSystemLoader(
             [
@@ -384,12 +365,12 @@ def write_template_section(config: dict[str, t.Any], name: str, plugin_root_dir:
 
     PULPDOCS_BRANCH = "main"
     template_vars = {
-        "section": name,
-        "setup_py": (plugin_root_path / "setup.py").exists(),
+        "section": section,
+        "setup_py": (plugin_root_dir / "setup.py").exists(),
         "ci_update_branches": utils.ci_update_branches(config),
         "python_version": "3.11",
         "ci_update_hour": sum((ord(c) for c in config["plugin_app_label"])) % 24,
-        "current_version": utils.current_version(plugin_root_path),
+        "current_version": utils.current_version(plugin_root_dir),
         "pulpdocs_branch": PULPDOCS_BRANCH,
         "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
         "black_version": utils.black_version(),
@@ -419,14 +400,14 @@ def write_template_section(config: dict[str, t.Any], name: str, plugin_root_dir:
             if destination.startswith("pyproject.toml."):
                 utils.merge_toml(
                     template,
-                    plugin_root_path,
+                    plugin_root_dir,
                     destination,
                     template_vars,
                 )
             else:
                 utils.template_to_file(
                     template,
-                    plugin_root_path,
+                    plugin_root_dir,
                     destination,
                     template_vars,
                 )
@@ -437,17 +418,17 @@ def write_template_section(config: dict[str, t.Any], name: str, plugin_root_dir:
             if destination_relative_path.endswith(".copy"):
                 destination_relative_path = destination_relative_path[: -len(".copy")]
             shutil.copy(
-                os.path.join(section_templates_dir, relative_path),
-                os.path.join(plugin_root_dir, destination_relative_path),
+                section_templates_dir / relative_path,
+                plugin_root_dir / destination_relative_path,
             )
             files_copied += 1
             if verbose:
                 print(f"Copied file: {relative_path}")
 
-    print(f"Section: {name} \n    templated: {files_templated}\n    copied: {files_copied}")
+    print(f"Section: {section} \n  templated: {files_templated}\n  copied: {files_copied}")
 
 
-def generate_relative_path_set(root_dir: str | Path)-> set[str|Path]:
+def generate_relative_path_set(root_dir: Path) -> set[str]:
     """
     Create a set of relative paths within the specified directory.
     """
@@ -460,7 +441,7 @@ def generate_relative_path_set(root_dir: str | Path)-> set[str|Path]:
     return applicable_paths
 
 
-def generate_config(plugin_name:str, plugin_app_label: str) -> dict[str, t.Any]:
+def generate_new_config(plugin_name: str, plugin_app_label: str | None) -> dict[str, t.Any]:
     """
     Generates a default config for a plugin
 
@@ -472,6 +453,8 @@ def generate_config(plugin_name:str, plugin_app_label: str) -> dict[str, t.Any]:
     Returns:
         config (dict): a dictionary containing a default template configuration for the plugin
     """
+    if plugin_app_label is None:
+        plugin_app_label = plugin_name.removeprefix("pulp").replace("-", "_").strip("_")
     config = DEFAULT_SETTINGS.copy()
     config["plugin_name"] = plugin_name
     config["plugin_app_label"] = plugin_app_label
@@ -479,8 +462,9 @@ def generate_config(plugin_name:str, plugin_app_label: str) -> dict[str, t.Any]:
     return config
 
 
-def check_for_deprecated_files(plugin_root_dir, sections):
+def remove_deprecated_files(plugin_root_dir: Path, sections: list[str]) -> None:
     """Check for files that have been deprecated (ie moved or removed)."""
+    print("Deprecation check:")
     files_found = False
     for section in sections:
         for fp in DEPRECATED_FILES.get(section, []):
@@ -488,14 +472,22 @@ def check_for_deprecated_files(plugin_root_dir, sections):
             if path.exists():
                 if path.is_dir():
                     shutil.rmtree(path)
-                    print(f"Removed deprecated directory: '{path}'.")
+                    print(f"  Removed deprecated directory: '{path}'.")
                 else:
                     path.unlink()
-                    print(f"Removed deprecated file: '{path}'.")
+                    print(f"  Removed deprecated file: '{path}'.")
                 files_found = True
 
     if not files_found:
-        print("No deprecated files found.")
+        print("  No deprecated files found.")
+
+
+def reformat_files(plugin_root_dir: Path, config: dict[str, t.Any]) -> None:
+    if config["black"]:
+        try:
+            subprocess.run(["black", "--quiet", "."], cwd=plugin_root_dir)
+        except FileNotFoundError:
+            pass
 
 
 if __name__ == "__main__":
