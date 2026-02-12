@@ -40,20 +40,6 @@ else
   echo "No updates needed"
 fi
 
-if [[ "${USE_BLACK}" == "True" ]]
-then
-  pip install -r lint_requirements.txt
-  black .
-
-  if [[ "$(git status --porcelain)" ]]
-  then
-    git add -A
-    git commit -m "Reformat with black"
-  else
-    echo "No formatting change needed"
-  fi
-fi
-
 # Check that pulpcore lowerbounds is set to a supported branch
 if [[ "${PLUGIN_NAME}" != "pulpcore" ]]; then
   python ../plugin_template/scripts/update_core_lowerbound.py
