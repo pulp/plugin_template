@@ -81,13 +81,13 @@ jobs:
   {%- endif %}
 
   lint:
-    needs:
-      - "check-changes"
-    if: needs.check-changes.outputs.run_tests == '1'
     uses: "./.github/workflows/lint.yml"
 
   build:
-    needs: "lint"
+    needs:
+      - "check-changes"
+      - "lint"
+    if: needs.check-changes.outputs.run_tests == '1'
     uses: "./.github/workflows/build.yml"
 
   test:
