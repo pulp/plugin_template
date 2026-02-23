@@ -227,6 +227,11 @@ def main() -> int:
         help="Generate or update functional and unit tests.",
     )
     parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="Generate or update generic CI/CD files.",
+    )
+    parser.add_argument(
         "--github",
         action="store_true",
         help="Generate or update github CI/CD configuration files.",
@@ -289,7 +294,7 @@ def main() -> int:
 
     sections = [
         section
-        for section in ["generate_config", "bootstrap", "github", "test"]
+        for section in ["generate_config", "bootstrap", "ci", "github", "test"]
         if getattr(args, section) or args.all or (section == "generate_config" and write_new_config)
     ]
     for section in sections:
