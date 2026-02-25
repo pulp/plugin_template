@@ -159,7 +159,7 @@ export PULP_FIXTURES_URL="http://pulp-fixtures:8080"
 {%- endif %}
 pushd ../{{ cli_package }}
 pip install -r test_requirements.txt
-pytest -v -m "{{ plugins | map(attribute='name') | join(' or ') | snake }}"
+pytest -v tests -m "{{ plugins | map(attribute='name') | join(' or ') | snake }}"
 popd
 {%- endif %}
 {%- endif %}
