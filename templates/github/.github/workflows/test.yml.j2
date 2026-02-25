@@ -71,11 +71,11 @@ jobs:
 
       {{ setup_env() | indent(6) }}
 
-      {{ run_script(name="Before Install", file="before_install.sh") | indent(6) }}
+      {{ run_script(name="Prepare Scenario Definition", file="before_install.sh") | indent(6) }}
 
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
-      {{ run_script(name="Before Script", file="before_script.sh", extra_env={"REDIS_DISABLED": "${{ contains('%s', matrix.env.TEST) }}" % (disabled_redis_runners | default(["TILT"]) | join(' '))}) | indent(6) }}
+      {{ run_script(name="Dump CI Metadata", file="before_script.sh") | indent(6) }}
 
       {{ run_script(name="Script", file="script.sh") | indent(6) }}
       {%- if test_deprecations %}
