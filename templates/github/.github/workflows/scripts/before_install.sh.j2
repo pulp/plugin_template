@@ -2,62 +2,41 @@
 
 {% include 'header.j2' %}
 
+# This script prepares the scenario definition in the .ci/ansible/vars/main.yaml file.
+#
+#   It requires the following environment:
+#     TEST - The name of the scenario to prepare.
+#
+#   It may also dump the {lower,upper}bounds_constraints.txt for the specific scenario.
+
+set -eu -o pipefail
+
 # make sure this script runs at the repo root
 cd "$(dirname "$(realpath -e "$0")")"/../../..
 
-set -mveuo pipefail
-
-if [ "${GITHUB_REF##refs/heads/}" = "${GITHUB_REF}" ]
-then
-  BRANCH_BUILD=0
-else
-  BRANCH_BUILD=1
-  BRANCH="${GITHUB_REF##refs/heads/}"
-fi
-if [ "${GITHUB_REF##refs/tags/}" = "${GITHUB_REF}" ]
-then
-  TAG_BUILD=0
-else
-  TAG_BUILD=1
-  BRANCH="${GITHUB_REF##refs/tags/}"
+if [ -f .github/workflows/scripts/pre_before_install.sh ]; then
+  source .github/workflows/scripts/pre_before_install.sh
 fi
 
-COMMIT_MSG=$(git log --format=%B --no-merges -1)
-export COMMIT_MSG
+COMPONENT_VERSION="$(bump-my-version show current_version | tail -n -1 | python -c 'from packaging.version import Version; print(Version(input()))')"
+COMPONENT_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${COMPONENT_VERSION}-py3-none-any.whl"
 
-{% if setup_py -%}
-COMPONENT_VERSION=$(sed -ne "s/\s*version.*=.*['\"]\(.*\)['\"][\s,]*/\1/p" setup.py)
-{%- else -%}
-COMPONENT_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+{%- set PULPCORE_PREFIX = "" if plugin_name == "pulpcore" else " pulpcore" %}
+{%- if test_s3 %}
+if [ "$TEST" = "s3" ]; then
+  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[s3]"
+fi
 {%- endif %}
-
-mkdir .ci/ansible/vars || true
-echo "---" > .ci/ansible/vars/main.yaml
-echo "legacy_component_name: {{ plugin_name | snake }}" >> .ci/ansible/vars/main.yaml
-echo "component_name: {{ plugin_app_label }}" >> .ci/ansible/vars/main.yaml
-echo "component_version: '${COMPONENT_VERSION}'" >> .ci/ansible/vars/main.yaml
-
-export PRE_BEFORE_INSTALL=$PWD/.github/workflows/scripts/pre_before_install.sh
-export POST_BEFORE_INSTALL=$PWD/.github/workflows/scripts/post_before_install.sh
-
-if [ -f $PRE_BEFORE_INSTALL ]; then
-  source $PRE_BEFORE_INSTALL
+{%- if test_azure %}
+if [ "$TEST" = "azure" ]; then
+  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[azure]"
 fi
-
-if [ "$GITHUB_EVENT_NAME" = "pull_request" ] || [ "${BRANCH_BUILD}" = "1" -a "${BRANCH}" != "{{ plugin_default_branch }}" ]
-then
-  echo $COMMIT_MSG | sed -n -e 's/.*CI Base Image:\s*\([-_/[:alnum:]]*:[-_[:alnum:]]*\).*/ci_base: "\1"/p' >> .ci/ansible/vars/main.yaml
+{%- endif %}
+{%- if test_gcp %}
+if [ "$TEST" = "gcp" ]; then
+  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[google]"
 fi
-
-for i in {1..3}
-do
-  ansible-galaxy collection install "amazon.aws:8.1.0" && s=0 && break || s=$? && sleep 3
-done
-if [[ $s -gt 0 ]]
-then
-  echo "Failed to install amazon.aws"
-  exit $s
-fi
+{%- endif %}
 
 if [[ "$TEST" = "pulp" ]]; then
   python3 .ci/scripts/calc_constraints.py -u {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > upperbounds_constraints.txt
@@ -66,6 +45,114 @@ if [[ "$TEST" = "lowerbounds" ]]; then
   python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
 fi
 
-if [ -f $POST_BEFORE_INSTALL ]; then
-  source $POST_BEFORE_INSTALL
+{%- if test_reroute %}
+export PULP_API_ROOT=$(test "${TEST}" = "s3" && echo "/rerouted/djnd/" || echo "{{ api_root }}")
+{%- else %}
+export PULP_API_ROOT="{{ api_root }}"
+{%- endif %}
+
+echo "PULP_API_ROOT=${PULP_API_ROOT}" >> "$GITHUB_ENV"
+
+# Compose the scenario definition.
+mkdir -p .ci/ansible/vars
+
+cat > .ci/ansible/vars/main.yaml << VARSYAML
+---
+scenario: "${TEST}"
+legacy_component_name: "{{ plugin_name | snake }}"
+component_name: "{{ plugin_app_label }}"
+component_version: "${COMPONENT_VERSION}"
+pulp_env: {{ pulp_env | tojson }}
+pulp_settings: {{ pulp_settings | tojson }}
+pulp_scheme: "{{ pulp_scheme }}"
+{%- if ci_base_image.count(":") %}
+pulp_default_container: "{{ ci_base_image }}"
+{% else %}
+pulp_default_container: "{{ ci_base_image + ":latest" }}"
+{% endif -%}
+api_root: "${PULP_API_ROOT}"
+image:
+  name: "pulp"
+  tag: "ci_build"
+plugins:
+  - name: "{{ plugin_name }}"
+    source: "${COMPONENT_SOURCE}"
+    ci_requirements: $(test -f ci_requirements.txt && echo -n true || echo -n false)
+    upperbounds: $(test "${TEST}" = "pulp" && echo -n true || echo -n false)
+    lowerounds: $(test "${TEST}" = "lowerbounds" && echo -n true || echo -n false)
+{%- if extra_files %}
+extra_files:
+  {%- for item in extra_files %}
+  - origin: "{{ item.origin }}"
+    destination: "{{ item.destination }}"
+  {%- endfor %}
+{%- endif %}
+services:
+  - name: "pulp"
+    image: "pulp:ci_build"
+    volumes:
+      - "./settings:/etc/pulp"
+      - "./ssh:/keys/"
+      - "~/.config:/var/lib/pulp/.config"
+      - "../../../pulp-openapi-generator:/root/pulp-openapi-generator"
+    env:
+      PULP_WORKERS: "4"
+      PULP_HTTPS: "{{ 'true' if pulp_scheme == 'https' else 'false' }}"
+{%- if docker_fixtures %}
+  - name: "pulp-fixtures"
+    image: "docker.io/pulp/pulp-fixtures:latest"
+    env:
+      BASE_URL: "http://pulp-fixtures:8080"
+{%- endif %}
+VARSYAML
+
+if [ "$TEST" = "s3" ]; then
+  MINIO_ACCESS_KEY=AKIAIT2Z5TDYPX3ARJBA
+  MINIO_SECRET_KEY=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
+  cat >> .ci/ansible/vars/main.yaml << VARSYAML
+  - name: "minio"
+    image: "minio/minio"
+    env:
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+    command: "server /data"
+s3_test: true
+minio_access_key: "${MINIO_ACCESS_KEY}"
+minio_secret_key: "${MINIO_SECRET_KEY}"
+pulp_scenario_settings: {{ pulp_settings_s3 | tojson }}
+pulp_scenario_env: {{ pulp_env_s3 | tojson }}
+VARSYAML
+fi
+
+if [ "$TEST" = "azure" ]; then
+  cat >> .ci/ansible/vars/main.yaml << VARSYAML
+  - name: "ci-azurite"
+    image: "mcr.microsoft.com/azure-storage/azurite"
+    command: "azurite-blob --skipApiVersionCheck --blobHost 0.0.0.0"
+azure_test: true
+pulp_scenario_settings: {{ pulp_settings_azure | tojson }}
+pulp_scenario_env: {{ pulp_env_azure | tojson }}
+VARSYAML
+fi
+
+if [ "$TEST" = "gcp" ]; then
+  cat >> .ci/ansible/vars/main.yaml << VARSYAML
+  - name: "ci-gcp"
+    image: "fsouza/fake-gcs-server"
+    volumes:
+      - "storage_data:/etc/pulp"
+    command: " -scheme http"
+gcp_test: true
+pulp_scenario_settings: {{ pulp_settings_gcp | tojson }}
+pulp_scenario_env: {{ pulp_env_gcp | tojson }}
+VARSYAML
+fi
+
+cat >> .ci/ansible/vars/main.yaml << VARSYAML
+...
+VARSYAML
+cat .ci/ansible/vars/main.yaml
+
+if [ -f .github/workflows/scripts/post_before_install.sh ]; then
+  source .github/workflows/scripts/post_before_install.sh
 fi
