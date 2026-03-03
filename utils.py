@@ -200,7 +200,7 @@ def merge_toml(template, plugin_root_path, relative_path, template_vars):
             old_toml[merge_key].update(data[merge_key])
         if template_vars["check_manifest"]:
             check_manifest_conf = old_toml["tool"].setdefault("check-manifest", {"ignore": []})
-            for ai_file in ["AGENT.md", "CLAUDE.md"]:
+            for ai_file in ["AGENTS.md", "CLAUDE.md"]:
                 if ai_file not in check_manifest_conf["ignore"]:
                     check_manifest_conf["ignore"].append(ai_file)
         output = tomlkit.dumps(old_toml)
