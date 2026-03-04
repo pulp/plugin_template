@@ -24,7 +24,7 @@ COMPONENT_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${COMPONENT
 {%- set PULPCORE_PREFIX = "" if plugin_name == "pulpcore" else " pulpcore" %}
 {%- if test_s3 %}
 if [ "$TEST" = "s3" ]; then
-  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[s3]"
+  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[s3] git+https://github.com/gerrod3/botocore.git@fix-100-continue"
 fi
 {%- endif %}
 {%- if test_azure %}
@@ -59,34 +59,34 @@ mkdir -p .ci/ansible/vars
 cat > .ci/ansible/vars/main.yaml << VARSYAML
 ---
 scenario: "${TEST}"
+plugin_name: "{{ plugin_name }}"
 legacy_component_name: "{{ plugin_name | snake }}"
 component_name: "{{ plugin_app_label }}"
 component_version: "${COMPONENT_VERSION}"
 pulp_env: {{ pulp_env | tojson }}
 pulp_settings: {{ pulp_settings | tojson }}
 pulp_scheme: "{{ pulp_scheme }}"
-{%- if ci_base_image.count(":") %}
-pulp_default_container: "{{ ci_base_image }}"
-{% else %}
-pulp_default_container: "{{ ci_base_image + ":latest" }}"
-{% endif -%}
 api_root: "${PULP_API_ROOT}"
 image:
   name: "pulp"
   tag: "ci_build"
-plugins:
-  - name: "{{ plugin_name }}"
-    source: "${COMPONENT_SOURCE}"
-    ci_requirements: $(test -f ci_requirements.txt && echo -n true || echo -n false)
-    upperbounds: $(test "${TEST}" = "pulp" && echo -n true || echo -n false)
-    lowerbounds: $(test "${TEST}" = "lowerbounds" && echo -n true || echo -n false)
-{%- if extra_files %}
+  {%- if ci_base_image.count(":") %}
+  ci_base: "{{ ci_base_image }}"
+  {% else %}
+  ci_base: "{{ ci_base_image + ":latest" }}"
+  {% endif -%}
+  source: "${COMPONENT_SOURCE}"
+  ci_requirements: $(test -f ci_requirements.txt && echo -n true || echo -n false)
+  upperbounds: $(test "${TEST}" = "pulp" && echo -n true || echo -n false)
+  lowerbounds: $(test "${TEST}" = "lowerbounds" && echo -n true || echo -n false)
+  webserver_snippet: $(test -f {{ plugin_name | snake }}/app/webserver_snippets/nginx.conf && echo -n true || echo -n false )
 extra_files:
+  - origin: "{{ plugin_name }}"
+    destination: "{{ plugin_name }}"
   {%- for item in extra_files %}
   - origin: "{{ item.origin }}"
     destination: "{{ item.destination }}"
   {%- endfor %}
-{%- endif %}
 services:
   - name: "pulp"
     image: "pulp:ci_build"
