@@ -92,8 +92,6 @@ services:
     image: "pulp:ci_build"
     volumes:
       - "./settings:/etc/pulp"
-      - "./ssh:/keys/"
-      - "~/.config:/var/lib/pulp/.config"
       - "../../../pulp-openapi-generator:/root/pulp-openapi-generator"
     env:
       PULP_WORKERS: "4"
