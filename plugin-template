@@ -145,7 +145,6 @@ DEFAULT_SETTINGS = {
     "test_gcp": False,
     "test_lowerbounds": True,
     "test_performance": False,
-    "test_reroute": True,
     "test_s3": False,
     "use_issue_template": True,
 }
