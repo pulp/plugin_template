@@ -45,10 +45,6 @@ if [[ "$TEST" = "lowerbounds" ]]; then
   python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
 fi
 
-export PULP_API_ROOT=$(test "${TEST}" = "s3" && echo "/rerouted/djnd/" || echo "{{ api_root }}")
-
-echo "PULP_API_ROOT=${PULP_API_ROOT}" >> "$GITHUB_ENV"
-
 # Compose the scenario definition.
 mkdir -p .ci/ansible/vars
 
@@ -62,7 +58,6 @@ component_version: "${COMPONENT_VERSION}"
 pulp_env: {{ pulp_env | tojson }}
 pulp_settings: {{ pulp_settings | tojson }}
 pulp_scheme: "{{ pulp_scheme }}"
-api_root: "${PULP_API_ROOT}"
 image:
   name: "pulp"
   tag: "ci_build"
