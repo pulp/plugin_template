@@ -53,12 +53,10 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- macro install_python_deps(deps=[]) -%}
 - name: "Install python dependencies"
   run: |
-    echo ::group::PYDEPS
     pip install {{ deps | map("shquote") | join(" ") }}
-    %% if 'httpie' in deps
+    {%- if 'httpie' in deps %}
     echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/{{ plugin_name }}/.ci/assets/httpie/" >> $GITHUB_ENV
-    %% endif
-    echo ::endgroup::
+    {%- endif %}
 {%- endmacro -%}
 
 

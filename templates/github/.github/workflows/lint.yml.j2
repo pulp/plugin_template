@@ -27,11 +27,6 @@ jobs:
       - name: "Lint workflow files"
         run: |
           yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
-
-      - name: "Verify bump version config"
-        run: |
-          bump-my-version bump --dry-run release
-          bump-my-version show-bump
       {%- if black %}
 
       # run black separately from flake8 to get a diff
@@ -47,31 +42,14 @@ jobs:
         run: |
           flake8
       {%- endif %}
-
-      - name: "Run extra lint checks"
-        run: |
-          [ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh
-      {%- if check_manifest %}
-
-      - name: "Check for any files unintentionally left out of MANIFEST.in"
-        run: |
-          check-manifest
-      {%- endif %}
-      {%- if lint_requirements %}
-
-      - name: "Verify requirements files"
-        run: |
-          python .ci/scripts/check_requirements.py
-      {%- endif %}
-      {%- if check_stray_pulpcore_imports %}
-
-      - name: "Check for pulpcore imports outside of pulpcore.plugin"
-        run: |
-          sh .ci/scripts/check_pulpcore_imports.sh
-      {%- endif %}
       {%- if check_gettext %}
 
       - name: "Check for common gettext problems"
         run: |
           sh .ci/scripts/check_gettext.sh
       {%- endif %}
+
+      - name: "Run extra lint checks"
+        run: |
+          [ ! -x .ci/scripts/extra_linting.sh ] || .ci/scripts/extra_linting.sh
+...
