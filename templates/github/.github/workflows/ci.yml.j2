@@ -37,10 +37,12 @@ jobs:
   {%- endif %}
 
   check-changes:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     outputs:
-      run_tests: {{ '${{ steps.check.outputs.run_tests }}' }}
-      run_docs: {{ '${{ steps.check.outputs.run_docs }}' }}
+      {%- raw %}
+      run_tests: "${{ steps.check.outputs.run_tests }}"
+      run_docs: "${{ steps.check.outputs.run_docs }}"
+      {%- endraw %}
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
@@ -48,9 +50,9 @@ jobs:
 
       {{ install_python_deps(["gitpython"]) | indent(6) }}
 
-      - name: Analyze changed files
-        shell: bash
-        id: check
+      - name: "Analyze changed files"
+        id: "check"
+        shell: "bash"
         run: |
           # We only test docs on the default branch (usually main)
           if [[ "{{ '${{ github.base_ref }}' }}" == *"{{ plugin_default_branch }}" ]]; then
@@ -77,17 +79,22 @@ jobs:
     needs: "check-changes"
     uses: "./.github/workflows/docs.yml"
     with:
-      run_docs: {{ '${{ needs.check-changes.outputs.run_docs }}' }}
+      {%- raw %}
+      run_docs: "${{ needs.check-changes.outputs.run_docs }}"
+      {%- endraw %}
   {%- endif %}
 
   lint:
     uses: "./.github/workflows/lint.yml"
 
+  sanity:
+    uses: "./.github/workflows/sanity.yml"
+
   build:
     needs:
       - "check-changes"
       - "lint"
-    if: needs.check-changes.outputs.run_tests == '1'
+    if: "needs.check-changes.outputs.run_tests == '1'"
     uses: "./.github/workflows/build.yml"
 
   test:
@@ -100,7 +107,7 @@ jobs:
 
   deprecations:
     runs-on: "ubuntu-latest"
-    if: github.base_ref == '{{ plugin_default_branch }}'
+    if: "github.base_ref == '{{ plugin_default_branch }}'"
     needs: "test"
     steps:
       - name: "Create working directory"
@@ -108,7 +115,7 @@ jobs:
           mkdir -p "{{ plugin_name }}"
         working-directory: "."
       - name: "Download Deprecations"
-        uses: actions/download-artifact@v4
+        uses: "actions/download-artifact@v4"
         with:
           pattern: "deprecations-*"
           path: "{{ plugin_name }}"
@@ -132,6 +139,7 @@ jobs:
       {%- if is_pulpdocs_member %}
       - "docs"
       {%- endif %}
+      - "sanity"
     if: "always()"
     steps:
       - name: "Collect needed jobs results"
@@ -164,3 +172,4 @@ jobs:
 
           check_jobs "$FILTERS"
           echo "CI says: Looks good!"
+...

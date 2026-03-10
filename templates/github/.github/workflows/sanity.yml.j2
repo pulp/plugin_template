@@ -1,0 +1,52 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  checkout,
+  setup_python,
+  install_python_deps,
+with context %}
+
+# This file describes checks that should prevent a premature merge,
+# but still let the tests run for demonstrations or experiments.
+---
+name: "Sanity"
+on:
+  workflow_call:
+
+defaults:
+  run:
+    working-directory: "{{ plugin_name }}"
+
+jobs:
+  sanity:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      {{ checkout(path=plugin_name) | indent(6) }}
+
+      {{ setup_python() | indent(6) }}
+
+      {{ install_python_deps(["-r", "lint_requirements.txt"]) | indent(6) }}
+
+      - name: "Verify bump version config"
+        run: |
+          bump-my-version bump --dry-run release
+          bump-my-version show-bump
+      {%- if check_manifest %}
+
+      - name: "Check for any files unintentionally left out of MANIFEST.in"
+        run: |
+          check-manifest
+      {%- endif %}
+      {%- if lint_requirements %}
+
+      - name: "Verify requirements files"
+        run: |
+          python .ci/scripts/check_requirements.py
+      {%- endif %}
+      {%- if check_stray_pulpcore_imports %}
+
+      - name: "Check for pulpcore imports outside of pulpcore.plugin"
+        run: |
+          sh .ci/scripts/check_pulpcore_imports.sh
+      {%- endif %}
+...

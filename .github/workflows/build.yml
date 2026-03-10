@@ -17,7 +17,7 @@ jobs:
           path: "plugin_template"
           # We need the full history for bootstrapping
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.11"
       - name: "Bootstrap catdog plugin"
@@ -34,9 +34,7 @@ jobs:
           path: "pulp-openapi-generator"
       - name: "Install python dependencies"
         run: |
-          echo ::group::PYDEPS
           pip install build packaging twine wheel mkdocs jq
-          echo ::endgroup::
       - name: "Build package"
         run: |
           python3 -m build
