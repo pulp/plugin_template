@@ -29,7 +29,6 @@ from jinja2 import Environment, FileSystemLoader
 import utils
 
 DEFAULT_SETTINGS = {
-    "api_root": "/pulp/",
     "black": True,
     "check_commit_message": True,
     "check_gettext": True,
@@ -108,7 +107,7 @@ DEFAULT_SETTINGS = {
             },
         },
     },
-    "pulp_settings": None,
+    "pulp_settings": {},
     "pulp_settings_s3": {
         "domain_enabled": True,
         "MEDIA_ROOT": "",
@@ -319,6 +318,13 @@ def load_config(plugin_config_path: Path, verbose: bool) -> tuple[dict[str, t.An
         if key not in config:
             config[key] = value
             write_new_config = True
+    # Migrate api_root to (scenario) setting
+    if config["pulp_settings"] is None:
+        config["pulp_settings"] = {}
+    config["pulp_settings"].setdefault("api_root", config.get("api_root", "/pulp/"))
+    if config["pulp_settings_s3"] is None:
+        config["pulp_settings_s3"] = {}
+    config["pulp_settings_s3"].setdefault("api_root", "/rerouted/djnd/")
     # remove deprecated options
     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
         config.pop(key)
