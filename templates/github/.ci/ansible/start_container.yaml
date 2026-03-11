@@ -55,7 +55,7 @@
       amazon.aws.s3_bucket:
         aws_access_key: "{{ minio_access_key }}"
         aws_secret_key: "{{ minio_secret_key }}"
-        s3_url: "http://minio:9000"
+        endpoint_url: "http://minio:9000"
         region: "eu-central-1"
         name: "pulp3"
         state: "present"
