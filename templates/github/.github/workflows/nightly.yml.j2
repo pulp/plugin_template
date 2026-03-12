@@ -15,7 +15,7 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     # runs at 3:00 UTC daily
-    - cron: '00 3 * * *'
+    - cron: "00 3 * * *"
   workflow_dispatch:
 
 defaults:
@@ -23,7 +23,9 @@ defaults:
     working-directory: "{{ plugin_name }}"
 
 concurrency:
-  group: "{{ '${{ github.ref_name }}-${{ github.workflow }}' }}"
+  {%- raw %}
+  group: "${{ github.ref_name }}-${{ github.workflow }}"
+  {%- endraw %}
   cancel-in-progress: true
 
 jobs:
@@ -38,7 +40,7 @@ jobs:
         {{ matrix_env(performance=true) | from_yaml | tojson }}
 
   changelog:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
@@ -48,14 +50,17 @@ jobs:
 
       {{ configure_git() | indent(6) }}
 
-      - name: Collect changes from all branches
-        run: python .ci/scripts/collect_changes.py
+      - name: "Collect changes from all branches"
+        run: |
+          python .ci/scripts/collect_changes.py
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+      - name: "Create Pull Request"
+        uses: "peter-evans/create-pull-request@v8"
         id: "create_pr_changelog"
         with:
-          token: {{ '${{ secrets.RELEASE_TOKEN }}' }}
+          {%- raw %}
+          token: "${{ secrets.RELEASE_TOKEN }}"
+          {%- endraw %}
           title: "Update Changelog"
           body: ""
           branch: "changelog/update"
@@ -64,9 +69,13 @@ jobs:
       - name: "Mark PR automerge"
         working-directory: "{{ plugin_name }}"
         run: |
-          gh pr merge --rebase --auto "{{ '${{ steps.create_pr_changelog.outputs.pull-request-number }}' }}"
+          {%- raw %}
+          gh pr merge --rebase --auto "${{ steps.create_pr_changelog.outputs.pull-request-number }}"
+          {%- endraw %}
         if: "steps.create_pr_changelog.outputs.pull-request-number"
         env:
-          GH_TOKEN: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          {%- raw %}
+          GH_TOKEN: "${{ secrets.RELEASE_TOKEN }}"
+          {%- endraw %}
         continue-on-error: true
 ...
