@@ -12,7 +12,7 @@ on:
     inputs:
       matrix_env:
         required: true
-        type: string
+        type: "string"
 
 defaults:
   run:
@@ -24,16 +24,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: ${{ fromJSON(inputs.matrix_env) }}
+        env: "${{ fromJSON(inputs.matrix_env) }}"
 
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v6"
         with:
           path: "plugin_template"
           # We need the full history for bootstrapping
           fetch-depth: 0
 
-      - uses: "actions/setup-python@v5"
+      - uses: "actions/setup-python@v6"
         with:
           python-version: "3.11"
 
@@ -44,26 +44,26 @@ jobs:
 
       # Below this line we include the steps of the ci workflow of the generated plugin
 
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v6"
         with:
           fetch-depth: 1
           repository: "pulp/pulp-openapi-generator"
           path: "pulp-openapi-generator"
 
       - name: "Download plugin package"
-        uses: "actions/download-artifact@v4"
+        uses: "actions/download-artifact@v8"
         with:
           name: "plugin_package"
           path: "pulp_catdog/dist/"
 
       - name: "Download API specs"
-        uses: "actions/download-artifact@v4"
+        uses: "actions/download-artifact@v8"
         with:
           name: "api_spec"
           path: "pulp_catdog/"
 
       - name: "Download client packages"
-        uses: "actions/download-artifact@v4"
+        uses: "actions/download-artifact@v8"
         with:
           name: "python-client.tar"
           path: "pulp_catdog"
@@ -130,7 +130,7 @@ jobs:
           docker logs pulp 2>&1 | grep -i pulpcore.deprecation | tee deprecations-${{ matrix.env.TEST }}.txt
 
       - name: "Upload Deprecations"
-        uses: actions/upload-artifact@v4
+        uses: "actions/upload-artifact@v5"
         with:
           name: "deprecations-${{ matrix.env.TEST }}"
           path: "pulp_catdog/deprecations-${{ matrix.env.TEST }}.txt"

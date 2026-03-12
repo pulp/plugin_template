@@ -12,7 +12,7 @@ on:
       run_docs:
         description: "Whether to run docs jobs"
         required: true
-        type: string
+        type: "string"
 
 jobs:
   changelog:
@@ -28,7 +28,10 @@ jobs:
         run: |
           towncrier build --yes --version 4.0.0.ci
   docs:
-    if: {{ '${{ inputs.run_docs == \'1\' }}' }}
-    uses: 'pulp/pulp-docs/.github/workflows/docs-ci.yml@{{ pulpdocs_branch }}'
+    {%- raw %}
+    if: "${{ inputs.run_docs == '1' }}"
+    {%- endraw %}
+    uses: "pulp/pulp-docs/.github/workflows/docs-ci.yml@{{ pulpdocs_branch }}"
     with:
-      pulpdocs_ref: '{{ pulpdocs_branch }}'
+      pulpdocs_ref: "{{ pulpdocs_branch }}"
+...

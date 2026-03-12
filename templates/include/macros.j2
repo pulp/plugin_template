@@ -15,7 +15,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 
 
 {%- macro checkout(depth=1, repository=None, path=None, ref=None, use_release_token=false) -%}
-- uses: "actions/checkout@v4"
+- uses: "actions/checkout@v6"
   with:
     fetch-depth: {{ depth }}
     {%- if repository %}
@@ -34,7 +34,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 
 
 {%- macro setup_python(pyversion=python_version) -%}
-- uses: "actions/setup-python@v5"
+- uses: "actions/setup-python@v6"
   with:
     python-version: "{{ pyversion }}"
 {%- endmacro -%}

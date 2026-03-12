@@ -20,7 +20,9 @@ on:
 # Static analysis should be fine however.
 
 concurrency:
-  group: "{{ '${{ github.event.pull_request.number }}-${{ github.workflow }}' }}"
+  {%- raw %}
+  group: "${{ github.event.pull_request.number }}-${{ github.workflow }}"
+  {%- endraw %}
   cancel-in-progress: true
 
 jobs:
@@ -39,7 +41,7 @@ jobs:
           git fetch origin ${{ github.event.pull_request.head.sha }}
           python .ci/scripts/pr_labels.py "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
           {%- endraw %}
-      - uses: "actions/github-script@v7"
+      - uses: "actions/github-script@v8"
         name: "Apply PR Labels"
         with:
           script: |

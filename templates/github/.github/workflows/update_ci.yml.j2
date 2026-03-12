@@ -13,7 +13,7 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     # runs at {{ ci_update_hour }}:30 UTC every Sunday
-    - cron: '30 {{ ci_update_hour }} * * 0'
+    - cron: "30 {{ ci_update_hour }} * * 0"
   {%- endif %}
   workflow_dispatch:
 
@@ -43,10 +43,12 @@ jobs:
           ../plugin_template/scripts/update_ci.sh{% if branch != plugin_default_branch %} --release{% endif %}
 
       - name: "Create Pull Request for CI files"
-        uses: "peter-evans/create-pull-request@v6"
+        uses: "peter-evans/create-pull-request@v8"
         id: "create_pr_{{ branch_slug }}"
         with:
-          token: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          {%- raw %}
+          token: "${{ secrets.RELEASE_TOKEN }}"
+          {%- endraw %}
           path: "{{ plugin_name }}"
           committer: "{{ release_user }} <{{ release_email }}>"
           author: "{{ release_user }} <{{ release_email }}>"
@@ -60,7 +62,9 @@ jobs:
           gh pr merge --rebase --auto "{{ '${{ steps.create_pr_' + branch_slug + '.outputs.pull-request-number }}' }}"
         if: "steps.create_pr_{{ branch_slug }}.outputs.pull-request-number"
         env:
-          GH_TOKEN: "{{ '${{ secrets.RELEASE_TOKEN }}' }}"
+          {%- raw %}
+          GH_TOKEN: "${{ secrets.RELEASE_TOKEN }}"
+          {%- endraw %}
         continue-on-error: true
       {%- endfor %}
 ...

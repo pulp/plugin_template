@@ -14,7 +14,7 @@ on:
     inputs:
       matrix_env:
         required: true
-        type: string
+        type: "string"
 
 defaults:
   run:
@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         {%- raw %}
-        env: ${{ fromJSON(inputs.matrix_env) }}
+        env: "${{ fromJSON(inputs.matrix_env) }}"
         {%- endraw %}
 
     steps:
@@ -38,20 +38,20 @@ jobs:
       {{ setup_python() | indent(6) }}
 
       - name: "Download plugin package"
-        uses: "actions/download-artifact@v4"
+        uses: "actions/download-artifact@v8"
         with:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
 
       - name: "Download API specs"
-        uses: "actions/download-artifact@v4"
+        uses: "actions/download-artifact@v8"
         with:
           name: "api_spec"
           path: "{{ plugin_name }}/"
       {%- if plugins %}
 
       - name: "Download client packages"
-        uses: "actions/download-artifact@v4"
+        uses: "actions/download-artifact@v8"
         with:
           name: "python-client.tar"
           path: "{{ plugin_name }}"
@@ -82,10 +82,12 @@ jobs:
 
       - name: "Extract Deprecations from Logs"
         run: |
-          docker logs pulp 2>&1 | grep -i pulpcore.deprecation | tee deprecations-{{ "${{ matrix.env.TEST }}" }}.txt
+          {%- raw %}
+          docker logs pulp 2>&1 | grep -i pulpcore.deprecation | tee deprecations-${{ matrix.env.TEST }}.txt
+          {%- endraw %}
 
       - name: "Upload Deprecations"
-        uses: actions/upload-artifact@v4
+        uses: "actions/upload-artifact@v5"
         with:
           name: "deprecations-{{ '${{ matrix.env.TEST }}' }}"
           path: "{{ plugin_name }}/deprecations-{{ '${{ matrix.env.TEST }}' }}.txt"
