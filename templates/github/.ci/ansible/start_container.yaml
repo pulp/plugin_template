@@ -62,8 +62,18 @@
       when: "s3_test | default(false)"
 
     - block:
+        - name: "Wait for azurite"
+          ansible.builtin.uri:
+            url: "http://ci-azurite:10000/"
+            status_code:
+              - 200
+              - 400
+          when: "azure_test | default(false)"
+          retries: 2
+          delay: 5
+
         - name: "Wait for Pulp"
-          uri:
+          ansible.builtin.uri:
             url: "http://pulp{{ pulp_scenario_settings.api_root | default(pulp_settings.api_root | default('\/pulp\/', True), True) }}api/v3/status/"
             follow_redirects: "all"
             validate_certs: "no"
