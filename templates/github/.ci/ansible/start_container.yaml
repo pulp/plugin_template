@@ -55,16 +55,25 @@
       amazon.aws.s3_bucket:
         aws_access_key: "{{ minio_access_key }}"
         aws_secret_key: "{{ minio_secret_key }}"
-        s3_url: "http://minio:9000"
+        endpoint_url: "http://minio:9000"
         region: "eu-central-1"
         name: "pulp3"
         state: "present"
       when: "s3_test | default(false)"
 
     - block:
+        - name: "Wait for azurite"
+          ansible.builtin.uri:
+            url: "http://ci-azurite:10000/"
+          when: "azure_test | default(false)"
+          register: "az_result"
+          until: "az_result.status == 200"
+          retries: 2
+          delay: 5
+
         - name: "Wait for Pulp"
-          uri:
-            url: "http://pulp{{ lookup('env', 'PULP_API_ROOT') | default('\/pulp\/', True) }}api/v3/status/"
+          ansible.builtin.uri:
+            url: "http://pulp{{ pulp_scenario_settings.api_root | default(pulp_settings.api_root | default('\/pulp\/', True), True) }}api/v3/status/"
             follow_redirects: "all"
             validate_certs: "no"
           register: "result"
