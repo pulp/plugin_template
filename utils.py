@@ -1,4 +1,7 @@
+import contextlib
+
 from datetime import timedelta
+from packaging.requirements import Requirement, InvalidRequirement
 from pathlib import Path
 import re
 import stat
@@ -94,12 +97,13 @@ def current_version(plugin_root_path):
     return current_version
 
 
-def black_version():
-    PATTERN = re.compile(r"^black==(?P<version>.*)$")
+def black_requirement():
     requirements_file = Path(__file__).parent / "requirements.txt"
     for line in requirements_file.read_text().splitlines():
-        if match := PATTERN.fullmatch(line):
-            return match.group("version")
+        with contextlib.suppress(InvalidRequirement):
+            requirement = Requirement(line.split("#")[0])
+            if requirement.name.lower() == "black":
+                return line
 
     raise ValueError("'black' not found in 'requirements.txt'")
 
