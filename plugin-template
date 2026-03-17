@@ -2,9 +2,10 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#     "black==24.3.0",
+#     "black~=26.3",
 #     "jamldump>=1.2.0,<1.3.0",
 #     "jinja2>=3.1.6,<3.2.0",
+#     "packaging>=26.0,<27",
 #     "pyyaml>=6.0.3,<6.1.0",
 #     "requests~=2.32.3",
 #     "requests-cache>=1.3.0,<1.4.0",
@@ -378,7 +379,7 @@ def write_template_section(
         "current_version": utils.current_version(plugin_root_dir),
         "pulpdocs_branch": PULPDOCS_BRANCH,
         "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
-        "black_version": utils.black_version(),
+        "black_requirement": utils.black_requirement(),
         "config": config,
         **config,
     }
