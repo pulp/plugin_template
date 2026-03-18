@@ -87,7 +87,7 @@ jobs:
           {%- endraw %}
 
       - name: "Upload Deprecations"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "deprecations-{{ '${{ matrix.env.TEST }}' }}"
           path: "{{ plugin_name }}/deprecations-{{ '${{ matrix.env.TEST }}' }}.txt"

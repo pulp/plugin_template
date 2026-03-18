@@ -43,7 +43,7 @@ jobs:
           pulpcore-manager openapi --bindings --component "{{ plugin.app_label }}" --file "{{ plugin.app_label }}-api.json"
           {%- endfor %}
       - name: "Upload Package whl"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "plugin_package"
           path: "{{ plugin_name }}/dist/"
@@ -51,7 +51,7 @@ jobs:
           retention-days: 5
           overwrite: true
       - name: "Upload API specs"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "api_spec"
           path: |
@@ -65,7 +65,7 @@ jobs:
       {%- if plugins %}
       {{ run_script(name="Build Python bindings packages", file="build_python_client.sh") | indent(6) }}
       - name: "Upload python client packages"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "python-client.tar"
           path: |
@@ -76,7 +76,7 @@ jobs:
           retention-days: 5
           overwrite: true
       - name: "Upload python client docs"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "python-client-docs.tar"
           path: |
@@ -89,7 +89,7 @@ jobs:
       {%- if deploy_client_to_rubygems %}
       {{ run_script(name="Build Ruby bindings packages", file="build_ruby_client.sh") | indent(6) }}
       - name: "Upload Ruby client"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "ruby-client.tar"
           path: |
