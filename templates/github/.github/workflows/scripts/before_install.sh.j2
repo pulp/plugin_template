@@ -29,7 +29,7 @@ fi
 {%- endif %}
 {%- if test_azure %}
 if [ "$TEST" = "azure" ]; then
-  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[azure]"
+  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[azure,uvloop]"
 fi
 {%- endif %}
 {%- if test_gcp %}
