@@ -416,6 +416,12 @@ def write_template_section(
                     destination,
                     template_vars,
                 )
+            elif destination.startswith(".gitleaks.toml."):
+                utils.merge_gitleaks(
+                    template,
+                    plugin_root_dir,
+                    destination,
+                )
             else:
                 utils.template_to_file(
                     template,
