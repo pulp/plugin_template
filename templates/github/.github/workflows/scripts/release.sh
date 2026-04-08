@@ -24,6 +24,5 @@ towncrier build --yes --version "${NEW_VERSION}"
 bump-my-version bump release --commit --message "Release {new_version}" --tag --tag-name "{new_version}" --tag-message "Release {new_version}" --allow-dirty
 bump-my-version bump patch --commit
 
-# Git push is not atomic. And we want this to fail if the branch could not be updated.
-git push origin "${BRANCH}"
-git push origin "${NEW_VERSION}"
+# Git push is not atomic by default!
+git push --atomic origin "${BRANCH}" "${NEW_VERSION}"
