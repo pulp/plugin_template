@@ -1,7 +1,4 @@
-import contextlib
-
 from datetime import timedelta
-from packaging.requirements import Requirement, InvalidRequirement
 from pathlib import Path
 import re
 import stat
@@ -95,17 +92,6 @@ def current_version(plugin_root_path):
         except Exception:
             current_version = "0.0.0.dev"
     return current_version
-
-
-def black_requirement():
-    requirements_file = Path(__file__).parent / "requirements.txt"
-    for line in requirements_file.read_text().splitlines():
-        with contextlib.suppress(InvalidRequirement):
-            requirement = Requirement(line.split("#")[0])
-            if requirement.name.lower() == "black":
-                return line
-
-    raise ValueError("'black' not found in 'requirements.txt'")
 
 
 def get_pulpdocs_members(pulpdocs_branch="main") -> list[str]:

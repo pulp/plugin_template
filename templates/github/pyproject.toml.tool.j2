@@ -54,3 +54,14 @@ filename = "./pyproject.toml"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 {%- endif %}
+
+[tool.ruff]
+# This section is managed by the plugin template. Do not edit manually.
+line-length = 100
+extend-exclude = [
+  "docs/**",
+  "**/migrations/*.py",
+  {%- for path in lint_ignore %}
+  "{{ path }}",
+  {%- endfor %}
+]

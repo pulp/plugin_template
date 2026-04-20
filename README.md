@@ -36,10 +36,6 @@ You can edit them according to your needs to control subsequent calls to `plugin
 The following settings are stored in `template_config.yml`.
 
 ```bash
-  black                 Boolean, whether to use black to format python source files.
-
-  flake8                Boolean, whether to use flake8 to lint python source files.
-
   check_commit_message  Include inspection of commit message for a reference to an issue in
                         pulp.plan.io.
 
@@ -117,9 +113,6 @@ The following settings are stored in `template_config.yml`.
                         A dictionary of ENV variables that will be translated to separate ENV
                         layers in Containerfile configuring the base Pulp image. `<scenario>` is one
                         of "azure", "s3", "gcp".
-
-  pydocstyle            Boolean, whether to have flake8 use pydocstyle to check for compliance with
-                        Python docstring conventions.
 
   release_user          The GitHub user that is associated with the RELEASE_TOKEN secret on GitHub.
                         The username and token are used to push the Changelog and version bump commits

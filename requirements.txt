@@ -1,9 +1,8 @@
-# This (black) is copied into templates/github/lint_requirement.txt.j2
-black~=26.3  # Pin style to the year. https://black.readthedocs.io/en/stable/faq.html#how-stable-is-black-s-style
 jamldump>=1.2.0,<1.3.0
 jinja2
 packaging>=26.0,<27
 pyyaml
 requests~=2.32.3
 requests_cache
+ruff
 tomlkit

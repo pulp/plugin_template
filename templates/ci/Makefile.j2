@@ -2,22 +2,14 @@
 
 .PHONY: format
 format:
-	{%- if black %}
-	black .
-	{%- else %}
-	@echo "No formating configured in this repository."
-	{%- endif %}
+	ruff format
 
 .PHONY: lint
 lint:
 	yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
 	bump-my-version bump --dry-run release
-	{%- if black %}
-	black --check --diff .
-	{%- endif %}
-	{%- if flake8 %}
-	flake8
-	{%- endif %}
+	ruff format --check --diff
+	ruff check --diff
 	{%- if check_manifest %}
 	check-manifest
 	{%- endif %}
