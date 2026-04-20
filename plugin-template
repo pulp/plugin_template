@@ -2,14 +2,14 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#     "black~=26.3",
-#     "jamldump>=1.2.0,<1.3.0",
-#     "jinja2>=3.1.6,<3.2.0",
+#     "jamldump>=1.2.0,<1.3",
+#     "jinja2>=3.1.6,<3.2",
 #     "packaging>=26.0,<27",
-#     "pyyaml>=6.0.3,<6.1.0",
+#     "pyyaml>=6.0.3,<6.1",
 #     "requests~=2.32.3",
-#     "requests-cache>=1.3.0,<1.4.0",
-#     "tomlkit>=0.14.0,<0.14.1",
+#     "requests-cache>=1.3.0,<1.4",
+#     "ruff>=0.15.11,<0.16",
+#     "tomlkit>=0.14.0,<0.15",
 # ]
 # ///
 
@@ -29,7 +29,6 @@ from jinja2 import Environment, FileSystemLoader
 import utils
 
 DEFAULT_SETTINGS = {
-    "black": True,
     "check_commit_message": True,
     "check_gettext": True,
     "check_manifest": True,
@@ -46,10 +45,9 @@ DEFAULT_SETTINGS = {
     "disabled_redis_runners": [],
     "docker_fixtures": False,
     "extra_files": [],
-    "flake8_ignore": [],
-    "flake8": True,
     "github_org": "pulp",
     "latest_release_branch": None,
+    "lint_ignore": [],
     "lint_requirements": True,
     "os_required_packages": [],
     "parallel_test_workers": 8,
@@ -130,7 +128,6 @@ DEFAULT_SETTINGS = {
             },
         },
     },
-    "pydocstyle": True,
     "release_email": "pulp-infra@redhat.com",
     "release_user": "pulpbot",
     "stalebot_days_until_close": 30,
@@ -170,6 +167,7 @@ DEPRECATED_FILES = {
         ".ci/scripts/update_github.sh",
         ".ci/scripts/update_redmine.sh",
         ".ci/scripts/upper_bound.py",
+        ".flake8",
         ".github/template_gitref",
         ".github/workflows/kanban.yml",
         ".github/workflows/changelog.yml",
@@ -188,6 +186,7 @@ DEPRECATED_FILES = {
         ".github/workflows/scripts/publish_plugin_pypi.sh",
         ".travis",
         ".travis.yml",
+        "dev_requirements.txt",
         "flake8.cfg",
         "CHANGES/.TEMPLATE.rst",
     ],
@@ -321,10 +320,20 @@ def load_config(plugin_config_path: Path, verbose: bool) -> tuple[dict[str, t.An
     # Migrate api_root to (scenario) setting
     if config["pulp_settings"] is None:
         config["pulp_settings"] = {}
-    config["pulp_settings"].setdefault("api_root", config.get("api_root", "/pulp/"))
+        write_new_config = True
+    if "api_root" not in config["pulp_settings"]:
+        config["pulp_settings"]["api_root"] = "/pulp/"
+        write_new_config = True
     if config["pulp_settings_s3"] is None:
         config["pulp_settings_s3"] = {}
-    config["pulp_settings_s3"].setdefault("api_root", "/rerouted/djnd/")
+        write_new_config = True
+    if "api_root" not in config["pulp_settings_s3"]:
+        config["pulp_settings_s3"]["api_root"] = "/rerouted/djnd/"
+        write_new_config = True
+    # Migrate flake8_ignore
+    if "flake8_ignore" in config:
+        config["lint_ignore"] = config.pop("flake8_ignore")
+        write_new_config = True
     # remove deprecated options
     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
         config.pop(key)
@@ -385,7 +394,6 @@ def write_template_section(
         "current_version": utils.current_version(plugin_root_dir),
         "pulpdocs_branch": PULPDOCS_BRANCH,
         "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
-        "black_requirement": utils.black_requirement(),
         "config": config,
         **config,
     }
@@ -501,11 +509,10 @@ def remove_deprecated_files(plugin_root_dir: Path, sections: list[str]) -> None:
 
 
 def reformat_files(plugin_root_dir: Path, config: dict[str, t.Any]) -> None:
-    if config["black"]:
-        try:
-            subprocess.run(["black", "--quiet", "."], cwd=plugin_root_dir)
-        except FileNotFoundError:
-            pass
+    try:
+        subprocess.run(["ruff", "format"], cwd=plugin_root_dir)
+    except FileNotFoundError:
+        pass
 
 
 if __name__ == "__main__":

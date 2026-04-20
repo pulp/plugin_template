@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euv
+set -eu
 
 GITHUB_EVENT_NAME="${GITHUB_EVENT_NAME:-not_pull_request}"
 if [ "$GITHUB_EVENT_NAME" = "pull_request" ]
@@ -23,8 +23,8 @@ sed -i "s/disabled_redis_runners: \[\]/disabled_redis_runners: [s3]/g" ../pulp_c
 cd ../pulp_catdog
 
 # ignore unused imports
-flake8 .ci || exit 1 # check ci files before ignoring imports
-sed -i -e '/^ignore/s/$/,F401/' .flake8
+ruff check .ci || exit 1 # check ci files before ignoring imports
+echo $'[tool.ruff.lint]\nignore = [ "F401" ]' >> pyproject.toml
 
 # include post_before_script to generate migrations
 cp ../plugin_template/.ci/post_before_script.sh .github/workflows/scripts

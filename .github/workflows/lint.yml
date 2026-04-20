@@ -30,10 +30,9 @@ jobs:
       - name: "Lint plugin_template"
         working-directory: "plugin_template"
         run: |
-          pip3 install black~=26.3 flake8
-          black --version
-          black --check --diff plugin-template utils.py
-          flake8 plugin-template utils.py
+          pip3 install ruff
+          ruff format --check --diff plugin-template utils.py
+          ruff check --diff plugin-template utils.py
       - name: "Bootstrap catdog plugin"
         working-directory: "plugin_template"
         run: |
@@ -49,16 +48,13 @@ jobs:
         run: |
           yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
 
-      # run black separately from flake8 to get a diff
-      - name: "Run black"
+      - name: "Check formatting"
         run: |
-          black --version
-          black --check --diff .
+          ruff format --check --diff
 
-      # Lint code.
-      - name: "Run flake8"
+      - name: "Lint code"
         run: |
-          flake8
+          ruff check --diff
 
       - name: "Check for common gettext problems"
         run: |

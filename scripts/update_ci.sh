@@ -20,7 +20,6 @@ fi
 
 PLUGIN_NAME="$(python ../plugin_template/scripts/get_template_config_value.py plugin_name)"
 CI_UPDATE_DOCS="$(python ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
-USE_BLACK="$(python ../plugin_template/scripts/get_template_config_value.py black)"
 
 if [[ "${CI_UPDATE_DOCS}" == "True" ]]; then
   DOCS=("--docs")

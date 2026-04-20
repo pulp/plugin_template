@@ -82,25 +82,6 @@ underlines = ["", "", ""]
         name = "Misc"
         showcontent = false
 
-{% if black %}
-[tool.black]
-line-length = 100
-target-version = ["py39", "py310", "py311", "py312"]
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.venv
-  | _build
-  | build
-  | dist
-  | migrations
-  | docs
-  | protobuf
-)/
-'''
-{% endif %}
-
 {% if check_manifest %}
 [tool.check-manifest]
 ignore = [
@@ -108,11 +89,9 @@ ignore = [
     "AGENTS.md",
     "CHANGES/**",
     "CLAUDE.md",
-    "dev_requirements.txt",
     "doc_requirements.txt",
     "lint_requirements.txt",
     "docs/**",
-    ".flake8",
     "template_config.yml",
     ".coveragerc",
     ".dependabot/config.yml",

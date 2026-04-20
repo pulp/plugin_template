@@ -1,13 +1,7 @@
 {% include 'header.j2' %}
 
-{% if black -%}
-{{ black_requirement }}
-{% endif -%}
 bump-my-version
 check-manifest
-flake8
-{% if black -%}
-flake8-black
-{% endif -%}
 packaging
+ruff
 yamllint
