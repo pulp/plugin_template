@@ -34,7 +34,7 @@ jobs:
 
       - name: "Lint code"
         run: |
-          ruff check --diff
+          ruff check
       {%- if check_gettext %}
 
       - name: "Check for common gettext problems"
