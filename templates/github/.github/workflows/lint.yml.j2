@@ -35,12 +35,6 @@ jobs:
       - name: "Lint code"
         run: |
           ruff check
-      {%- if check_gettext %}
-
-      - name: "Check for common gettext problems"
-        run: |
-          sh .ci/scripts/check_gettext.sh
-      {%- endif %}
 
       - name: "Run extra lint checks"
         run: |

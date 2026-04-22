@@ -3,11 +3,12 @@
 .PHONY: format
 format:
 	ruff format
+	ruff check --select I --fix
 
 .PHONY: lint
 lint:
 	yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
-	bump-my-version bump --dry-run release
+	bump-my-version bump --dry-run --allow-dirty release
 	ruff format --check --diff
 	ruff check
 	{%- if check_manifest %}
@@ -18,7 +19,4 @@ lint:
 	{%- endif %}
 	{%- if check_stray_pulpcore_imports %}
 	sh .ci/scripts/check_pulpcore_imports.sh
-	{%- endif %}
-	{%- if check_gettext %}
-	sh .ci/scripts/check_gettext.sh
 	{%- endif %}

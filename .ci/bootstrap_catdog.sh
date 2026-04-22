@@ -24,7 +24,7 @@ cd ../pulp_catdog
 
 # ignore unused imports
 ruff check .ci || exit 1 # check ci files before ignoring imports
-echo $'[tool.ruff.lint]\nignore = [ "F401" ]' >> pyproject.toml
+sed -i -e '/\[tool.ruff.lint\]/a ignore = ["F401"]' pyproject.toml
 
 # include post_before_script to generate migrations
 cp ../plugin_template/.ci/post_before_script.sh .github/workflows/scripts
