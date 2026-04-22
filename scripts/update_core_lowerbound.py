@@ -15,7 +15,6 @@ import yaml
 from packaging.requirements import Requirement
 from packaging.version import Version
 
-
 CORE_TEMPLATE_URL = "https://raw.githubusercontent.com/pulp/pulpcore/main/template_config.yml"
 
 

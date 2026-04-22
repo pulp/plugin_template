@@ -13,13 +13,13 @@
 # ]
 # ///
 
-import typing as t
 import argparse
 import os
 import shlex
 import shutil
 import subprocess
 import sys
+import typing as t
 from pathlib import Path
 
 import jamldump
@@ -30,7 +30,6 @@ import utils
 
 DEFAULT_SETTINGS = {
     "check_commit_message": True,
-    "check_gettext": True,
     "check_manifest": True,
     "check_stray_pulpcore_imports": True,
     "cli_package": "pulp-cli",
@@ -153,6 +152,7 @@ DEPRECATED_FILES = {
         ".ci/assets/bindings/.gitkeep",
         ".ci/scripts/changelog.py",
         ".ci/scripts/calc_deps_lowerbounds.py",
+        ".ci/scripts/check_gettext.sh",
         ".ci/scripts/cherrypick.sh",
         ".ci/scripts/docs-builder.py",
         ".ci/scripts/publish_docs.sh",

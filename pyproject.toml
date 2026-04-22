@@ -9,3 +9,6 @@ issue_format = "`#{issue} <https://github.com/pulp/plugin_template/issues/{issue
 [tool.ruff]
 line-length = 100
 extend-exclude = ["templates"]
+
+[tool.ruff.lint]
+extend-select = ["I"]
