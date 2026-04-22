@@ -9,7 +9,7 @@ lint:
 	yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
 	bump-my-version bump --dry-run release
 	ruff format --check --diff
-	ruff check --diff
+	ruff check
 	{%- if check_manifest %}
 	check-manifest
 	{%- endif %}

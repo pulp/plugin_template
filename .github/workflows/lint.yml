@@ -32,7 +32,7 @@ jobs:
         run: |
           pip3 install ruff
           ruff format --check --diff plugin-template utils.py
-          ruff check --diff plugin-template utils.py
+          ruff check plugin-template utils.py
       - name: "Bootstrap catdog plugin"
         working-directory: "plugin_template"
         run: |
@@ -54,7 +54,7 @@ jobs:
 
       - name: "Lint code"
         run: |
-          ruff check --diff
+          ruff check
 
       - name: "Check for common gettext problems"
         run: |

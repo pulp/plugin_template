@@ -511,6 +511,7 @@ def remove_deprecated_files(plugin_root_dir: Path, sections: list[str]) -> None:
 def reformat_files(plugin_root_dir: Path, config: dict[str, t.Any]) -> None:
     try:
         subprocess.run(["ruff", "format"], cwd=plugin_root_dir)
+        subprocess.run(["ruff", "check", "--select", "I", "--fix"], cwd=plugin_root_dir)
     except FileNotFoundError:
         pass
 
