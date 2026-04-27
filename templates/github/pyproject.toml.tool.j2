@@ -74,10 +74,11 @@ extend-select = [
   "TID",
   "T10",
 ]
-{%- if plugin_name != "pulpcore" %}
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 # This section is managed by the plugin template. Do not edit manually.
+"distutils".msg = "The 'distutils' module has been deprecated since Python 3.9."
+{%- if plugin_name != "pulpcore" %}
 "pulpcore.app".msg = "The 'pulpcore' apis must only be consumed via 'pulpcore.plugin'."
 {%- endif %}
 
