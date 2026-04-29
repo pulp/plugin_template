@@ -40,6 +40,14 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- endmacro -%}
 
 
+{%- macro install_uv() -%}
+- name: "Install uv"
+  uses: "astral-sh/setup-uv@v7"
+  with:
+    enable-cache: true
+{%- endmacro -%}
+
+
 {%- macro setup_ruby(condition=None) -%}
 - uses: ruby/setup-ruby@v1
   {%- if condition %}
