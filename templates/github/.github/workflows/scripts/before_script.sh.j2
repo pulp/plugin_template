@@ -19,6 +19,12 @@ fi
 echo
 echo "# Pulp config:"
 tail -v -n +1 .ci/ansible/settings/settings.*
+{%- if test_cli %}
+
+echo
+echo "# Pulp CLI config"
+tail -v -n +1 "../{{ cli_package }}/tests/cli.toml"
+{%- endif %}
 
 echo
 echo "# Containerfile:"

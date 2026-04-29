@@ -3,6 +3,7 @@
   checkout,
   display_logs,
   install_python_deps,
+  install_uv,
   run_script,
   setup_env,
   setup_python,
@@ -36,6 +37,8 @@ jobs:
       {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
 
       {{ setup_python() | indent(6) }}
+
+      {{ install_uv() | indent(6) }}
 
       - name: "Download plugin package"
         uses: "actions/download-artifact@v8"

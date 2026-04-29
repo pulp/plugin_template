@@ -36,7 +36,7 @@ git clone --depth 1 --branch "$PULP_CLI_VERSION" {{ cli_repo }} ../{{ cli_packag
 PULP_API_ROOT="$(yq -r '.pulp_scenario_settings.api_root // .pulp_settings.api_root // "/pulp/"' < .ci/ansible/vars/main.yaml)"
 
 pulp config create --base-url {{ pulp_scheme }}://pulp{% if pulp_scheme != 'https' %} --no-verify-ssl{% endif %} --api-root "${PULP_API_ROOT}" --username "admin" --password "password"
-{% if test_cli -%}
+{%- if test_cli %}
 cp ~/.config/pulp/cli.toml "../{{ cli_package }}/tests/cli.toml"
 {%- endif %}
 
