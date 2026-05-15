@@ -7,7 +7,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {{ key }}: "{{ value }}"
 {%- endfor %}
 {%- if with_pulpcore_ref %}
-PULPCORE_REF: "{{ '${{ inputs.pulpcore_ref }}' }}"
+BLEEDING_PULPCORE_REF: "{{ '${{ inputs.pulpcore_ref }}' }}"
 {%- endif %}
 {%- if extra_env is not none %}
 {%- for key, value in extra_env.items() %}
@@ -123,10 +123,10 @@ pulpcore_ref:
 
 
 {%- macro resolve_pulpcore_ref(output_var="PULPCORE_SOURCE") -%}
-if [[ "$PULPCORE_REF" =~ ^[0-9]+$ ]]; then
-  PULPCORE_REF="refs/pull/${PULPCORE_REF}/head"
+if [[ "$BLEEDING_PULPCORE_REF" =~ ^[0-9]+$ ]]; then
+  BLEEDING_PULPCORE_REF="refs/pull/${BLEEDING_PULPCORE_REF}/head"
 fi
-{{ output_var }}="git+https://github.com/pulp/pulpcore.git@${PULPCORE_REF}"
+{{ output_var }}="git+https://github.com/pulp/pulpcore.git@${BLEEDING_PULPCORE_REF}"
 sed -i '/^pulpcore/d' .ci/assets/ci_constraints.txt
 if [ -f upperbounds_constraints.txt ]; then
   sed -i '/^pulpcore/d' upperbounds_constraints.txt

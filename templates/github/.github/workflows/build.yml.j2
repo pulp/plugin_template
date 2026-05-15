@@ -42,8 +42,8 @@ jobs:
       - name: "Install built packages"
         run: |
           {%- if plugin_name != "pulpcore" %}
-          PULPCORE_REF="{{ '${{ inputs.pulpcore_ref }}' }}"
-          if [ -n "$PULPCORE_REF" ]; then
+          BLEEDING_PULPCORE_REF="{{ '${{ inputs.pulpcore_ref }}' }}"
+          if [ -n "$BLEEDING_PULPCORE_REF" ]; then
             {{ resolve_pulpcore_ref() | indent(12) }}
           fi
           {%- endif %}

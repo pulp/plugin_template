@@ -10,7 +10,7 @@
 #
 {%- if plugin_name != "pulpcore" %}
 #   Optional environment:
-#     PULPCORE_REF - A pulpcore branch, commit SHA, or PR number to test against.
+#     BLEEDING_PULPCORE_REF - A pulpcore branch, commit SHA, or PR number to test against.
 #                   When set, installs pulpcore from source and removes version pins
 #                   so the custom ref can be installed without constraint conflicts.
 #
@@ -54,7 +54,7 @@ if [[ "$TEST" = "lowerbounds" ]]; then
 fi
 {% if plugin_name != "pulpcore" %}
 # Relax constraints if a custom pulpcore is provided
-if [ -n "${PULPCORE_REF:-}" ]; then
+if [ -n "${BLEEDING_PULPCORE_REF:-}" ]; then
   {{ resolve_pulpcore_ref() | indent(2) }}
   echo "$PULPCORE_SOURCE" > ci_requirements.txt
 fi
