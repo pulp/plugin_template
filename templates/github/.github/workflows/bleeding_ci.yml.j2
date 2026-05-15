@@ -1,0 +1,41 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  matrix_env,
+with context %}
+---
+name: "{{ plugin_app_label | camel }} Bleeding Edge CI"
+on:
+  workflow_dispatch:
+    inputs:
+      pulpcore_ref:
+        description: >
+          pulpcore ref to test against: branch name, commit SHA, or PR number.
+
+          PR numbers are automatically converted to refs/pull/<number>/head.
+        required: true
+        type: "string"
+
+concurrency:
+  {%- raw %}
+  group: "${{ github.ref_name }}-${{ github.workflow }}"
+  {%- endraw %}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: "./.github/workflows/build.yml"
+    with:
+      {%- raw %}
+      pulpcore_ref: "${{ inputs.pulpcore_ref }}"
+      {%- endraw %}
+
+  test:
+    needs: "build"
+    uses: "./.github/workflows/test.yml"
+    with:
+      matrix_env: |
+        {{ matrix_env(lowerbounds=false) | from_yaml | tojson }}
+      {%- raw %}
+      pulpcore_ref: "${{ inputs.pulpcore_ref }}"
+      {%- endraw %}
+...

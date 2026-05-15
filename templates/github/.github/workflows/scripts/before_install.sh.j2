@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
 {% include 'header.j2' %}
+{% from 'macros.j2' import resolve_pulpcore_ref with context %}
 
 # This script prepares the scenario definition in the .ci/ansible/vars/main.yaml file.
 #
 #   It requires the following environment:
 #     TEST - The name of the scenario to prepare.
 #
+{%- if plugin_name != "pulpcore" %}
+#   Optional environment:
+#     PULPCORE_REF - A pulpcore branch, commit SHA, or PR number to test against.
+#                   When set, installs pulpcore from source and removes version pins
+#                   so the custom ref can be installed without constraint conflicts.
+#
+{%- endif %}
 #   It may also dump the {lower,upper}bounds_constraints.txt for the specific scenario.
 
 set -eu -o pipefail
@@ -44,7 +52,13 @@ fi
 if [[ "$TEST" = "lowerbounds" ]]; then
   python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
 fi
-
+{% if plugin_name != "pulpcore" %}
+# Relax constraints if a custom pulpcore is provided
+if [ -n "${PULPCORE_REF:-}" ]; then
+  {{ resolve_pulpcore_ref() | indent(2) }}
+  echo "$PULPCORE_SOURCE" > ci_requirements.txt
+fi
+{% endif %}
 # Compose the scenario definition.
 mkdir -p .ci/ansible/vars
 

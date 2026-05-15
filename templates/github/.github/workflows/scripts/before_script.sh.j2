@@ -34,6 +34,12 @@ echo
 echo "# Constraints Files:"
 # They need not even exist.
 tail -v -n +1  ../*/*constraints.txt || true
+{%- if plugin_name != "pulpcore" %}
+
+echo
+echo "# ci_requirements.txt:"
+tail -v -n +1 ci_requirements.txt || true
+{%- endif %}
 
 echo
 echo "# pip list outside the container"

@@ -16,6 +16,19 @@ on:
       matrix_env:
         required: true
         type: "string"
+      {%- if plugin_name != "pulpcore" %}
+      pulpcore_ref:
+        # WARNING: PRs should always be tested against released pulpcore versions.
+        # This is intended for ad-hoc use only, such as testing unforeseen
+        # side-effects of pulpcore changes.
+        description: >
+          pulpcore ref to test against: branch name, commit SHA, or PR number.
+
+          PR numbers are automatically converted to refs/pull/<number>/head.
+        required: false
+        type: "string"
+        default: ""
+      {%- endif %}
 
 defaults:
   run:
@@ -74,7 +87,7 @@ jobs:
 
       {{ setup_env() | indent(6) }}
 
-      {{ run_script(name="Prepare Scenario Definition", file="before_install.sh") | indent(6) }}
+      {{ run_script(name="Prepare Scenario Definition", file="before_install.sh", with_pulpcore_ref=(plugin_name != "pulpcore")) | indent(6) }}
 
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 
