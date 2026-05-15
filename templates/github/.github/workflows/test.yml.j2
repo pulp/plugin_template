@@ -4,6 +4,7 @@
   display_logs,
   install_python_deps,
   install_uv,
+  pulpcore_ref_input,
   run_script,
   setup_env,
   setup_python,
@@ -16,6 +17,9 @@ on:
       matrix_env:
         required: true
         type: "string"
+      {%- if plugin_name != "pulpcore" %}
+      {{ pulpcore_ref_input() | indent(6) }}
+      {%- endif %}
 
 defaults:
   run:
@@ -74,7 +78,11 @@ jobs:
 
       {{ setup_env() | indent(6) }}
 
-      {{ run_script(name="Prepare Scenario Definition", file="before_install.sh") | indent(6) }}
+      {{ run_script(
+            name="Prepare Scenario Definition",
+            file="before_install.sh",
+            with_bleeding_pulpcore_ref=(plugin_name != "pulpcore"),
+          ) | indent(6) }}
 
       {{ run_script(name="Install", file="install.sh") | indent(6) }}
 

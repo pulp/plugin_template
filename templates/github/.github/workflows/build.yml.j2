@@ -1,14 +1,20 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
   checkout,
-  setup_python,
   install_python_deps,
+  pulpcore_ref_input,
+  resolve_pulpcore_ref,
   run_script,
+  setup_python,
 with context %}
 ---
 name: "Build"
 on:
   workflow_call:
+    {%- if plugin_name != "pulpcore" %}
+    inputs:
+      {{ pulpcore_ref_input() | indent(6) }}
+    {%- endif %}
 
 defaults:
   run:
@@ -35,7 +41,13 @@ jobs:
           twine check dist/*
       - name: "Install built packages"
         run: |
-          pip install dist/{{ plugin_name | snake }}-*-py3-none-any.whl -c .ci/assets/ci_constraints.txt
+          {%- if plugin_name != "pulpcore" %}
+          BLEEDING_PULPCORE_REF="{{ '${{ inputs.pulpcore_ref }}' }}"
+          if [ -n "$BLEEDING_PULPCORE_REF" ]; then
+            {{ resolve_pulpcore_ref() | indent(12) }}
+          fi
+          {%- endif %}
+          pip install dist/{{ plugin_name | snake }}-*-py3-none-any.whl{% if plugin_name != "pulpcore" %} ${PULPCORE_SOURCE:-}{% endif %} -c .ci/assets/ci_constraints.txt
       - name: "Generate api specs"
         run: |
           pulpcore-manager openapi --file "api.json"

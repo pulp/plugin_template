@@ -1,0 +1,71 @@
+{% include 'header.j2' %}
+{% from 'macros.j2' import
+  matrix_env,
+  pulpcore_ref_input,
+with context %}
+{%- set bleeding_edge_plugins = ['pulp_ansible', 'pulp_container', 'pulp_deb', 'pulp_python', 'pulp_rpm'] %}
+---
+name: "{{ plugin_app_label | camel }} Bleeding Edge CI"
+on:
+  workflow_dispatch:
+    inputs:
+      {%- if plugin_name == "pulpcore" %}
+      {%- set extra_description = "This will trigger bleeding edge CI on: " ~ bleeding_edge_plugins | join(", ") ~ "." %}
+      {{ pulpcore_ref_input(required=True, extra_description=extra_description) | indent(6) }}
+      {%- else %}
+      {{ pulpcore_ref_input(required=True) | indent(6) }}
+      {%- endif %}
+
+concurrency:
+  {%- raw %}
+  group: "${{ github.ref_name }}-${{ github.workflow }}"
+  {%- endraw %}
+  cancel-in-progress: true
+
+{%- if plugin_name == "pulpcore" %}
+
+jobs:
+  dispatch:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Trigger Plugin Workflows"
+        uses: "actions/github-script@v7"
+        with:
+          github-token: "{{ '${{ secrets.ORG_DISPATCH_TOKEN }}' }}"
+          script: |
+            const plugins = [{% for p in bleeding_edge_plugins %}'{{ p }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+            const owner = context.repo.owner;
+
+            for (const repo of plugins) {
+              console.log(`Triggering bleeding edge CI in ${repo}...`);
+              await github.rest.actions.createWorkflowDispatch({
+                owner: owner,
+                repo: repo,
+                workflow_id: 'bleeding_ci.yml',
+                ref: 'main',
+                inputs: {
+                  pulpcore_ref: "{{ '${{ inputs.pulpcore_ref }}' }}"
+                }
+              });
+            }
+{%- else %}
+
+jobs:
+  build:
+    uses: "./.github/workflows/build.yml"
+    with:
+      {%- raw %}
+      pulpcore_ref: "${{ inputs.pulpcore_ref }}"
+      {%- endraw %}
+
+  test:
+    needs: "build"
+    uses: "./.github/workflows/test.yml"
+    with:
+      matrix_env: |
+        {{ matrix_env(lowerbounds=false) | from_yaml | tojson }}
+      {%- raw %}
+      pulpcore_ref: "${{ inputs.pulpcore_ref }}"
+      {%- endraw %}
+{%- endif %}
+...
