@@ -404,8 +404,6 @@ def write_template_section(
             continue
         if config["use_issue_template"] is False and "ISSUE_TEMPLATE" in relative_path:
             continue
-        if config["plugin_name"] == "pulpcore" and "bleeding_ci" in relative_path:
-            continue
         destination_relative_path = relative_path.replace(
             "plugin_name", utils.to_snake(config["plugin_name"])
         )

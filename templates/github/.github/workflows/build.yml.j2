@@ -2,6 +2,7 @@
 {% from 'macros.j2' import
   checkout,
   install_python_deps,
+  pulpcore_ref_input,
   resolve_pulpcore_ref,
   run_script,
   setup_python,
@@ -12,10 +13,7 @@ on:
   workflow_call:
     {%- if plugin_name != "pulpcore" %}
     inputs:
-      pulpcore_ref:
-        required: false
-        type: "string"
-        default: ""
+      {{ pulpcore_ref_input() | indent(6) }}
     {%- endif %}
 
 defaults:

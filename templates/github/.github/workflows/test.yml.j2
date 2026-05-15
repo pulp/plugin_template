@@ -4,6 +4,7 @@
   display_logs,
   install_python_deps,
   install_uv,
+  pulpcore_ref_input,
   run_script,
   setup_env,
   setup_python,
@@ -17,17 +18,7 @@ on:
         required: true
         type: "string"
       {%- if plugin_name != "pulpcore" %}
-      pulpcore_ref:
-        # WARNING: PRs should always be tested against released pulpcore versions.
-        # This is intended for ad-hoc use only, such as testing unforeseen
-        # side-effects of pulpcore changes.
-        description: >
-          pulpcore ref to test against: branch name, commit SHA, or PR number.
-
-          PR numbers are automatically converted to refs/pull/<number>/head.
-        required: false
-        type: "string"
-        default: ""
+      {{ pulpcore_ref_input() | indent(6) }}
       {%- endif %}
 
 defaults:

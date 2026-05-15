@@ -102,6 +102,26 @@ PULPCORE_REF: "{{ '${{ inputs.pulpcore_ref }}' }}"
 {%- endmacro -%}
 
 
+{%- macro pulpcore_ref_input(required=False, extra_description=None) -%}
+pulpcore_ref:
+  # WARNING: PRs should always be tested against released pulpcore versions.
+  # This is intended to be used in the add-hoc bleeding_ci workflow
+  description: >
+    pulpcore ref to test against: branch name, commit SHA, or PR number.
+
+    PR numbers are automatically converted to refs/pull/<number>/head.
+    {%- if extra_description %}
+
+    {{ extra_description }}
+    {%- endif %}
+  required: {{ "true" if required else "false" }}
+  type: "string"
+  {%- if not required %}
+  default: ""
+  {%- endif %}
+{%- endmacro -%}
+
+
 {%- macro resolve_pulpcore_ref(output_var="PULPCORE_SOURCE") -%}
 if [[ "$PULPCORE_REF" =~ ^[0-9]+$ ]]; then
   PULPCORE_REF="refs/pull/${PULPCORE_REF}/head"
