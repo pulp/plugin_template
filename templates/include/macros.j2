@@ -1,4 +1,7 @@
-{%- macro set_env_vars(extra_env=None, with_pulpcore_ref=False) -%}
+{%- macro set_env_vars(
+    extra_env=None,
+    with_bleeding_pulpcore_ref=False
+) -%}
 PY_COLORS: "1"
 ANSIBLE_FORCE_COLOR: "1"
 GITHUB_TOKEN: "{{ '${{ secrets.GITHUB_TOKEN }}' }}"
@@ -6,7 +9,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- for key, value in ci_env.items() %}
 {{ key }}: "{{ value }}"
 {%- endfor %}
-{%- if with_pulpcore_ref %}
+{%- if with_bleeding_pulpcore_ref %}
 BLEEDING_PULPCORE_REF: "{{ '${{ inputs.pulpcore_ref }}' }}"
 {%- endif %}
 {%- if extra_env is not none %}
@@ -134,7 +137,10 @@ fi
 {%- endmacro -%}
 
 
-{%- macro run_script(name, file, withenv=True, condition=None, extra_env=None, path=None, with_pulpcore_ref=False) -%}
+{%- macro run_script(
+    name, file, withenv=True, condition=None, extra_env=None, path=None,
+    with_bleeding_pulpcore_ref=False
+) -%}
 - name: "{{ name }}"
   {%- if path %}
   working-directory: "{{ path }}"
@@ -147,7 +153,10 @@ fi
   shell: "bash"
   {%- if withenv %}
   env:
-    {{ set_env_vars(extra_env, with_pulpcore_ref=with_pulpcore_ref) | indent(4) }}
+    {{ set_env_vars(
+           extra_env,
+           with_bleeding_pulpcore_ref=with_bleeding_pulpcore_ref,
+         ) | indent(4) }}
   {%- endif %}
 {%- endmacro -%}
 
