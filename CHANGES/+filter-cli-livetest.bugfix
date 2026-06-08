@@ -1,0 +1,1 @@
+Filter pulp-cli livetest runs to the plugin under test when using pulp-cli 0.40.0+.
