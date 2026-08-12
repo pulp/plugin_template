@@ -11,7 +11,8 @@ else
 fi
 echo "${COMMIT_MSG}"
 
-pip install -r test_requirements.txt
+uv pip install -r test_requirements.txt
+
 ./plugin-template --generate-config --plugin-app-label catdog pulp_catdog
 mkdir -p ../pulp_catdog/.ci/assets/bindings
 sed -i "s/test_s3: false/test_s3: true/g" ../pulp_catdog/template_config.yml

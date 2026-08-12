@@ -18,6 +18,9 @@ on:
     - cron: "00 3 * * *"
   workflow_dispatch:
 
+env:
+  UV_SYSTEM_PYTHON: "1"
+
 defaults:
   run:
     working-directory: "{{ plugin_name }}"

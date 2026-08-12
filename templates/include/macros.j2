@@ -37,6 +37,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 - uses: "actions/setup-python@v6"
   with:
     python-version: "{{ pyversion }}"
+{{ install_uv() }}
 {%- endmacro -%}
 
 
@@ -61,7 +62,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- macro install_python_deps(deps=[]) -%}
 - name: "Install python dependencies"
   run: |
-    pip install {{ deps | map("shquote") | join(" ") }}
+    uv pip install {{ deps | map("shquote") | join(" ") }}
     {%- if 'httpie' in deps %}
     echo "HTTPIE_CONFIG_DIR=$GITHUB_WORKSPACE/{{ plugin_name }}/.ci/assets/httpie/" >> $GITHUB_ENV
     {%- endif %}
@@ -95,7 +96,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
     docker logs pulp || true
     docker exec pulp ls -latr /etc/yum.repos.d/ || true
     docker exec pulp cat /etc/yum.repos.d/* || true
-    docker exec pulp bash -c "pip3 list" || true
+    docker exec pulp bash -c "uv pip list" || true
 {%- endmacro -%}
 
 

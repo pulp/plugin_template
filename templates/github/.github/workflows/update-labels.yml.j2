@@ -14,6 +14,9 @@ on:
     paths:
       - "template_config.yml"
 
+env:
+  UV_SYSTEM_PYTHON: "1"
+
 jobs:
   update_backport_labels:
     runs-on: "ubuntu-latest"
