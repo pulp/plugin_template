@@ -12,6 +12,9 @@ name: "Sanity"
 on:
   workflow_call:
 
+env:
+  UV_SYSTEM_PYTHON: "1"
+
 defaults:
   run:
     working-directory: "{{ plugin_name }}"
