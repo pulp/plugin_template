@@ -37,6 +37,9 @@ DEFAULT_SETTINGS = {
     "ci_base_image": "ghcr.io/pulp/pulp-ci-centos9",
     "ci_env": {},
     "ci_trigger": "{pull_request: {branches: ['*']}}",
+    "claude_bindings_note": None,
+    "claude_cli_app_label": None,
+    "claude_cli_examples": None,
     "core_import_allowed": [],
     "deploy_client_to_pypi": True,
     "deploy_client_to_rubygems": True,
@@ -396,6 +399,8 @@ def write_template_section(
         "is_pulpdocs_member": config["plugin_name"] in utils.get_pulpdocs_members(PULPDOCS_BRANCH),
         "config": config,
         **config,
+        # Computed after **config so None defaults do not clobber derived values.
+        "claude_cli_app_label": utils.default_claude_cli_app_label(config),
     }
 
     relative_path_set = generate_relative_path_set(section_templates_dir)
@@ -429,6 +434,13 @@ def write_template_section(
                     template,
                     plugin_root_dir,
                     destination,
+                )
+            elif destination == "CLAUDE.md":
+                utils.merge_marked_markdown(
+                    template,
+                    plugin_root_dir,
+                    destination,
+                    template_vars,
                 )
             else:
                 utils.template_to_file(
