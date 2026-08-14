@@ -1,4 +1,12 @@
 FROM {{ image.ci_base }}
+
+# Third-party deps are compiled on the host into a lockfile that does not include
+# the PR wheel, so this layer can be reused across CI runs.
+COPY ./{{ plugin_name }}/.ci/assets/third-party-requirements.txt /tmp/third-party-requirements.txt
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --upgrade setuptools wheel && \
+    uv pip install -r /tmp/third-party-requirements.txt
+
 {%- if image.webserver_snippet %}
 
 ADD ./{{ plugin_name }}/{{ plugin_name | replace("-", "_") }}/app/webserver_snippets/nginx.conf /etc/nginx/pulp/{{ plugin_name }}.conf
@@ -9,19 +17,8 @@ ADD ./{{ plugin_name }}/{{ plugin_name | replace("-", "_") }}/app/webserver_snip
 ADD ./{{ item.origin }} {{ item.destination }}
 {%- endfor %}
 
-# This MUST be the ONLY package install inside the container.
-RUN --mount=type=cache,target=/root/.cache/uv uv pip install --upgrade setuptools wheel && \
-  uv pip install {{ image.source }}
-{%- if image.upperbounds | default(false) -%}
-{{ " " }}-c ./{{ plugin_name }}/upperbounds_constraints.txt
-{%- endif -%}
-{%- if image.lowerbounds | default(false) -%}
-{{ " " }}-c ./{{ plugin_name }}/lowerbounds_constraints.txt
-{%- endif -%}
-{%- if image.ci_requirements | default(false) -%}
-{{ " " }}-r ./{{ plugin_name }}/ci_requirements.txt
-{%- endif -%}
-{{ " " }}-c ./{{ plugin_name }}/.ci/assets/ci_constraints.txt
+# The local wheel changes every CI run; extras and git deps are already in the lockfile.
+RUN uv pip install --no-deps {{ image.wheel }}
 
 {% if pulp_env is defined and pulp_env %}
 {% for key, value in pulp_env.items() %}

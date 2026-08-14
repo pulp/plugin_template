@@ -12,28 +12,28 @@
         dest: "Containerfile"
 
     - name: "Build pulp image"
-      # We build from the ../.. (parent dir of pulpcore git repo) Docker build
-      # "context" so that repos like pulp-smash are accessible to Docker
-      # build. So that PR branches can be used via relative paths.
-      #
-      # We default to using the docker build / podman buildah cache, for
-      # 1-off-builds and CI purposes (which has no cache across CI runs.)
-      # Run build.yaml with -e cache=false if your builds are using outdated
-      # layers.
-      ansible.builtin.command:
-        argv:
-          - "docker"
-          - "build"
-          - "--network"
-          - "host"
-          - "--no-cache={{ not cache | default(true) | bool }}"
-          - "-t"
-          - "{{ image.name }}:{{ image.tag }}"
-          - "-f"
-          - "{{ playbook_dir }}/Containerfile"
-          - "../../.."
-
-    - name: "Clean image cache"
-      community.docker.docker_prune:
-        images: true
-...
+      # Build from the parent of the plugin checkout so extra repos can be ADD'd
+      # via relative paths. GitHub Actions imports/exports layer cache via GHCR
+      # (nightly writes, PRs only read). Local builds use the engine's own cache.
+      # Pass -e cache=false to force a full rebuild.
+      ansible.builtin.shell:
+        cmd: |
+          set -eu
+          extra=()
+          if [ "{{ cache | default(true) | bool }}" = "True" ]; then
+            if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+              extra+=(--cache-from "type=registry,ref={{ image.cache_ref }},ignore-error=true")
+              if [ "{{ image.cache_write | default(false) | bool }}" = "True" ]; then
+                extra+=(--cache-to "type=registry,ref={{ image.cache_ref }},mode=max,image-manifest=true,oci-mediatypes=true")
+              fi
+            fi
+          else
+            extra+=(--no-cache)
+          fi
+          docker buildx build --network host --load \
+            -t "{{ image.name }}:{{ image.tag }}" \
+            -f "{{ playbook_dir }}/Containerfile" \
+            "${extra[@]}" \
+            ../../..
+      args:
+        executable: "/bin/bash"

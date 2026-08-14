@@ -37,8 +37,12 @@ jobs:
 
   test:
     needs: "build"
+    permissions:
+      contents: "read"
+      packages: "write"
     uses: "./.github/workflows/test.yml"
     with:
+      cache_write: true
       matrix_env: |
         {{ matrix_env(performance=true) | from_yaml | tojson }}
 

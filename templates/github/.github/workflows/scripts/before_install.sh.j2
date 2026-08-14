@@ -19,22 +19,37 @@ if [ -f .github/workflows/scripts/pre_before_install.sh ]; then
 fi
 
 COMPONENT_VERSION="$(bump-my-version show current_version | tail -n -1 | python -c 'from packaging.version import Version; print(Version(input()))')"
-COMPONENT_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${COMPONENT_VERSION}-py3-none-any.whl"
+WHEEL_NAME="{{ plugin_name | snake }}-${COMPONENT_VERSION}-py3-none-any.whl"
+HOST_WHEEL="./dist/${WHEEL_NAME}"
+DOCKER_WHEEL="./{{ plugin_name }}/dist/${WHEEL_NAME}"
 
-{%- set PULPCORE_PREFIX = "" if plugin_name == "pulpcore" else " pulpcore" %}
+COMPILE_PKGS=("${HOST_WHEEL}")
 {%- if test_s3 %}
 if [ "$TEST" = "s3" ]; then
-  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[s3] git+https://github.com/gerrod3/botocore.git@fix-100-continue"
+  {%- if plugin_name == "pulpcore" %}
+  COMPILE_PKGS=("${HOST_WHEEL}[s3]")
+  {%- else %}
+  COMPILE_PKGS+=("pulpcore[s3]")
+  {%- endif %}
+  COMPILE_PKGS+=("git+https://github.com/gerrod3/botocore.git@fix-100-continue")
 fi
 {%- endif %}
 {%- if test_azure %}
 if [ "$TEST" = "azure" ]; then
-  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[azure,uvloop]"
+  {%- if plugin_name == "pulpcore" %}
+  COMPILE_PKGS=("${HOST_WHEEL}[azure,uvloop]")
+  {%- else %}
+  COMPILE_PKGS+=("pulpcore[azure,uvloop]")
+  {%- endif %}
 fi
 {%- endif %}
 {%- if test_gcp %}
 if [ "$TEST" = "gcp" ]; then
-  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[google]"
+  {%- if plugin_name == "pulpcore" %}
+  COMPILE_PKGS=("${HOST_WHEEL}[google]")
+  {%- else %}
+  COMPILE_PKGS+=("pulpcore[google]")
+  {%- endif %}
 fi
 {%- endif %}
 
@@ -44,6 +59,28 @@ fi
 if [[ "$TEST" = "lowerbounds" ]]; then
   python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
 fi
+
+# Pin third-party deps without the PR wheel so the image's first RUN can cache.
+COMPILE_ARGS=(
+  --no-header
+  --no-annotate
+  --no-emit-package "{{ plugin_name | snake }}"
+  --python-version "{{ python_version }}"
+  --python-platform linux
+  -o .ci/assets/third-party-requirements.txt
+  -c .ci/assets/ci_constraints.txt
+)
+if [[ "$TEST" = "pulp" ]]; then
+  COMPILE_ARGS+=(-c upperbounds_constraints.txt)
+fi
+if [[ "$TEST" = "lowerbounds" ]]; then
+  COMPILE_ARGS+=(-c lowerbounds_constraints.txt)
+fi
+if [[ -s ci_requirements.txt ]]; then
+  COMPILE_ARGS+=(-r ci_requirements.txt)
+fi
+printf '%s\n' "${COMPILE_PKGS[@]}" > .ci/assets/third-party-requirements.in
+uv pip compile "${COMPILE_ARGS[@]}" .ci/assets/third-party-requirements.in
 
 # Compose the scenario definition.
 mkdir -p .ci/ansible/vars
@@ -66,7 +103,9 @@ image:
   {% else %}
   ci_base: "{{ ci_base_image + ":latest" }}"
   {% endif -%}
-  source: "${COMPONENT_SOURCE}"
+  wheel: "${DOCKER_WHEEL}"
+  cache_ref: "ghcr.io/{{ github_org }}/{{ plugin_name | dash }}-ci-cache:${TEST}"
+  cache_write: "${DOCKER_CACHE_WRITE:-false}"
   ci_requirements: $(test -f ci_requirements.txt && echo -n true || echo -n false)
   upperbounds: $(test "${TEST}" = "pulp" && echo -n true || echo -n false)
   lowerbounds: $(test "${TEST}" = "lowerbounds" && echo -n true || echo -n false)

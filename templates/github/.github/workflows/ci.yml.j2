@@ -102,6 +102,9 @@ jobs:
 
   test:
     needs: "build"
+    permissions:
+      contents: "read"
+      packages: "read"
     uses: "./.github/workflows/test.yml"
     with:
       matrix_env: |

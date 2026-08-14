@@ -31,6 +31,10 @@ echo "# Containerfile:"
 tail -v -n +1 .ci/ansible/Containerfile
 
 echo
+echo "# Third-party requirements:"
+tail -v -n +1 .ci/assets/third-party-requirements.txt
+
+echo
 echo "# Constraints Files:"
 # They need not even exist.
 tail -v -n +1  ../*/*constraints.txt || true
