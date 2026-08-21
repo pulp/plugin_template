@@ -24,7 +24,7 @@ COMPONENT_SOURCE="./{{ plugin_name }}/dist/{{ plugin_name | snake }}-${COMPONENT
 {%- set PULPCORE_PREFIX = "" if plugin_name == "pulpcore" else " pulpcore" %}
 {%- if test_s3 %}
 if [ "$TEST" = "s3" ]; then
-  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[s3] git+https://github.com/gerrod3/botocore.git@fix-100-continue"
+  COMPONENT_SOURCE="${COMPONENT_SOURCE}{{ PULPCORE_PREFIX }}[s3]"
 fi
 {%- endif %}
 {%- if test_azure %}
@@ -109,7 +109,8 @@ s3_test: true
 minio_access_key: "${MINIO_ACCESS_KEY}"
 minio_secret_key: "${MINIO_SECRET_KEY}"
 pulp_scenario_settings: {{ pulp_settings_s3 | tojson }}
-pulp_scenario_env: {{ pulp_env_s3 | tojson }}
+# MinIO omits 100-continue on 0-byte PUTs; stock botocore hangs without this (boto/botocore#3123).
+pulp_scenario_env: {{ dict({"BOTO_EXPERIMENTAL__NO_EMPTY_CONTINUE": "true"}, **(pulp_env_s3 or {})) | tojson }}
 VARSYAML
 fi
 
