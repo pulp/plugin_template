@@ -53,11 +53,21 @@ jobs:
     outputs:
       run_tests: "${{ steps.check.outputs.run_tests }}"
       run_docs: "${{ steps.check.outputs.run_docs }}"
+      full_image: "${{ steps.check.outputs.full_image }}"
     steps:
       - uses: "actions/checkout@v6"
         with:
           fetch-depth: 0
           path: "plugin_template"
+
+      - uses: "actions/setup-python@v6"
+        with:
+          python-version: "3.11"
+
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          enable-cache: true
 
       - name: "Analyze changed files"
         id: "check"
@@ -68,6 +78,8 @@ jobs:
           # We just assume we want to see all tests.
           echo "run_docs=1" >> $GITHUB_OUTPUT
           echo "run_tests=1" >> $GITHUB_OUTPUT
+          uv pip install GitPython==3.1.42
+          echo "full_image=$(python3 .ci/scripts/pr_labels.py --deps-changed ${{ github.event.pull_request.base.sha }} HEAD)" >> $GITHUB_OUTPUT
 
   lint:
     uses: "./.github/workflows/lint.yml"
@@ -83,12 +95,15 @@ jobs:
     uses: "./.github/workflows/build.yml"
 
   test:
-    needs: "build"
+    needs:
+      - "build"
+      - "check-changes"
     permissions:
       contents: "read"
       packages: "read"
     uses: "./.github/workflows/test.yml"
     with:
+      full_image: ${{ needs.check-changes.outputs.full_image == '1' }}
       matrix_env: |
         [{"TEST": "pulp"}, {"TEST": "azure"}, {"TEST": "gcp"}, {"TEST": "s3"}, {"TEST": "lowerbounds"}]
 

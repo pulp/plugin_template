@@ -32,7 +32,7 @@ tail -v -n +1 .ci/ansible/Containerfile
 
 echo
 echo "# Third-party requirements:"
-tail -v -n +1 .ci/assets/third-party-requirements.txt
+tail -v -n +1 .ci/assets/third-party-requirements.txt || echo "(overlay build; lockfile not compiled)"
 
 echo
 echo "# Constraints Files:"

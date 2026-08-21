@@ -16,14 +16,19 @@ on:
         required: true
         type: "string"
       cache_write:
-        description: "Push Docker layer cache to GHCR. Only enable from nightly; PR GITHUB_TOKEN cannot push packages."
+        description: "Push the prebuilt third-party deps image to GHCR. Only enable from nightly; PR GITHUB_TOKEN cannot push packages."
+        required: false
+        type: "boolean"
+        default: false
+      full_image:
+        description: "Force a full image build (dependency files changed)."
         required: false
         type: "boolean"
         default: false
 
 env:
   UV_SYSTEM_PYTHON: "1"
-  DOCKER_CACHE_WRITE: "{{ '${{ inputs.cache_write }}' }}"
+  DOCKER_DEPS_WRITE: "{{ '${{ inputs.cache_write }}' }}"
 
 defaults:
   run:
@@ -80,8 +85,26 @@ jobs:
 
       {{ setup_env() | indent(6) }}
 
-      - name: "Set up Docker Buildx"
-        uses: "docker/setup-buildx-action@v4"
+      - name: "Choose image build mode"
+        run: |
+          overlay=true
+          if [ "{{ '${{ inputs.cache_write }}' }}" = "true" ]; then
+            overlay=false
+            echo "Nightly: full image build and push deps image"
+          elif [ "{{ '${{ inputs.full_image }}' }}" = "true" ]; then
+            overlay=false
+            echo "Dependency files changed: full image build"
+          elif [[ ",${PR_LABELS}," == *",no-cache,"* ]]; then
+            overlay=false
+            echo "no-cache label present: full image build"
+          else
+            echo "Overlay PR wheel on the nightly deps image"
+          fi
+          echo "DOCKER_OVERLAY=${overlay}" >> "$GITHUB_ENV"
+        env:
+          {%- raw %}
+          PR_LABELS: "${{ join(github.event.pull_request.labels.*.name, ',') }}"
+          {%- endraw %}
 
       - name: "Login to GHCR"
         uses: "docker/login-action@v4"

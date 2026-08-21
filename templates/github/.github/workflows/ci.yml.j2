@@ -45,6 +45,7 @@ jobs:
       {%- raw %}
       run_tests: "${{ steps.check.outputs.run_tests }}"
       run_docs: "${{ steps.check.outputs.run_docs }}"
+      full_image: "${{ steps.check.outputs.full_image }}"
       {%- endraw %}
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
@@ -75,6 +76,12 @@ jobs:
             exit $exit_code
           fi
           echo "run_tests=$exit_code" >> $GITHUB_OUTPUT
+          set -e
+          if [ -n "$BASE_REF" ]; then
+            echo "full_image=$(python3 .ci/scripts/pr_labels.py --deps-changed $BASE_REF HEAD)" >> $GITHUB_OUTPUT
+          else
+            echo "full_image=1" >> $GITHUB_OUTPUT
+          fi
 
   {%- if is_pulpdocs_member %}
 
@@ -101,12 +108,17 @@ jobs:
     uses: "./.github/workflows/build.yml"
 
   test:
-    needs: "build"
+    needs:
+      - "build"
+      - "check-changes"
     permissions:
       contents: "read"
       packages: "read"
     uses: "./.github/workflows/test.yml"
     with:
+      {%- raw %}
+      full_image: ${{ needs.check-changes.outputs.full_image == '1' }}
+      {%- endraw %}
       matrix_env: |
         {{ matrix_env() | from_yaml | tojson }}
   {%- if test_deprecations %}

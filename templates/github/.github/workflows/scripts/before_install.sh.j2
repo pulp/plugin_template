@@ -53,34 +53,46 @@ if [ "$TEST" = "gcp" ]; then
 fi
 {%- endif %}
 
-if [[ "$TEST" = "pulp" ]]; then
-  python3 .ci/scripts/calc_constraints.py -u {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > upperbounds_constraints.txt
-fi
-if [[ "$TEST" = "lowerbounds" ]]; then
-  python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
+DEPS_REF="ghcr.io/{{ github_org }}/{{ plugin_name | dash }}-ci-deps:${TEST}"
+OVERLAY=false
+if [ "${DOCKER_OVERLAY:-false}" = "true" ]; then
+  if docker pull "${DEPS_REF}"; then
+    OVERLAY=true
+  else
+    echo "Prebuilt deps image ${DEPS_REF} is missing; falling back to a full image build"
+  fi
 fi
 
-# Pin third-party deps without the PR wheel so the image's first RUN can cache.
-COMPILE_ARGS=(
-  --no-header
-  --no-annotate
-  --no-emit-package "{{ plugin_name | snake }}"
-  --python-version "{{ python_version }}"
-  --python-platform linux
-  -o .ci/assets/third-party-requirements.txt
-  -c .ci/assets/ci_constraints.txt
-)
-if [[ "$TEST" = "pulp" ]]; then
-  COMPILE_ARGS+=(-c upperbounds_constraints.txt)
+if [ "$OVERLAY" != "true" ]; then
+  if [[ "$TEST" = "pulp" ]]; then
+    python3 .ci/scripts/calc_constraints.py -u {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > upperbounds_constraints.txt
+  fi
+  if [[ "$TEST" = "lowerbounds" ]]; then
+    python3 .ci/scripts/calc_constraints.py {% if setup_py -%} requirements.txt {% else -%} pyproject.toml {% endif -%} > lowerbounds_constraints.txt
+  fi
+
+  # Pin third-party deps without the PR wheel so nightly can publish a reusable deps image.
+  COMPILE_ARGS=(
+    --no-header
+    --no-annotate
+    --no-emit-package "{{ plugin_name | snake }}"
+    --python-version "{{ python_version }}"
+    --python-platform linux
+    -o .ci/assets/third-party-requirements.txt
+    -c .ci/assets/ci_constraints.txt
+  )
+  if [[ "$TEST" = "pulp" ]]; then
+    COMPILE_ARGS+=(-c upperbounds_constraints.txt)
+  fi
+  if [[ "$TEST" = "lowerbounds" ]]; then
+    COMPILE_ARGS+=(-c lowerbounds_constraints.txt)
+  fi
+  if [[ -s ci_requirements.txt ]]; then
+    COMPILE_ARGS+=(-r ci_requirements.txt)
+  fi
+  printf '%s\n' "${COMPILE_PKGS[@]}" > .ci/assets/third-party-requirements.in
+  uv pip compile "${COMPILE_ARGS[@]}" .ci/assets/third-party-requirements.in
 fi
-if [[ "$TEST" = "lowerbounds" ]]; then
-  COMPILE_ARGS+=(-c lowerbounds_constraints.txt)
-fi
-if [[ -s ci_requirements.txt ]]; then
-  COMPILE_ARGS+=(-r ci_requirements.txt)
-fi
-printf '%s\n' "${COMPILE_PKGS[@]}" > .ci/assets/third-party-requirements.in
-uv pip compile "${COMPILE_ARGS[@]}" .ci/assets/third-party-requirements.in
 
 # Compose the scenario definition.
 mkdir -p .ci/ansible/vars
@@ -104,8 +116,9 @@ image:
   ci_base: "{{ ci_base_image + ":latest" }}"
   {% endif -%}
   wheel: "${DOCKER_WHEEL}"
-  cache_ref: "ghcr.io/{{ github_org }}/{{ plugin_name | dash }}-ci-cache:${TEST}"
-  cache_write: "${DOCKER_CACHE_WRITE:-false}"
+  deps_ref: "${DEPS_REF}"
+  deps_write: "${DOCKER_DEPS_WRITE:-false}"
+  overlay: "${OVERLAY}"
   ci_requirements: $(test -f ci_requirements.txt && echo -n true || echo -n false)
   upperbounds: $(test "${TEST}" = "pulp" && echo -n true || echo -n false)
   lowerbounds: $(test "${TEST}" = "lowerbounds" && echo -n true || echo -n false)

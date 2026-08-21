@@ -11,26 +11,33 @@
         src: "Containerfile.j2"
         dest: "Containerfile"
 
+    - name: "Push nightly deps image"
+      ansible.builtin.shell:
+        cmd: |
+          set -eu
+          docker build --network host \
+            --target deps \
+            -t "{{ image.deps_ref }}" \
+            -f "{{ playbook_dir }}/Containerfile" \
+            ../../..
+          docker push "{{ image.deps_ref }}"
+      args:
+        executable: "/bin/bash"
+      when: "image.deps_write | default(false) | bool"
+
     - name: "Build pulp image"
       # Build from the parent of the plugin checkout so extra repos can be ADD'd
-      # via relative paths. GitHub Actions imports/exports layer cache via GHCR
-      # (nightly writes, PRs only read). Local builds use the engine's own cache.
-      # Pass -e cache=false to force a full rebuild.
+      # via relative paths. Nightly pushes the `deps` stage to GHCR; PRs pull it
+      # and overlay the PR wheel unless no-cache / dep-file changes force a
+      # full rebuild. Pass -e cache=false to force a full rebuild locally.
       ansible.builtin.shell:
         cmd: |
           set -eu
           extra=()
-          if [ "{{ cache | default(true) | bool }}" = "True" ]; then
-            if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
-              extra+=(--cache-from "type=registry,ref={{ image.cache_ref }},ignore-error=true")
-              if [ "{{ image.cache_write | default(false) | bool }}" = "True" ]; then
-                extra+=(--cache-to "type=registry,ref={{ image.cache_ref }},mode=max,image-manifest=true,oci-mediatypes=true")
-              fi
-            fi
-          else
+          if [ "{{ cache | default(true) | bool }}" != "True" ]; then
             extra+=(--no-cache)
           fi
-          docker buildx build --network host --load \
+          docker build --network host \
             -t "{{ image.name }}:{{ image.tag }}" \
             -f "{{ playbook_dir }}/Containerfile" \
             "${extra[@]}" \

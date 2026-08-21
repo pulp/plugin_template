@@ -1,12 +1,18 @@
-FROM {{ image.ci_base }}
+{% if image.overlay | default(false) | bool %}
+FROM {{ image.deps_ref }}
+{% else %}
+FROM {{ image.ci_base }} AS deps
 
 # Third-party deps are compiled on the host into a lockfile that does not include
-# the PR wheel, so this layer can be reused across CI runs.
+# the PR wheel. Nightly pushes this `deps` stage; PRs that do not touch deps overlay
+# the PR wheel on that image instead of reinstalling packages.
 COPY ./{{ plugin_name }}/.ci/assets/third-party-requirements.txt /tmp/third-party-requirements.txt
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --upgrade setuptools wheel && \
     uv pip install -r /tmp/third-party-requirements.txt
 
+FROM deps
+{% endif %}
 {%- if image.webserver_snippet %}
 
 ADD ./{{ plugin_name }}/{{ plugin_name | replace("-", "_") }}/app/webserver_snippets/nginx.conf /etc/nginx/pulp/{{ plugin_name }}.conf
