@@ -106,19 +106,9 @@ jobs:
 
       - name: "Choose image build mode"
         run: |
+          # TEMP: force overlay on this PR to test the prebuilt deps images.
           overlay=true
-          if [ "${{ inputs.cache_write }}" = "true" ]; then
-            overlay=false
-            echo "Nightly: full image build and push deps image"
-          elif [ "${{ inputs.full_image }}" = "true" ]; then
-            overlay=false
-            echo "Dependency files changed: full image build"
-          elif [[ ",${PR_LABELS}," == *",no-cache,"* ]]; then
-            overlay=false
-            echo "no-cache label present: full image build"
-          else
-            echo "Overlay PR wheel on the nightly deps image"
-          fi
+          echo "TEMP: overlay PR wheel on the nightly deps image"
           echo "DOCKER_OVERLAY=${overlay}" >> "$GITHUB_ENV"
         env:
           PR_LABELS: "${{ join(github.event.pull_request.labels.*.name, ',') }}"

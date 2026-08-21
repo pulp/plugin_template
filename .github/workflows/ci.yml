@@ -79,7 +79,8 @@ jobs:
           echo "run_docs=1" >> $GITHUB_OUTPUT
           echo "run_tests=1" >> $GITHUB_OUTPUT
           uv pip install GitPython==3.1.42
-          echo "full_image=$(python3 .ci/scripts/pr_labels.py --deps-changed ${{ github.event.pull_request.base.sha }} HEAD)" >> $GITHUB_OUTPUT
+          # TEMP: force overlay on this PR to test the prebuilt deps images.
+          echo "full_image=0" >> $GITHUB_OUTPUT
 
   lint:
     uses: "./.github/workflows/lint.yml"
