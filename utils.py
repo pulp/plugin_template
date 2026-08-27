@@ -8,6 +8,8 @@ import requests_cache
 import tomlkit
 import tomllib
 import yaml
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 # Jinja tests and filters
 
@@ -92,6 +94,30 @@ def current_version(plugin_root_path):
         except Exception:
             current_version = "0.0.0.dev"
     return current_version
+
+
+DEFAULT_PYTHON_VERSION = "3.11"
+_PYTHON_MINOR_RANGE = range(6, 40)
+
+
+def python_version_from_requires(requires_python):
+    """Return the lowest CPython 3.x series that can satisfy requires-python."""
+    spec = SpecifierSet(requires_python)
+    for minor in _PYTHON_MINOR_RANGE:
+        # Probe a high micro so ">=3.11.4" still selects the 3.11 series.
+        if Version(f"3.{minor}.999") in spec:
+            return f"3.{minor}"
+    return DEFAULT_PYTHON_VERSION
+
+
+def min_python_version(plugin_root_path):
+    """Read [project] requires-python and return the minimum 3.x series, e.g. '3.11'."""
+    try:
+        path = plugin_root_path / "pyproject.toml"
+        requires_python = tomllib.loads(path.read_text())["project"]["requires-python"]
+        return python_version_from_requires(requires_python)
+    except Exception:
+        return DEFAULT_PYTHON_VERSION
 
 
 def get_pulpdocs_members(pulpdocs_branch="main") -> list[str]:

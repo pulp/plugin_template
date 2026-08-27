@@ -389,7 +389,7 @@ def write_template_section(
         "section": section,
         "setup_py": (plugin_root_dir / "setup.py").exists(),
         "ci_update_branches": utils.ci_update_branches(config),
-        "python_version": "3.11",
+        "python_version": utils.min_python_version(plugin_root_dir),
         "ci_update_hour": sum((ord(c) for c in config["plugin_app_label"])) % 24,
         "current_version": utils.current_version(plugin_root_dir),
         "pulpdocs_branch": PULPDOCS_BRANCH,
