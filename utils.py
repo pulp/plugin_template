@@ -275,3 +275,78 @@ def merge_toml(template, plugin_root_path, relative_path, template_vars):
         if output[-1] != "\n":
             output = output + "\n"
         path.write_text(output)
+
+
+PLUGIN_TEMPLATE_BEGIN = "<!-- BEGIN plugin-template -->"
+PLUGIN_TEMPLATE_END = "<!-- END plugin-template -->"
+CLAUDE_PLUGIN_NOTES_HEADING = "## Plugin-specific notes"
+
+
+def default_claude_cli_app_label(config: dict) -> str:
+    """
+    Pick a CLI plugin label for example commands.
+
+    pulpcore's monorepo demos pulp-file, so prefer a non-core app label there.
+    """
+    if config.get("claude_cli_app_label"):
+        return config["claude_cli_app_label"]
+    if config["plugin_name"] == "pulpcore":
+        labels = [p["app_label"] for p in config.get("plugins") or [] if p["app_label"] != "core"]
+        if "file" in labels:
+            return "file"
+        if labels:
+            return labels[0]
+        return "file"
+    return config["plugin_app_label"]
+
+
+def ensure_agents_md_symlink(plugin_root_path: Path) -> None:
+    """Point AGENTS.md at CLAUDE.md when AGENTS.md is missing."""
+    agents = plugin_root_path / "AGENTS.md"
+    if agents.exists() or agents.is_symlink():
+        return
+    agents.symlink_to("CLAUDE.md")
+
+
+def merge_marked_markdown(template, plugin_root_path, relative_path, template_vars):
+    """
+    Render a markdown template that owns content between plugin-template markers.
+
+    Content outside the BEGIN/END markers (typically plugin-specific notes after END) is
+    preserved across updates. Existing marker-less files are migrated under a plugin notes
+    heading so prior customizations are not lost.
+    """
+    managed = template.render(**template_vars).strip() + "\n"
+    if PLUGIN_TEMPLATE_BEGIN not in managed or PLUGIN_TEMPLATE_END not in managed:
+        raise ValueError(
+            f"Template for {relative_path} must include "
+            f"{PLUGIN_TEMPLATE_BEGIN!r} and {PLUGIN_TEMPLATE_END!r} markers."
+        )
+
+    path = plugin_root_path / relative_path
+    default_trailer = f"\n{CLAUDE_PLUGIN_NOTES_HEADING}\n\n"
+
+    if not path.exists():
+        content = managed + default_trailer
+    else:
+        existing = path.read_text()
+        if PLUGIN_TEMPLATE_BEGIN in existing and PLUGIN_TEMPLATE_END in existing:
+            before, rest = existing.split(PLUGIN_TEMPLATE_BEGIN, 1)
+            _, after = rest.split(PLUGIN_TEMPLATE_END, 1)
+            if not after.strip():
+                after = default_trailer
+            elif not after.startswith("\n"):
+                after = "\n" + after
+            content = before + managed.rstrip("\n") + after
+        else:
+            content = (
+                managed
+                + default_trailer
+                + "<!-- Migrated from pre-template CLAUDE.md; trim or rewrite as needed. -->\n\n"
+                + existing.lstrip()
+            )
+
+    path.write_text(content.rstrip() + "\n")
+
+    if relative_path == "CLAUDE.md":
+        ensure_agents_md_symlink(plugin_root_path)

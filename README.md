@@ -163,7 +163,19 @@ The following settings are stored in `template_config.yml`.
   ci_trigger            Value for the `on` clause on workflow/ci.yml (push, pull_request, etc...)
   ci_env                Environment variables to set for the CI build.
   lint_requirements     Boolean (defaults True) to enable upper bound check on requirements.txt
+
+  claude_cli_app_label  App label used in generated pulp-cli examples in CLAUDE.md. Defaults to
+                        `plugin_app_label`, or `file` for pulpcore.
+
+  claude_cli_examples   Optional list of pulp-cli example lines for CLAUDE.md. When set, replaces
+                        the default content/repository examples.
+
+  claude_bindings_note  Optional override for the client-bindings sentence in CLAUDE.md.
 ```
+
+`CLAUDE.md` is updated by `--github`. Content between `<!-- BEGIN plugin-template -->` and
+`<!-- END plugin-template -->` is managed; anything after the END marker (plugin-specific notes)
+is preserved. `AGENTS.md` is created as a symlink to `CLAUDE.md` when missing.
 
 # Bootstrap a new Pulp plugin
 
