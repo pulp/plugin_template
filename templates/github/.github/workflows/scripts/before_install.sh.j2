@@ -96,18 +96,18 @@ services:
 VARSYAML
 
 if [ "$TEST" = "s3" ]; then
-  MINIO_ACCESS_KEY=AKIAIT2Z5TDYPX3ARJBA
-  MINIO_SECRET_KEY=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
+  RUSTFS_ACCESS_KEY=AKIAIT2Z5TDYPX3ARJBA
+  RUSTFS_SECRET_KEY=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
   cat >> .ci/ansible/vars/main.yaml << VARSYAML
-  - name: "minio"
-    image: "minio/minio"
+  - name: "rustfs"
+    image: "rustfs/rustfs"
     env:
-      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
-      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+      RUSTFS_ACCESS_KEY: "${RUSTFS_ACCESS_KEY}"
+      RUSTFS_SECRET_KEY: "${RUSTFS_SECRET_KEY}"
     command: "server /data"
 s3_test: true
-minio_access_key: "${MINIO_ACCESS_KEY}"
-minio_secret_key: "${MINIO_SECRET_KEY}"
+rustfs_access_key: "${RUSTFS_ACCESS_KEY}"
+rustfs_secret_key: "${RUSTFS_SECRET_KEY}"
 pulp_scenario_settings: {{ pulp_settings_s3 | tojson }}
 # MinIO omits 100-continue on 0-byte PUTs; stock botocore hangs without this (boto/botocore#3123).
 pulp_scenario_env: {{ dict({"BOTO_EXPERIMENTAL__NO_EMPTY_CONTINUE": "true"}, **(pulp_env_s3 or {})) | tojson }}

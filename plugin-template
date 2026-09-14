@@ -118,7 +118,7 @@ DEFAULT_SETTINGS = {
                     "addressing_style": "path",
                     "signature_version": "s3v4",
                     "bucket_name": "pulp3",
-                    "endpoint_url": "http://minio:9000",
+                    "endpoint_url": "http://rustfs:9000",
                     "default_acl": "@none",
                 },
             },

@@ -157,7 +157,7 @@ The following settings are stored in `template_config.yml`.
 
   test_lowerbounds      Include lowerbounds job for running tests using lower bounds found in requirements.txt.
 
-  test_s3               Include s3 job for running tests using [minio](https://github.com/minio/minio)
+  test_s3               Include s3 job for running tests using [rustfs](https://github.com/rustfs/rustfs)
                         to emulate S3.
 
   ci_trigger            Value for the `on` clause on workflow/ci.yml (push, pull_request, etc...)
@@ -175,7 +175,7 @@ minimal code and tests.
    and tests.
 
    ``$ ./plugin-template --bootstrap PLUGIN_NAME``
-   
+
 In order to use these tests, you will need to address the "FIXME" messages left in places where
 plugin-writer intervention is required.
 
