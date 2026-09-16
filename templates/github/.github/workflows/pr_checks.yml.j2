@@ -36,13 +36,13 @@ jobs:
       pull-requests: "write"
     steps:
       {{ checkout(depth=0) | indent(6) }}
-      {{ setup_python() | indent(6) }}
+      {{ setup_python(pyversion="3.14") | indent(6) }}
       - name: "Determine PR labels"
         run: |
           {%- raw %}
           uv pip install GitPython==3.1.42
           git fetch origin ${{ github.event.pull_request.head.sha }}
-          python .ci/scripts/pr_labels.py "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          uv run --script .ci/scripts/pr_labels.py "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
           {%- endraw %}
       - uses: "actions/github-script@v8"
         name: "Apply PR Labels"
