@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import typing as t
+from contextlib import suppress
 from pathlib import Path
 
 import jamldump
@@ -334,6 +335,13 @@ def load_config(plugin_config_path: Path, verbose: bool) -> tuple[dict[str, t.An
     if "flake8_ignore" in config:
         config["lint_ignore"] = config.pop("flake8_ignore")
         write_new_config = True
+    # Migrate minio to rustfs
+    with suppress(KeyError):
+        if "s3boto3" in config["pulp_settings_s3"]["STORAGES"]["default"]["BACKEND"]:
+            config["pulp_settings_s3"]["STORAGES"]["default"]["OPTIONS"]["endpoint_url"] = (
+                "https://rustfs:9000"
+            )
+            write_new_config = True
     # remove deprecated options
     for key in set(config.keys()) - set(DEFAULT_SETTINGS.keys()):
         config.pop(key)
