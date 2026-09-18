@@ -40,7 +40,6 @@ jobs:
       - name: "Determine PR labels"
         run: |
           {%- raw %}
-          uv pip install GitPython==3.1.42
           git fetch origin ${{ github.event.pull_request.head.sha }}
           uv run --script .ci/scripts/pr_labels.py "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
           {%- endraw %}

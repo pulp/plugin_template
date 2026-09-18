@@ -26,7 +26,7 @@ jobs:
     steps:
       {{ checkout(path=plugin_name) | indent(6) }}
 
-      {{ setup_python() | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
 
       {{ install_python_deps(["-r", "lint_requirements.txt"]) | indent(6) }}
 

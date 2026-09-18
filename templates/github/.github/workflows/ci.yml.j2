@@ -22,21 +22,17 @@ defaults:
     working-directory: "{{ plugin_name }}"
 
 jobs:
-  {%- if check_commit_message or lint_requirements %}
+  {%- if check_commit_message %}
   check-commits:
     runs-on: "ubuntu-latest"
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
-      {{ setup_python() | indent(6) }}
-      {%- if check_commit_message %}
-      {{ install_python_deps(["requests", "pygithub", "pyyaml"]) | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
       - name: "Check commit message"
-        if: github.event_name == 'pull_request'
         env:
           {{ set_env_vars() | indent(10) }}
         run: |
           .github/workflows/scripts/check_commit.sh
-      {%- endif %}
   {%- endif %}
 
   check-changes:
@@ -49,9 +45,7 @@ jobs:
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
-      {{ setup_python() | indent(6) }}
-
-      {{ install_python_deps(["gitpython"]) | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
 
       - name: "Analyze changed files"
         id: "check"
@@ -68,7 +62,7 @@ jobs:
           BASE_REF={{ "${{ github.event.pull_request.base.sha }}" }}
           echo "Checking against:"
           git name-rev $BASE_REF
-          python3 .ci/scripts/skip_tests.py . $BASE_REF
+          uv run --script .ci/scripts/skip_tests.py . $BASE_REF
           exit_code=$?
           if [ $exit_code -ne 0 ] && [ $exit_code -ne 1 ]; then
             echo "Error: skip_tests.py returned unexpected exit code $exit_code"
