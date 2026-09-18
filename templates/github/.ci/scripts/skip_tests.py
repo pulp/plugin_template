@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gitpython>=3.1.62",
+# ]
+# ///
 """
 skip_tests.py - Check if only documentation files were changed in a git branch
 
@@ -18,9 +24,10 @@ Returns:
 import sys
 import os
 import re
-import git
 import textwrap
 import argparse
+
+import git
 
 DOC_PATTERNS = [
     r"^docs/",

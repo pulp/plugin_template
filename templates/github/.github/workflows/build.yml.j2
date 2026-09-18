@@ -25,7 +25,6 @@ jobs:
       {{ checkout(path=plugin_name) | indent(6) }}
       {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
       {{ setup_python() | indent(6) }}
-      {{ install_python_deps(["build", "packaging", "twine", "wheel", "mkdocs", "jq"]) | indent(6) }}
       {%- if os_required_packages %}
       - name: "Install OS packages"
         run: |
@@ -34,10 +33,11 @@ jobs:
       {%- endif %}
       - name: "Build package"
         run: |
-          python3 -m build
-          twine check dist/*
+          uv build
+          uvx twine check dist/*
       - name: "Install built packages"
         run: |
+          # This seems to be the only way to inject the constraints file.
           uv pip install dist/{{ plugin_name | snake }}-*-py3-none-any.whl -c .ci/assets/ci_constraints.txt
       - name: "Generate api specs"
         run: |
@@ -74,17 +74,6 @@ jobs:
           path: |
             {%- for plugin in plugins %}
             {{ plugin_name }}/{{ plugin.app_label }}-python-client.tar
-            {%- endfor %}
-          if-no-files-found: "error"
-          retention-days: 5
-          overwrite: true
-      - name: "Upload python client docs"
-        uses: "actions/upload-artifact@v7"
-        with:
-          name: "python-client-docs.tar"
-          path: |
-            {%- for plugin in plugins %}
-            {{ plugin_name }}/{{ plugin.app_label }}-python-client-docs.tar
             {%- endfor %}
           if-no-files-found: "error"
           retention-days: 5

@@ -38,7 +38,7 @@ jobs:
 
       {{ checkout(repository="pulp/pulp-openapi-generator", path="pulp-openapi-generator") | indent(6) }}
 
-      {{ setup_python() | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
 
       - name: "Download plugin package"
         uses: "actions/download-artifact@v8"
@@ -70,7 +70,7 @@ jobs:
           {%- endfor %}
       {%- endif %}
 
-      {{ install_python_deps(["build", "towncrier", "twine", "wheel", "httpie", "docker", "netaddr", "boto3", "ansible~=10.3.0", "mkdocs", "jq", "jsonpatch", "bump-my-version"]) | indent(6) }}
+      {{ install_python_deps(["httpie", "docker", "netaddr", "boto3", "ansible~=10.3.0", "mkdocs", "jsonpatch"]) | indent(6) }}
 
       {{ setup_env() | indent(6) }}
 

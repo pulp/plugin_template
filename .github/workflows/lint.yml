@@ -37,9 +37,8 @@ jobs:
       - name: "Lint plugin_template"
         working-directory: "plugin_template"
         run: |
-          uv pip install ruff
-          ruff format --check --diff plugin-template utils.py
-          ruff check plugin-template utils.py
+          uvx ruff format --check --diff plugin-template utils.py
+          uvx ruff check plugin-template utils.py
       - name: "Bootstrap catdog plugin"
         working-directory: "plugin_template"
         run: |
@@ -55,7 +54,7 @@ jobs:
         run: |
           yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
 
-      - name: "Check formatting"
+      - name: "Check formating"
         run: |
           ruff format --check --diff
 

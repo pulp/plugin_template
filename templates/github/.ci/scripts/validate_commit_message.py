@@ -1,14 +1,22 @@
 # This file is managed by the plugin template.
 # Do not edit.
 
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pygithub",
+#     "pyyaml",
+# ]
+# ///
+
 import os
 import re
 import subprocess
 import sys
 import tomllib
-import yaml
 from pathlib import Path
 
+import yaml
 from github import Github
 
 

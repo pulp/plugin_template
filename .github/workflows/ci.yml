@@ -23,7 +23,7 @@ jobs:
           path: "plugin_template"
       - uses: "actions/setup-python@v6"
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: "Install uv"
         uses: "astral-sh/setup-uv@v7"
         with:
@@ -34,9 +34,7 @@ jobs:
           .ci/bootstrap_catdog.sh
 
       # Below this line we include the steps of the ci workflow of the generated plugin
-      - name: "Install python dependencies"
-        run: |
-          uv pip install requests pygithub pyyaml
+
       - name: "Check commit message"
         # This will fail for our fake plugin
         if: false
