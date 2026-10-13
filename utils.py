@@ -1,12 +1,12 @@
 import re
 import stat
 import textwrap
+import tomllib
 from datetime import timedelta
 from pathlib import Path
 
 import requests_cache
 import tomlkit
-import tomllib
 import yaml
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version

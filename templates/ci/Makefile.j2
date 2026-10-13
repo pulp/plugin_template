@@ -10,7 +10,7 @@ lint:
 	yamllint -s -d '{extends: relaxed, rules: {line-length: disable}}' .github/workflows
 	bump-my-version bump --dry-run --allow-dirty release
 	ruff format --check --diff
-	ruff check
+	ruff check --output-format concise
 	{%- if check_manifest %}
 	check-manifest
 	{%- endif %}
@@ -20,3 +20,4 @@ lint:
 	{%- if check_stray_pulpcore_imports %}
 	sh .ci/scripts/check_pulpcore_imports.sh
 	{%- endif %}
+	python .ci/scripts/check_changelog_snippets.py
