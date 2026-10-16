@@ -185,6 +185,8 @@ DEPRECATED_FILES = {
         ".github/workflows/scripts/publish_client_gem.sh",
         ".github/workflows/scripts/publish_client_pypi.sh",
         ".github/workflows/scripts/publish_plugin_pypi.sh",
+        ".github/workflows/scripts/push_branch_and_tag_to_github.sh",
+        ".github/workflows/scripts/secrets.py",
         ".travis",
         ".travis.yml",
         "dev_requirements.txt",

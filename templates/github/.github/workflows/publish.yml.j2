@@ -1,17 +1,12 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
-  set_env_vars,
   checkout,
   setup_python,
   setup_ruby,
-  display_logs,
   run_script,
-  set_secrets,
-  install_python_deps,
-  configure_git,
 with context %}
 ---
-name: "{{ plugin_app_label | camel }} Publish Release"
+name: "Publish Release"
 on:
   push:
     tags:
@@ -149,17 +144,13 @@ jobs:
 
       {{ setup_python(pyversion="3.11") | indent(6) }}
 
-      - name: "Install towncrier"
-        run: |
-          uv pip install towncrier
-
       - name: "Get release notes"
         id: "get_release_notes"
         shell: "bash"
         run: |
           # The last commit before the release commit contains the release CHANGES fragments
           git checkout "${TAG_NAME}~"
-          NOTES=$(towncrier build --draft --version $TAG_NAME | .ci/scripts/clean_gh_release_notes.py {{ plugin_name }} $TAG_NAME)
+          NOTES=$(uvx towncrier build --draft --version $TAG_NAME | uv run --script .ci/scripts/clean_gh_release_notes.py {{ plugin_name }} $TAG_NAME)
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

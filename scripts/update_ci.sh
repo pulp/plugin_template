@@ -18,8 +18,14 @@ then
     "template_config.yml"
 fi
 
-PLUGIN_NAME="$(python ../plugin_template/scripts/get_template_config_value.py plugin_name)"
-CI_UPDATE_DOCS="$(python ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
+if [[ $(git status --porcelain) ]]
+then
+  echo "Working directory not clean. Aborting."
+  exit 1
+fi
+
+PLUGIN_NAME="$(uv run --script ../plugin_template/scripts/get_template_config_value.py plugin_name)"
+CI_UPDATE_DOCS="$(uv run --script ../plugin_template/scripts/get_template_config_value.py ci_update_docs)"
 
 if [[ "${CI_UPDATE_DOCS}" == "True" ]]; then
   DOCS=("--docs")
@@ -27,10 +33,7 @@ else
   DOCS=()
 fi
 
-pushd ../plugin_template
-  pip install -r requirements.txt
-  ./plugin-template --github "${DOCS[@]}" "${PLUGIN_NAME}"
-popd
+uv run --script ../plugin_template/plugin-template --github "${DOCS[@]}"
 
 if [[ $(git status --porcelain) ]]; then
   git add -A
@@ -41,7 +44,7 @@ fi
 
 # Check that pulpcore lowerbounds is set to a supported branch
 if [[ "${PLUGIN_NAME}" != "pulpcore" ]]; then
-  python ../plugin_template/scripts/update_core_lowerbound.py
+  uv run --script ../plugin_template/scripts/update_core_lowerbound.py
   if [[ $(git status --porcelain) ]]; then
     git add -A
     git commit -m "Bump pulpcore lowerbounds to supported branch"

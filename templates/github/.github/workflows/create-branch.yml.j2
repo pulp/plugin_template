@@ -2,7 +2,6 @@
 {% from 'macros.j2' import
   checkout,
   setup_python,
-  set_secrets,
   install_python_deps
 with context %}
 ---
@@ -23,17 +22,16 @@ jobs:
 
     permissions:
       contents: "write"
+      pull-requests: "write"
 
     steps:
       {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
       {{ checkout(repository="pulp/plugin_template", path="plugin_template") | indent(6) }}
 
-      {{ setup_python() | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
 
       {{ install_python_deps(["bump-my-version", "packaging", "-r", "plugin_template/requirements.txt"]) | indent(6) }}
-
-      {{ set_secrets(path=plugin_name) | indent(6) }}
 
       - name: "Determine new branch name"
         working-directory: "{{ plugin_name }}"
@@ -73,9 +71,6 @@ jobs:
         uses: "peter-evans/create-pull-request@v8"
         with:
           path: "{{ plugin_name }}"
-          {%- raw %}
-          token: "${{ secrets.RELEASE_TOKEN }}"
-          {%- endraw %}
           committer: "{{release_user}} <{{ release_email }}>"
           author: "{{release_user}} <{{ release_email }}>"
           branch: "minor-version-bump"

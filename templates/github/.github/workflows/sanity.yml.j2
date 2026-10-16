@@ -28,23 +28,21 @@ jobs:
 
       {{ setup_python(pyversion="3.12") | indent(6) }}
 
-      {{ install_python_deps(["-r", "lint_requirements.txt"]) | indent(6) }}
-
       - name: "Verify bump version config"
         run: |
-          bump-my-version bump --dry-run release
-          bump-my-version show-bump
+          uvx bump-my-version bump --dry-run release
+          uvx bump-my-version show-bump
       {%- if check_manifest %}
 
       - name: "Check for any files unintentionally left out of MANIFEST.in"
         run: |
-          check-manifest
+          uvx check-manifest
       {%- endif %}
       {%- if lint_requirements %}
 
       - name: "Verify requirements files"
         run: |
-          python .ci/scripts/check_requirements.py
+          uv run --script .ci/scripts/check_requirements.py
       {%- endif %}
       {%- if check_stray_pulpcore_imports %}
 

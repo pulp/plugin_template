@@ -2,15 +2,11 @@
 {% from 'macros.j2' import
   checkout,
   configure_git,
-  display_logs,
-  install_python_deps,
   matrix_env,
-  run_script,
-  setup_env,
   setup_python,
 with context %}
 ---
-name: "{{ plugin_app_label | camel }} Nightly CI"
+name: "Nightly CI"
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
@@ -49,21 +45,19 @@ jobs:
 
       {{ setup_python(pyversion="3.13") | indent(6) }}
 
-      {{ install_python_deps(["gitpython", "packaging", "toml"]) | indent(6) }}
-
       {{ configure_git() | indent(6) }}
 
       - name: "Collect changes from all branches"
         run: |
-          python .ci/scripts/collect_changes.py
+          uv run --script .ci/scripts/collect_changes.py
 
       - name: "Create Pull Request"
         uses: "peter-evans/create-pull-request@v8"
         id: "create_pr_changelog"
+        permissions:
+          contents: "write"
+          pull-requests: "write"
         with:
-          {%- raw %}
-          token: "${{ secrets.RELEASE_TOKEN }}"
-          {%- endraw %}
           title: "Update Changelog"
           body: ""
           branch: "changelog/update"
@@ -71,6 +65,9 @@ jobs:
           path: "{{ plugin_name }}"
       - name: "Mark PR automerge"
         working-directory: "{{ plugin_name }}"
+        permissions:
+          contents: "write"
+          pull-requests: "write"
         run: |
           {%- raw %}
           gh pr merge --rebase --auto "${{ steps.create_pr_changelog.outputs.pull-request-number }}"
@@ -78,7 +75,7 @@ jobs:
         if: "steps.create_pr_changelog.outputs.pull-request-number"
         env:
           {%- raw %}
-          GH_TOKEN: "${{ secrets.RELEASE_TOKEN }}"
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           {%- endraw %}
         continue-on-error: true
 ...

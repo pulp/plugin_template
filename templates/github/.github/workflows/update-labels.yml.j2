@@ -1,12 +1,10 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
   setup_python,
-  configure_git,
-  install_python_deps,
 with context %}
 
 ---
-name: "{{ plugin_app_label | camel }} Update Labels"
+name: "Update Labels"
 on:
   push:
     branches:
@@ -22,13 +20,14 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       {{ setup_python(pyversion="3.12") | indent(6) }}
-      {{ configure_git() | indent(6) }}
       - uses: "actions/checkout@v6"
       - name: "Update labels"
+        permissions:
+          issues: "write"
         run: |
           uv run --script .github/workflows/scripts/update_backport_labels.py
         env:
           {%- raw %}
-          GITHUB_TOKEN: "${{ secrets.RELEASE_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           {%- endraw %}
 ...

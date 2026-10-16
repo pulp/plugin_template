@@ -2,7 +2,6 @@
 {% from 'macros.j2' import
   checkout,
   setup_python,
-  install_python_deps,
   configure_git,
 with context %}
 
@@ -30,9 +29,7 @@ jobs:
     steps:
       {{ checkout(repository="pulp/plugin_template", path="plugin_template", depth=0) | indent(6) }} %# "depth=0" is needed to run "git describe".
 
-      {{ setup_python() | indent(6) }}
-
-      {{ install_python_deps(["gitpython", "packaging", "-r", "plugin_template/requirements.txt"]) | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
 
       {{ configure_git() | indent(6) }}
 
@@ -48,10 +45,10 @@ jobs:
       - name: "Create Pull Request for CI files"
         uses: "peter-evans/create-pull-request@v8"
         id: "create_pr_{{ branch_slug }}"
+        permissions:
+          contents: "write"
+          pull-requests: "write"
         with:
-          {%- raw %}
-          token: "${{ secrets.RELEASE_TOKEN }}"
-          {%- endraw %}
           path: "{{ plugin_name }}"
           committer: "{{ release_user }} <{{ release_email }}>"
           author: "{{ release_user }} <{{ release_email }}>"
@@ -61,12 +58,15 @@ jobs:
           delete-branch: true
       - name: "Mark PR automerge"
         working-directory: "{{ plugin_name }}"
+        permissions:
+          contents: "write"
+          pull-requests: "write"
         run: |
           gh pr merge --rebase --auto "{{ '${{ steps.create_pr_' + branch_slug + '.outputs.pull-request-number }}' }}"
         if: "steps.create_pr_{{ branch_slug }}.outputs.pull-request-number"
         env:
           {%- raw %}
-          GH_TOKEN: "${{ secrets.RELEASE_TOKEN }}"
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           {%- endraw %}
         continue-on-error: true
       {%- endfor %}

@@ -1,17 +1,13 @@
 {% include 'header.j2' %}
 {% from 'macros.j2' import
-  set_env_vars,
   checkout,
   setup_python,
-  setup_ruby,
-  display_logs,
   run_script,
-  set_secrets,
   install_python_deps,
   configure_git,
 with context %}
 ---
-name: {{ plugin_app_label | camel }} Release Pipeline
+name: "Tag Release"
 on:
   workflow_dispatch:
 
@@ -29,16 +25,15 @@ jobs:
     strategy:
       fail-fast: false
 
+    permissions:
+      contents: "write"
+
     steps:
-      {{ checkout(depth=0, path=plugin_name, use_release_token=true) | indent(6) }}
+      {{ checkout(depth=0, path=plugin_name) | indent(6) }}
 
-      {{ setup_python() | indent(6) }}
-
-      {{ install_python_deps(["bump-my-version", "towncrier"]) | indent(6) }}
+      {{ setup_python(pyversion="3.12") | indent(6) }}
 
       {{ configure_git() | indent(6) }}
-
-      {{ set_secrets() | indent(6) }}
 
       {{ run_script(name="Tag the release", file="release.sh") | indent(6) }}
 ...

@@ -14,7 +14,7 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
 {%- endmacro -%}
 
 
-{%- macro checkout(depth=1, repository=None, path=None, ref=None, use_release_token=false) -%}
+{%- macro checkout(depth=1, repository=None, path=None, ref=None) -%}
 - uses: "actions/checkout@v6"
   with:
     fetch-depth: {{ depth }}
@@ -26,9 +26,6 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
     {%- endif %}
     {%- if ref %}
     ref: "{{ ref }}"
-    {%- endif %}
-    {%- if use_release_token %}
-    token: {{ "${{ secrets.RELEASE_TOKEN }}" }}
     {%- endif %}
 {%- endmacro -%}
 
@@ -115,21 +112,6 @@ GITHUB_CONTEXT: "{{ '${{ github.event.pull_request.commits_url }}' }}"
   env:
     {{ set_env_vars(extra_env) | indent(4) }}
   {%- endif %}
-{%- endmacro -%}
-
-
-{%- macro set_secrets(condition=None, path=None) -%}
-- name: "Setting secrets"
-  {%- if path %}
-  working-directory: "{{ path }}"
-  {%- endif %}
-  {%- if condition %}
-  if: {{ condition }}
-  {%- endif %}
-  run: |
-    python3 .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
-  env:
-    SECRETS_CONTEXT: "{{ '${{ toJson(secrets) }}' }}"
 {%- endmacro -%}
 
 
