@@ -1,9 +1,19 @@
 {% include 'header.j2' %}
+#!/usr/bin/env python
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "packaging>=26.0,<27",
+#     "pyyaml>=6.0.3,<6.1",
+#     "tomli;python_version<'3.11'",
+# ]
+# ///
 
 import argparse
 import fileinput
 import urllib.request
 import sys
+
 from packaging.requirements import Requirement
 from packaging.version import Version
 import yaml
