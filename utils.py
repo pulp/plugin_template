@@ -97,7 +97,7 @@ def current_version(plugin_root_path):
 
 
 DEFAULT_PYTHON_VERSION = "3.11"
-_PYTHON_MINOR_RANGE = range(6, 40)
+_PYTHON_MINOR_RANGE = range(11, 40)
 
 
 def python_version_from_requires(requires_python):
@@ -111,7 +111,7 @@ def python_version_from_requires(requires_python):
 
 
 def min_python_version(plugin_root_path):
-    """Read [project] requires-python and return the minimum 3.x series, e.g. '3.11'."""
+    """Read [project] requires-python and return the minimum 3.x series, but never less than '3.11'."""
     try:
         path = plugin_root_path / "pyproject.toml"
         requires_python = tomllib.loads(path.read_text())["project"]["requires-python"]
